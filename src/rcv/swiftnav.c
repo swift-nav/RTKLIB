@@ -70,7 +70,7 @@ static const uint32_t CRC_16CCIT_LookUp[256] = {
     0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0};
 
 /* it's easy to derive a function for the values below, but I'd rather map the table explicitly from the RTCM standard document */
-static const uint32_t uRtcmPhaseRangeLockTimeTable[16] = {
+static const uint32_t puRtcmPhaseRangeLockTimeTable[16] = {
     0, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288
 };
 
@@ -110,18 +110,17 @@ static gtime_t adjday(gtime_t time, double tod)
 
 
 /* flush observation data buffer ---------------------------------------------*/
-static int flushobuf(raw_t *raw)
-{
+static int flushobuf(raw_t *raw) {
     gtime_t time0={0};
     int i,j,n=0;
 
-    trace(3,"flushobuf: n=%d\n",raw->obuf.n);
+    trace(3,"flushobuf: n=%d\n", raw->obuf.n);
 
     /* copy observation data buffer */
-    for (i=0;i<raw->obuf.n&&i<MAXOBS;i++) {
+    for (i=0; i<raw->obuf.n && i<MAXOBS; i++) {
         if (!satsys(raw->obuf.data[i].sat,NULL)) continue;
         if (raw->obuf.data[i].time.time==0) continue;
-        raw->obs.data[n++]=raw->obuf.data[i];
+        raw->obs.data[n++] = raw->obuf.data[i];
     }
     raw->obs.n=n;
 
@@ -146,15 +145,32 @@ static void clearbuff(raw_t *raw) {
 
 /* appropriate calculation of LLI for SBP */
 static uint8_t calculate_loss_of_lock(double dt, uint32_t prev_lock_time, uint32_t curr_lock_time) {
-  if (prev_lock_time > curr_lock_time) return 1;
-  else if ((prev_lock_time == curr_lock_time) && (dt >= prev_lock_time)) return 1;
-  else if ((prev_lock_time == curr_lock_time) && (dt < prev_lock_time)) return 0;
+  if (prev_lock_time > curr_lock_time) {
+/*    fprintf(stderr, "prev_lock_time %d curr_lock_time %d\n", prev_lock_time, curr_lock_time);*/
+    return 1;
+  }
+  else if ((prev_lock_time == curr_lock_time) && (dt >= prev_lock_time)) {
+    /*fprintf(stderr, "2\n");*/
+    return 1;
+  }
+  else if ((prev_lock_time == curr_lock_time) && (dt < prev_lock_time)) {
+    return 0;
+  }
   else if ((prev_lock_time < curr_lock_time) && \
-      (dt >= (2 * curr_lock_time - prev_lock_time))) return 1;
+      (dt >= (2 * curr_lock_time - prev_lock_time))) {
+    /*fprintf(stderr, "3\n");*/
+    return 1;
+  }
   else if ((prev_lock_time < curr_lock_time) && \
-     (curr_lock_time < dt && dt < (2 * curr_lock_time - prev_lock_time))) return 1;
+     (curr_lock_time < dt && dt < (2 * curr_lock_time - prev_lock_time))) {
+    /*fprintf(stderr, "4\n");*/
+    return 1;
+  }
   else if ((prev_lock_time < curr_lock_time) && (dt <= curr_lock_time)) return 0;
-  else return 1;
+  else {
+    /*fprintf(stderr, "5\n");*/
+    return 1;
+  }
 }
 
 /* decode SBF measurements message (observables) -----------------------------*/
@@ -164,7 +180,7 @@ static int decode_msgobs(raw_t *raw){
   int16_t i,ii,sat,n,week;
   uint8_t *p=(raw->buff)+6;                   /* jump to TOW location */
   uint8_t  uNobs, uLockInfo;
-  uint32_t sys, uPrevLockTime, uCurrLockTime;
+  uint32_t sys, uPrevLockTime=0, uCurrLockTime=0;
   uint8_t   uFlags, uSatId, uBandCode, uCN0, uCode, uFreq, uSlip, uHalfC;
   int iDidFlush=0, iSatFound=0;
 
@@ -185,7 +201,6 @@ static int decode_msgobs(raw_t *raw){
   if ((dDeltaTime)>1E-6) {
     n = 0;
     iDidFlush = flushobuf(raw);
-    /*raw->time = time;*/
   } else {
     n = raw->obuf.n;
     iDidFlush = 0;
@@ -246,19 +261,24 @@ static int decode_msgobs(raw_t *raw){
       }
     }
 
+/*    fprintf(stderr, "%.1f (raw->halfc[%d][%d]) %u  uLockInfo %u \n",
+        0.001*tow,
+        sat-1, uFreq, (raw->halfc[sat-1][uFreq]),
+        uLockInfo);*/
+
     raw->obuf.data[ii].time = time;
     raw->obuf.data[ii].sat  = sat;
 
     /* store signal info */
-    if (uFreq <= NFREQ+NEXOBS) {
+    if (uFreq < NFREQ+NEXOBS) {
       raw->obuf.data[ii].L[uFreq]    = dCarrPhase;
       raw->obuf.data[ii].P[uFreq]    = dPseudoRng;
       raw->obuf.data[ii].D[uFreq]    = (float) dDoppler;
       raw->obuf.data[ii].SNR[uFreq]  = uCN0;
       raw->obuf.data[ii].code[uFreq] = uCode;
 
-      uPrevLockTime = uRtcmPhaseRangeLockTimeTable[(int) rint((raw->lockt[sat-1][uFreq]))];
-      uCurrLockTime = uRtcmPhaseRangeLockTimeTable[(uLockInfo)];
+      uPrevLockTime = puRtcmPhaseRangeLockTimeTable[(raw->halfc[sat-1][uFreq])];
+      uCurrLockTime = puRtcmPhaseRangeLockTimeTable[uLockInfo];
       uSlip  = (uLockInfo==0) ? 0x1 : 0x0;
       uSlip |= calculate_loss_of_lock(dDeltaTime*1000.0, uPrevLockTime, uCurrLockTime);
       uHalfC = (uFlags & 0x4) ? 0:1;
@@ -267,8 +287,7 @@ static int decode_msgobs(raw_t *raw){
       }
 
       raw->obuf.data[ii].LLI[uFreq] |= uSlip;
-      raw->halfc[sat-1][uFreq] = uHalfC;
-      raw->lockt[sat-1][uFreq] = (double) uLockInfo;
+      raw->halfc[sat-1][uFreq] = uLockInfo;
     }
 
     /* Receiver channel goes up */
@@ -411,6 +430,8 @@ static int decode_sbp(raw_t *raw)
   /* read the SBF block ID and revision */
   int type   = U2(raw->buff+1);
   int sender = U2(raw->buff+3);
+
+  if (sender==0) return 0;
 
   trace(3,"decode_sbp: type=%04x len=%d\n",type,raw->len);
 
