@@ -221,9 +221,9 @@ void MainWindow::SetOutFiles(const QString &infile)
     QString OutDir_Text=OutDir->text();
     QString ofile[8];
     int i,lex=Format_Text.contains("LEX");
-    
+
     if (!EventEna) return;
-    
+
     if (OutDirEna->isChecked()) {
         QFileInfo info(infile);
 
@@ -328,14 +328,14 @@ void MainWindow::BtnPlotClick()
         OutFileEna1,OutFileEna2,OutFileEna3,OutFileEna4,OutFileEna5,OutFileEna6
     };
     int i,ena[6];
-    
+
     for (i=0;i<6;i++) ena[i]=cb[i]->isEnabled()&&cb[i]->isChecked();
-    
+
     for (i=0;i<6;i++) {
         if (ena[i]) opts=opts+" \""+RepPath(file[i])+"\"";
     }
     if (opts==" -r") return;
-    
+
     if (!ExecCmd(cmd1+opts)&&!ExecCmd(cmd2+opts)) {
         Message->setText(tr("error : rtkplot execution"));
     }
@@ -345,12 +345,12 @@ void MainWindow::BtnPostClick()
 {
     QString path2="..\\..\\..\\bin\\";
     QString cmd1=CmdPostExe,cmd2=path2+CmdPostExe,opts=" ";
-    
+
     if (!OutFileEna1->isChecked()) return;
-    
+
     opts=opts+" -r \""+OutFile1->text()+"\"";
     opts=opts+" -n \"\" -n \"\"";
-    
+
     if (OutFileEna7->isChecked()) {
         opts=opts+" -n \""+OutFile7->text()+"\"";
     }
@@ -358,7 +358,7 @@ void MainWindow::BtnPostClick()
     if (TimeEndF  ->isChecked()) opts=opts+" -te "+TimeY2->text()+" "+TimeH2->text();
     if (TimeIntF  ->isChecked()) opts=opts+" -ti "+TimeInt->currentText();
     if (TimeUnitF ->isChecked()) opts=opts+" -tu "+TimeUnit->text();
-    
+
     if (!ExecCmd(cmd1+opts)&&!ExecCmd(cmd2+opts)) {
         Message->setText(tr("error : rtkpost execution"));
     }
@@ -409,9 +409,9 @@ void MainWindow::BtnTime2Click()
 }
 // callback on button-input-file --------------------------------------------
 void MainWindow::BtnInFileClick()
-{    
+{
     InFile->setCurrentText(QDir::toNativeSeparators(QFileDialog::getOpenFileName(this,tr("Input RTCM, RCV RAW or RINEX OBS File"),QString(),
-         tr("All (*.*);;RTCM 2 (*.rtcm2);;RTCM 3 (*.rtcm3);;NovtAtel (*.gps);;ublox (*.ubx);;SuperStart II (*.log);;"
+         tr("All (*.*);;RTCM 2 (*.rtcm2);;RTCM 3 (*.rtcm3);;NovtAtel (*.gps);;ublox (*.ubx);;Swiftnav (*.sbp);;"
             "Hemisphere (*.bin);;Javad (*.jps);;RINEX OBS (*.obs *.*O);Septentrio (*.sbf)"))));
     SetOutFiles(InFile->currentText());
 }
@@ -689,7 +689,7 @@ void MainWindow::ConvertFile(void)
     int i;
     char *p;
     double RNXVER[]={2.10,2.11,2.12,3.00,3.01,3.02,3.03};
-    
+
     conversionThread= new ConversionThread(this);
 
     // recognize input file format
@@ -700,7 +700,7 @@ void MainWindow::ConvertFile(void)
         else if (fi.completeSuffix()=="rtcm3") conversionThread->format=STRFMT_RTCM3;
         else if (fi.completeSuffix()=="gps"  ) conversionThread->format=STRFMT_OEM4;
         else if (fi.completeSuffix()=="ubx"  ) conversionThread->format=STRFMT_UBX;
-        else if (fi.completeSuffix()=="log"  ) conversionThread->format=STRFMT_SS2;
+        else if (fi.completeSuffix()=="sbp"  ) conversionThread->format=STRFMT_SBP;
         else if (fi.completeSuffix()=="bin"  ) conversionThread->format=STRFMT_CRES;
         else if (fi.completeSuffix()=="jps"  ) conversionThread->format=STRFMT_JAVAD;
         else if (fi.completeSuffix()=="bnx"  ) conversionThread->format=STRFMT_BINEX;
@@ -735,10 +735,10 @@ void MainWindow::ConvertFile(void)
         if (formatstrs[i]) conversionThread->format=i; else return;
     }
     conversionThread->rnxopt.rnxver=RNXVER[RnxVer];
-    
+
     if (conversionThread->format==STRFMT_RTCM2||conversionThread->format==STRFMT_RTCM3||conversionThread->format==STRFMT_RT17
             ||conversionThread->format==STRFMT_CMR) {
-        
+
         // input start date/time for rtcm 2, rtcm 3, RT17 or CMR
         startDialog->exec();
         if (startDialog->result()!=QDialog::Accepted) return;
@@ -751,7 +751,7 @@ void MainWindow::ConvertFile(void)
     if (OutFile5->isEnabled()&&OutFileEna5->isChecked()) strcpy(conversionThread->ofile[4],qPrintable(OutFile5_Text));
     if (OutFile6->isEnabled()&&OutFileEna6->isChecked()) strcpy(conversionThread->ofile[5],qPrintable(OutFile6_Text));
     if (OutFile7->isEnabled()&&OutFileEna7->isChecked()) strcpy(conversionThread->ofile[6],qPrintable(OutFile7_Text));
-    
+
     // check overwrite output file
     for (i=0;i<6;i++) {
         if (!QFile(conversionThread->ofile[i]).exists()) continue;
@@ -787,7 +787,7 @@ void MainWindow::ConvertFile(void)
     conversionThread->rnxopt.outiono=OutIono;
     conversionThread->rnxopt.outtime=OutTime;
     conversionThread->rnxopt.outleaps=OutLeaps;
-    
+
     QStringList exsatsLst=ExSats.split(" ");
     foreach (const QString & sat,exsatsLst)
     {
@@ -812,7 +812,7 @@ void MainWindow::ConvertFile(void)
     LabelOutFile->setEnabled(false);
     LabelFormat ->setEnabled(false);
     Message     ->setText("");
-    
+
     if (TraceLevel>0) {
         traceopen(TRACEFILE);
         tracelevel(TraceLevel);
@@ -846,7 +846,7 @@ void MainWindow::ConversionFinished()
     LabelOutDir ->setEnabled(true);
     LabelOutFile->setEnabled(true);
     LabelFormat ->setEnabled(true);
-    
+
 #if 0
     // set time-start/end if time not specified
     if (!TimeStartF->Checked&&rnxopt.tstart.time!=0) {
@@ -873,7 +873,7 @@ void MainWindow::LoadOpt(void)
 {
     QSettings ini(IniFile,QSettings::IniFormat);
     QString mask="1111111111111111111111111111111111111111111";
-    
+
     RnxVer              =ini.value ("opt/rnxver",      0).toInt();
     RnxFile             =ini.value ("opt/rnxfile",     0).toInt();
     RnxCode             =ini.value ("opt/rnxcode","0000").toString();
@@ -915,7 +915,7 @@ void MainWindow::LoadOpt(void)
     OutIono             =ini.value ("opt/outiono",     0).toInt();
     OutTime             =ini.value ("opt/outtime",     0).toInt();
     OutLeaps            =ini.value ("opt/outleaps",    0).toInt();
-    
+
     TimeStartF ->setChecked(ini.value("set/timestartf",  0).toBool());
     TimeEndF   ->setChecked(ini.value("set/timeendf",    0).toBool());
     TimeIntF   ->setChecked(ini.value("set/timeintf",    0).toBool());
@@ -944,16 +944,16 @@ void MainWindow::LoadOpt(void)
     OutFileEna6->setChecked(ini.value("set/outfileena6", true).toBool());
     OutFileEna7->setChecked(ini.value("set/outfileena7", true).toBool());
     Format   ->setCurrentIndex(ini.value("set/format",      0).toInt());
-    
+
     ReadList(InFile,&ini,"hist/inputfile");
-    
+
     TextViewer::Color1=ini.value("viewer/color1",QColor(Qt::black)).value<QColor>();
     TextViewer::Color2=ini.value("viewer/color2",QColor(Qt::white)).value<QColor>();
     TextViewer::FontD.setFamily(ini.value ("viewer/fontname","Courier New").toString());
     TextViewer::FontD.setPointSize(ini.value("viewer/fontsize",9).toInt());
 
     CmdPostExe         =ini.value  ("set/cmdpostexe","rtkpost_qt").toString();
-    
+
     UpdateEnable();
 }
 // save options -------------------------------------------------------------
@@ -1002,7 +1002,7 @@ void MainWindow::SaveOpt(void)
     ini.setValue ("opt/outiono",    OutIono);
     ini.setValue ("opt/outtime",    OutTime);
     ini.setValue ("opt/outleaps",   OutLeaps);
-    
+
     ini.setValue ("set/timestartf", TimeStartF ->isChecked());
     ini.setValue ("set/timeendf",   TimeEndF   ->isChecked());
     ini.setValue ("set/timeintf",   TimeIntF   ->isChecked());
@@ -1031,9 +1031,9 @@ void MainWindow::SaveOpt(void)
     ini.setValue("set/outfileena6",OutFileEna6->isChecked());
     ini.setValue("set/outfileena7",OutFileEna7->isChecked());
     ini.setValue("set/format",     Format     ->currentIndex());
-    
+
     WriteList(&ini,"hist/inputfile",InFile);
-    
+
     ini.setValue("viewer/color1",  TextViewer::Color1  );
     ini.setValue("viewer/color2",  TextViewer::Color2  );
     ini.setValue("viewer/fontname",TextViewer::FontD.family());
