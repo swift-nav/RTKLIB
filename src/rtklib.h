@@ -428,7 +428,7 @@ extern "C" {
 #define STRFMT_OEM4  2                  /* stream format: NovAtel OEMV/4 */
 #define STRFMT_OEM3  3                  /* stream format: NovAtel OEM3 */
 #define STRFMT_UBX   4                  /* stream format: u-blox LEA-*T */
-#define STRFMT_SS2   5                  /* stream format: NovAtel Superstar II */
+#define STRFMT_SWIFT 5                  /* stream format: Swift Navigation Binary Protocol */
 #define STRFMT_CRES  6                  /* stream format: Hemisphere */
 #define STRFMT_STQ   7                  /* stream format: SkyTraq S1315F */
 #define STRFMT_GW10  8                  /* stream format: Furuno GW10 */
@@ -964,8 +964,8 @@ typedef struct {        /* RTCM control struct type */
     unsigned short lock[MAXSAT][NFREQ+NEXOBS]; /* lock time */
     unsigned short loss[MAXSAT][NFREQ+NEXOBS]; /* loss of lock count */
     gtime_t lltime[MAXSAT][NFREQ+NEXOBS]; /* last lock time */
-    int nbyte;          /* number of bytes in message buffer */ 
-    int nbit;           /* number of bits in word buffer */ 
+    int nbyte;          /* number of bytes in message buffer */
+    int nbit;           /* number of bits in word buffer */
     int len;            /* message length (bytes) */
     unsigned char buff[1200]; /* message buffer */
     unsigned int word;  /* word buffer for rtcm 2 */
@@ -1222,7 +1222,7 @@ typedef struct {        /* receiver raw data control type */
     double prCA[MAXSAT],dpCA[MAXSAT]; /* L1/CA pseudrange/doppler for javad */
     unsigned char halfc[MAXSAT][NFREQ+NEXOBS]; /* half-cycle add flag */
     char freqn[MAXOBS]; /* frequency number for javad */
-    int nbyte;          /* number of bytes in message buffer */ 
+    int nbyte;          /* number of bytes in message buffer */
     int len;            /* message length (bytes) */
     int iod;            /* issue of data */
     int tod;            /* time of day (ms) */
@@ -1232,7 +1232,7 @@ typedef struct {        /* receiver raw data control type */
     unsigned char buff[MAXRAWLEN]; /* message buffer */
     char opt[256];      /* receiver dependent options */
     half_cyc_t *half_cyc; /* half-cycle correction list */
-    
+
     int format;         /* receiver stream format */
     void *rcv_data;     /* receiver dependent data */
 } raw_t;
@@ -1622,7 +1622,7 @@ EXPORT int update_cmr (raw_t *raw, rtksvr_t *svr, obs_t *obs);
 EXPORT int input_oem4  (raw_t *raw, unsigned char data);
 EXPORT int input_oem3  (raw_t *raw, unsigned char data);
 EXPORT int input_ubx   (raw_t *raw, unsigned char data);
-EXPORT int input_ss2   (raw_t *raw, unsigned char data);
+EXPORT int input_sbp   (raw_t *raw, unsigned char data);
 EXPORT int input_cres  (raw_t *raw, unsigned char data);
 EXPORT int input_stq   (raw_t *raw, unsigned char data);
 EXPORT int input_gw10  (raw_t *raw, unsigned char data);
@@ -1636,7 +1636,7 @@ EXPORT int input_lexr  (raw_t *raw, unsigned char data);
 EXPORT int input_oem4f (raw_t *raw, FILE *fp);
 EXPORT int input_oem3f (raw_t *raw, FILE *fp);
 EXPORT int input_ubxf  (raw_t *raw, FILE *fp);
-EXPORT int input_ss2f  (raw_t *raw, FILE *fp);
+EXPORT int input_sbpf  (raw_t *raw, FILE *fp);
 EXPORT int input_cresf (raw_t *raw, FILE *fp);
 EXPORT int input_stqf  (raw_t *raw, FILE *fp);
 EXPORT int input_gw10f (raw_t *raw, FILE *fp);

@@ -60,12 +60,12 @@ __fastcall TMainWindow::TMainWindow(TComponent* Owner)
     gtime_t time0={0};
     int i;
     char file[1024]="rtkconv.exe",*p;
-    
+
     ::GetModuleFileName(NULL,file,sizeof(file));
     if (!(p=strrchr(file,'.'))) p=file+strlen(file);
     strcpy(p,".ini");
     IniFile=file;
-    
+
     DoubleBuffered=true;
     Format->Items->Clear();
     Format->Items->Add("Auto");
@@ -80,9 +80,9 @@ __fastcall TMainWindow::TMainWindow(TComponent* Owner)
 void __fastcall TMainWindow::FormCreate(TObject *Sender)
 {
     AnsiString s;
-    
+
     Caption=s.sprintf("%s ver.%s %s",PRGNAME,VER_RTKLIB,PATCH_LEVEL);
-    
+
     ::DragAcceptFiles(Handle,true);
 }
 // callback on form show ----------------------------------------------------
@@ -90,9 +90,9 @@ void __fastcall TMainWindow::FormShow(TObject *Sender)
 {
     char *p,*argv[32],buff[1024];
     int argc=0;
-    
+
     strcpy(buff,GetCommandLine());
-    
+
     for (p=buff;*p&&argc<32;p++) {
         if (*p==' ') continue;
         if (*p=='"') {
@@ -109,7 +109,7 @@ void __fastcall TMainWindow::FormShow(TObject *Sender)
         if (!strcmp(argv[i],"-i")&&i+1<argc) IniFile=argv[++i];
     }
     LoadOpt();
-    
+
     for (int i=1;i<argc;i++) {
         if (!strcmp(argv[i],"-t")&&i+1<argc) Caption=argv[++i];
     }
@@ -130,9 +130,9 @@ void __fastcall TMainWindow::SetOutFiles(AnsiString infile)
     AnsiString OutDir_Text=OutDir->Text;
     char *ifile,ofile[8][1024],*code,*p;
     int i,lex=strstr(Format_Text.c_str(),"LEX")!=NULL;
-    
+
     if (!EventEna) return;
-    
+
     ifile=infile.c_str();
     if (OutDirEna->Checked) {
         if ((p=strrchr(ifile,'\\'))) p++; else p=ifile;
@@ -179,7 +179,7 @@ void __fastcall TMainWindow::SetOutFiles(AnsiString infile)
 void __fastcall TMainWindow::DropFiles(TWMDropFiles msg)
 {
     char *p,str[1024];
-    
+
     if (DragQueryFile((HDROP)msg.Drop,0xFFFFFFFF,NULL,0)<=0) return;
     DragQueryFile((HDROP)msg.Drop,0,str,sizeof(str));
     InFile->Text=str;
@@ -204,7 +204,7 @@ TStringList * __fastcall TMainWindow::ReadList(TIniFile *ini, AnsiString cat,
     TStringList *list=new TStringList;
     AnsiString s,item;
     int i;
-    
+
     for (i=0;i<100;i++) {
         item=ini->ReadString(cat,s.sprintf("%s_%03d",key.c_str(),i),"");
         if (item!="") list->Add(item); else break;
@@ -217,7 +217,7 @@ void __fastcall TMainWindow::WriteList(TIniFile *ini, AnsiString cat,
 {
     AnsiString s;
     int i;
-    
+
     for (i=0;i<list->Count;i++) {
         ini->WriteString(cat,s.sprintf("%s_%03d",key.c_str(),i),list->Strings[i]);
     }
@@ -237,14 +237,14 @@ void __fastcall TMainWindow::BtnPlotClick(TObject *Sender)
         OutFileEna1,OutFileEna2,OutFileEna3,OutFileEna4,OutFileEna5,OutFileEna6
     };
     int i,ena[6];
-    
+
     for (i=0;i<6;i++) ena[i]=cb[i]->Enabled&&cb[i]->Checked;
-    
+
     for (i=0;i<6;i++) {
         if (ena[i]) opts=opts+" \""+RepPath(file[i])+"\"";
     }
     if (opts==" -r") return;
-    
+
     if (!ExecCmd(cmd1+opts)&&!ExecCmd(cmd2+opts)) {
         Message->Caption="error : rtkplot execution";
     }
@@ -254,12 +254,12 @@ void __fastcall TMainWindow::BtnPostClick(TObject *Sender)
 {
     AnsiString path2="..\\..\\..\\bin\\";
     AnsiString cmd1=CmdPostExe,cmd2=path2+CmdPostExe,opts=" ";
-    
+
     if (!OutFileEna1->Checked) return;
-    
+
     opts=opts+" -r \""+OutFile1->Text+"\"";
     opts=opts+" -n \"\" -n \"\"";
-    
+
     if (OutFileEna7->Checked) {
         opts=opts+" -n \""+OutFile7->Text+"\"";
     }
@@ -267,7 +267,7 @@ void __fastcall TMainWindow::BtnPostClick(TObject *Sender)
     if (TimeEndF  ->Checked) opts=opts+" -te "+TimeY2->Text+" "+TimeH2->Text;
     if (TimeIntF  ->Checked) opts=opts+" -ti "+TimeInt->Text;
     if (TimeUnitF ->Checked) opts=opts+" -tu "+TimeUnit->Text;
-    
+
     if (!ExecCmd(cmd1+opts)&&!ExecCmd(cmd2+opts)) {
         Message->Caption="error : rtkpost execution";
     }
@@ -532,7 +532,7 @@ void __fastcall TMainWindow::GetTime(gtime_t *ts, gtime_t *te, double *tint,
     AnsiString TimeY2_Text=TimeY2->Text,TimeH2_Text=TimeH2->Text;
     AnsiString TimeInt_Text=TimeInt->Text,TimeUnit_Text=TimeUnit->Text;
     double eps[]={2000,1,1,0,0,0},epe[]={2000,1,1,0,0,0};
-    
+
     if (TimeStartF->Checked) {
         sscanf(TimeY1_Text.c_str(),"%lf/%lf/%lf",eps,eps+1,eps+2);
         sscanf(TimeH1_Text.c_str(),"%lf:%lf:%lf",eps+3,eps+4,eps+5);
@@ -735,9 +735,9 @@ void __fastcall TMainWindow::ConvertFile(void)
     char buff[256],tstr[32];
     double RNXVER[]={2.10,2.11,2.12,3.00,3.01,3.02,3.03};
     FILE *fp;
-    
+
     for (i=0;i<7;i++) ofile[i]=ofile_[i];
-    
+
     // recognize input file format
     strcpy(file,InFile_Text.c_str());
     if (!(p=strrchr(file,'.'))) p=file;
@@ -746,7 +746,7 @@ void __fastcall TMainWindow::ConvertFile(void)
         else if (!strcmp(p,".rtcm3")) format=STRFMT_RTCM3;
         else if (!strcmp(p,".gps"  )) format=STRFMT_OEM4;
         else if (!strcmp(p,".ubx"  )) format=STRFMT_UBX;
-        else if (!strcmp(p,".log"  )) format=STRFMT_SS2;
+        else if (!strcmp(p,".sbp"  )) format=STRFMT_SBP;
         else if (!strcmp(p,".bin"  )) format=STRFMT_CRES;
         else if (!strcmp(p,".jps"  )) format=STRFMT_JAVAD;
         else if (!strcmp(p,".bnx"  )) format=STRFMT_BINEX;
@@ -785,10 +785,10 @@ void __fastcall TMainWindow::ConvertFile(void)
         if (formatstrs[i]) format=i; else return;
     }
     rnxopt.rnxver=RNXVER[RnxVer];
-    
+
     if (format==STRFMT_RTCM2||format==STRFMT_RTCM3||format==STRFMT_RT17||
         format==STRFMT_CMR) {
-        
+
         // input start date/time for rtcm 2, rtcm 3, RT17 or CMR
         StartDialog->FileName=file;
         if (StartDialog->ShowModal()!=mrOk) return;
@@ -801,7 +801,7 @@ void __fastcall TMainWindow::ConvertFile(void)
     if (OutFile5->Enabled&&OutFileEna5->Checked) strcpy(ofile[4],OutFile5_Text.c_str());
     if (OutFile6->Enabled&&OutFileEna6->Checked) strcpy(ofile[5],OutFile6_Text.c_str());
     if (OutFile7->Enabled&&OutFileEna7->Checked) strcpy(ofile[6],OutFile7_Text.c_str());
-    
+
     // check overwrite output file
     for (i=0;i<6;i++) {
         if (!*ofile[i]||!(fp=fopen(ofile[i],"r"))) continue;
@@ -840,7 +840,7 @@ void __fastcall TMainWindow::ConvertFile(void)
     rnxopt.outiono=OutIono;
     rnxopt.outtime=OutTime;
     rnxopt.outleaps=OutLeaps;
-    
+
     strcpy(buff,ExSats.c_str());
     for (p=strtok(buff," ");p;p=strtok(NULL," ")) {
         if (!(sat=satid2no(p))) continue;
@@ -862,14 +862,14 @@ void __fastcall TMainWindow::ConvertFile(void)
     LabelOutFile->Enabled=false;
     LabelFormat ->Enabled=false;
     Message     ->Caption="";
-    
+
     if (TraceLevel>0) {
         traceopen(TRACEFILE);
         tracelevel(TraceLevel);
     }
     // convert to rinex
     (void)convrnx(format,&rnxopt,file,ofile);
-    
+
     if (TraceLevel>0) {
         traceclose();
     }
@@ -887,7 +887,7 @@ void __fastcall TMainWindow::ConvertFile(void)
     LabelOutDir ->Enabled=true;
     LabelOutFile->Enabled=true;
     LabelFormat ->Enabled=true;
-    
+
 #if 0
     // set time-start/end if time not specified
     if (!TimeStartF->Checked&&rnxopt.tstart.time!=0) {
@@ -904,7 +904,7 @@ void __fastcall TMainWindow::ConvertFile(void)
     }
 #endif
     RnxTime=rnxopt.tstart;
-    
+
     AddHist(InFile);
 }
 // load options -------------------------------------------------------------
@@ -912,7 +912,7 @@ void __fastcall TMainWindow::LoadOpt(void)
 {
     TIniFile *ini=new TIniFile(IniFile);
     AnsiString mask="1111111111111111111111111111111111111111111111111111111";
-    
+
     RnxVer              =ini->ReadInteger("opt","rnxver",      0);
     RnxFile             =ini->ReadInteger("opt","rnxfile",     0);
     RnxCode             =ini->ReadString ("opt","rnxcode","0000");
@@ -956,7 +956,7 @@ void __fastcall TMainWindow::LoadOpt(void)
     OutIono             =ini->ReadInteger("opt","outiono",     0);
     OutTime             =ini->ReadInteger("opt","outtime",     0);
     OutLeaps            =ini->ReadInteger("opt","outleaps",    0);
-    
+
     TimeStartF ->Checked=ini->ReadInteger("set","timestartf",  0);
     TimeEndF   ->Checked=ini->ReadInteger("set","timeendf",    0);
     TimeIntF   ->Checked=ini->ReadInteger("set","timeintf",    0);
@@ -985,27 +985,27 @@ void __fastcall TMainWindow::LoadOpt(void)
     OutFileEna6->Checked=ini->ReadInteger("set","outfileena6", 1);
     OutFileEna7->Checked=ini->ReadInteger("set","outfileena7", 1);
     Format   ->ItemIndex=ini->ReadInteger("set","format",      0);
-    
+
     InFile->Items=ReadList(ini,"hist","inputfile");
-    
+
     TTextViewer::Color1=(TColor)ini->ReadInteger("viewer","color1",(int)clBlack);
     TTextViewer::Color2=(TColor)ini->ReadInteger("viewer","color2",(int)clWhite);
     TTextViewer::FontD=new TFont;
     TTextViewer::FontD->Name=ini->ReadString ("viewer","fontname","Courier New");
     TTextViewer::FontD->Size=ini->ReadInteger("viewer","fontsize",9);
-    
+
     CmdPostExe         =ini->ReadString  ("set","cmdpostexe","rtkpost_mkl");
     Width              =ini->ReadInteger ("window","width", 488);
-    
+
     delete ini;
-    
+
     UpdateEnable();
 }
 // save options -------------------------------------------------------------
 void __fastcall TMainWindow::SaveOpt(void)
 {
     TIniFile *ini=new TIniFile(IniFile);
-    
+
     ini->WriteInteger("opt","rnxver",     RnxVer);
     ini->WriteInteger("opt","rnxfile",    RnxFile);
     ini->WriteString ("opt","rnxcode",    RnxCode);
@@ -1049,7 +1049,7 @@ void __fastcall TMainWindow::SaveOpt(void)
     ini->WriteInteger("opt","outiono",    OutIono);
     ini->WriteInteger("opt","outtime",    OutTime);
     ini->WriteInteger("opt","outleaps",   OutLeaps);
-    
+
     ini->WriteInteger("set","timestartf", TimeStartF ->Checked);
     ini->WriteInteger("set","timeendf",   TimeEndF   ->Checked);
     ini->WriteInteger("set","timeintf",   TimeIntF   ->Checked);
@@ -1078,9 +1078,9 @@ void __fastcall TMainWindow::SaveOpt(void)
     ini->WriteInteger("set","outfileena6",OutFileEna6->Checked);
     ini->WriteInteger("set","outfileena7",OutFileEna7->Checked);
     ini->WriteInteger("set","format",     Format     ->ItemIndex);
-    
+
     WriteList(ini,"hist","inputfile",InFile->Items);
-    
+
     ini->WriteInteger("viewer","color1",  (int)TTextViewer::Color1);
     ini->WriteInteger("viewer","color2",  (int)TTextViewer::Color2);
     ini->WriteString ("viewer","fontname",TTextViewer::FontD->Name);
@@ -1092,47 +1092,47 @@ void __fastcall TMainWindow::SaveOpt(void)
 
 void __fastcall TMainWindow::Panel4Resize(TObject *Sender)
 {
-	TBitBtn *btns[]={BtnPlot,BtnPost,BtnOptions,BtnConvert,BtnExit};
-	int w=(Panel4->Width-2)/5;
-	
-	for (int i=0;i<5;i++) {
-		btns[i]->Width=w;
-		btns[i]->Left=i*w+1;
-	}
-	BtnAbort->Width=BtnConvert->Width;
-	BtnAbort->Left =BtnConvert->Left;
+  TBitBtn *btns[]={BtnPlot,BtnPost,BtnOptions,BtnConvert,BtnExit};
+  int w=(Panel4->Width-2)/5;
+
+  for (int i=0;i<5;i++) {
+    btns[i]->Width=w;
+    btns[i]->Left=i*w+1;
+  }
+  BtnAbort->Width=BtnConvert->Width;
+  BtnAbort->Left =BtnConvert->Left;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TMainWindow::Panel2Resize(TObject *Sender)
 {
-	TButton *btns1[]={
-		BtnOutFile1,BtnOutFile2,BtnOutFile3,BtnOutFile4,BtnOutFile5,
-		BtnOutFile6,BtnOutFile7
-	};
-	TSpeedButton *btns2[]={
-		BtnOutFileView1,BtnOutFileView2,BtnOutFileView3,BtnOutFileView4,
-		BtnOutFileView5,BtnOutFileView6,BtnOutFileView7
-	};
-	TEdit *inps[]={
-		OutFile1,OutFile2,OutFile3,OutFile4,OutFile5,OutFile6,OutFile7
-	};
-	int w=Panel2->Width;
-	
-	BtnInFile->Left=w-BtnInFile->Width-5;
-	BtnInFileView->Left=w-BtnInFile->Width-BtnInFileView->Width-5;
-	InFile->Width=w-BtnInFile->Width-BtnInFileView->Width-6-InFile->Left;
-	
-	Format->Left=w-Format->Width-5;
-	LabelFormat->Left=Format->Left+3;
-	BtnOutDir->Left=w-BtnOutDir->Width-Format->Width-6;
-	OutDir->Width=w-BtnOutDir->Width-Format->Width-7-OutDir->Left;
-	
-	for (int i=0;i<7;i++) {
-		btns1[i]->Left=w-btns1[i]->Width-5;
-		btns2[i]->Left=w-btns1[i]->Width-btns2[i]->Width-5;
-		inps[i]->Width=w-btns1[i]->Width-btns2[i]->Width-6-inps[i]->Left;
-	}
+  TButton *btns1[]={
+    BtnOutFile1,BtnOutFile2,BtnOutFile3,BtnOutFile4,BtnOutFile5,
+    BtnOutFile6,BtnOutFile7
+  };
+  TSpeedButton *btns2[]={
+    BtnOutFileView1,BtnOutFileView2,BtnOutFileView3,BtnOutFileView4,
+    BtnOutFileView5,BtnOutFileView6,BtnOutFileView7
+  };
+  TEdit *inps[]={
+    OutFile1,OutFile2,OutFile3,OutFile4,OutFile5,OutFile6,OutFile7
+  };
+  int w=Panel2->Width;
+
+  BtnInFile->Left=w-BtnInFile->Width-5;
+  BtnInFileView->Left=w-BtnInFile->Width-BtnInFileView->Width-5;
+  InFile->Width=w-BtnInFile->Width-BtnInFileView->Width-6-InFile->Left;
+
+  Format->Left=w-Format->Width-5;
+  LabelFormat->Left=Format->Left+3;
+  BtnOutDir->Left=w-BtnOutDir->Width-Format->Width-6;
+  OutDir->Width=w-BtnOutDir->Width-Format->Width-7-OutDir->Left;
+
+  for (int i=0;i<7;i++) {
+    btns1[i]->Left=w-btns1[i]->Width-5;
+    btns2[i]->Left=w-btns1[i]->Width-btns2[i]->Width-5;
+    inps[i]->Width=w-btns1[i]->Width-btns2[i]->Width-6-inps[i]->Left;
+  }
 }
 //---------------------------------------------------------------------------
 
