@@ -1,0 +1,12 @@
+sudo: false
+language: c
+
+matrix:
+  include:
+   - os: linux
+   - os: osx 
+     osx_image: Xcode 8.2
+
+script:
+  - (cd ./app/convbin/gcc/ && make clean all)
+  - (cd ./app/convbin/gcc/ && make clean all)
