@@ -1,6 +1,15 @@
 #
 # makefile for convbin
 #
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
 
 BINDIR = /usr/local/bin
 
@@ -9,10 +18,21 @@ SRC    = ../../../src
 INCLUDE= -I$(SRC)
 OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS=3
 
-CC = gcc
-CFLAGS = -O3 -ansi -pedantic -static -Wall -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
+CC=gcc
+CFLAGS=-O3 -ansi -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
 
-LDLIBS = -static -lm -lrt -lpthread
+ifeq ($(UNAME),Windows)
+OPTIONS += -DWIN32
+endif
+
+LDLIBS= -lm
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
+
 
 all : convbin_swift
 
