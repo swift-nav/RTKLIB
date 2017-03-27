@@ -12,14 +12,17 @@ OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS
 CC = gcc
 CFLAGS = -O3 -ansi -pedantic -static -Wall -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
 
-LDLIBS = -lm -lrt
+LDLIBS = -static -lm -lrt -lpthread
 
-all  : convbin
+all : convbin_swift
 
-convbin    : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
-convbin    : rtcm.o rtcm2.o rtcm3.o rtcm3e.o pntpos.o ephemeris.o ionex.o
-convbin    : novatel.o swiftnav.o ublox.o crescent.o skytraq.o gw10.o javad.o nvs.o
-convbin    : binex.o rt17.o qzslex.o septentrio.o cmr.o
+convbin_swift  : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
+convbin_swift  : rtcm.o rtcm2.o rtcm3.o rtcm3e.o pntpos.o ephemeris.o ionex.o
+convbin_swift  : novatel.o swiftnav.o ublox.o crescent.o skytraq.o gw10.o javad.o nvs.o
+convbin_swift  : binex.o rt17.o qzslex.o septentrio.o cmr.o
+
+convbin_swift  :
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 convbin.o  : ../convbin.c
 	$(CC) -c $(CFLAGS) ../convbin.c
@@ -151,6 +154,6 @@ test18:
 	./convbin $(DATDIR)/GMSD7_20121014.rtcm3 -scan -v 3.01 -f 6 -od -os -tr 2012/10/14 0:00:00
 test21:
 	stty raw < /dev/ttyACM0
-	./convbin -r ubx -o ubx.obs -n ubx.nav -s ubx.sbs -h ubx.hnav /dev/ttyACM0
+	./convbin_swift -r ubx -o ubx.obs -n ubx.nav -s ubx.sbs -h ubx.hnav /dev/ttyACM0
 
 
