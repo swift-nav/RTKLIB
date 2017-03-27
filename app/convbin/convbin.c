@@ -87,21 +87,8 @@ static const char *help[]={
     "     -ti tint     observation data interval (s) [all]",
     "     -span span   time span (h) [all]",
     "     -r format    log format type",
-    "                  rtcm2= RTCM 2",
-    "                  rtcm3= RTCM 3",
-    "                  nov  = NovAtel OEMV/4/6,OEMStar",
-    "                  oem3 = NovAtel OEM3",
-    "                  ubx  = ublox LEA-4T/5T/6T/7T/M8T",
-    "                  sbp  = Swift Navigation",
-    "                  hemis= Hemisphere Eclipse/Crescent",
-    "                  stq  = SkyTraq S1315F",
-    "                  javad= Javad",
-    "                  nvs  = NVS NV08C BINR",
-    "                  binex= BINEX",
-    "                  rt17 = Trimble RT17",
-    "                  sbf  = Septentrio",
-    "                  cmr  = CMR/CMR+",
-    "                  rinex= RINEX",
+    "                  sbp  = Swift Navigation SBP",
+    "                  json = Swift Navigation SBP-JSON",
     "     -ro opt      receiver options",
     "     -f freq      number of frequencies [2]",
     "     -hc comment  rinex header: comment line",
@@ -139,19 +126,8 @@ static const char *help[]={
     "",
     " If receiver type is not specified, type is recognized by the input",
     " file extension as follows.",
-    "     *.rtcm2       RTCM 2",
-    "     *.rtcm3       RTCM 3",
-    "     *.gps         NovAtel OEMV/4/6,OEMStar",
-    "     *.ubx         u-blox LEA-4T/5T/6T/7T/M8T",
-    "     *.sbp         Swift Navigation",
-    "     *.bin         Hemisphere Eclipse/Crescent",
-    "     *.stq         SkyTraq S1315F",
-    "     *.jps         Javad",
-    "     *.bnx,*binex  BINEX",
-    "     *.rt17        Trimble RT17",
-    "     *.sbf         Septentrio",
-    "     *.cmr         CMR/CMR+",
-    "     *.obs,*.*o    RINEX OBS"
+    "     *.sbp         Swift Navigation SBP",
+    "     *.json        Swift Navigation SBP-JSON",
 };
 
 void settspan(gtime_t ts, gtime_t te) {}
@@ -449,41 +425,43 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
   if (nf>=7) opt->freqtype|=FREQTYPE_L9;
 
   if (*fmt) {
-    if      (!strcmp(fmt,"rtcm2")) format=STRFMT_RTCM2;
-    else if (!strcmp(fmt,"rtcm3")) format=STRFMT_RTCM3;
-    else if (!strcmp(fmt,"nov"  )) format=STRFMT_OEM4;
-    else if (!strcmp(fmt,"oem3" )) format=STRFMT_OEM3;
-    else if (!strcmp(fmt,"ubx"  )) format=STRFMT_UBX;
-    else if (!strcmp(fmt,"sbp"  )) format=STRFMT_SWIFT;
-    else if (!strcmp(fmt,"hemis")) format=STRFMT_CRES;
-    else if (!strcmp(fmt,"stq"  )) format=STRFMT_STQ;
-    else if (!strcmp(fmt,"javad")) format=STRFMT_JAVAD;
-    else if (!strcmp(fmt,"nvs"  )) format=STRFMT_NVS;
-    else if (!strcmp(fmt,"binex")) format=STRFMT_BINEX;
-    else if (!strcmp(fmt,"rt17" )) format=STRFMT_RT17;
-    else if (!strcmp(fmt,"sbf"  )) format=STRFMT_SEPT;
-    else if (!strcmp(fmt,"cmr"  )) format=STRFMT_CMR;
-    else if (!strcmp(fmt,"rinex")) format=STRFMT_RINEX;
+    /* if      (!strcmp(fmt,"rtcm2")) format=STRFMT_RTCM2;  */
+    /* else if (!strcmp(fmt,"rtcm3")) format=STRFMT_RTCM3;  */
+    /* else if (!strcmp(fmt,"nov"  )) format=STRFMT_OEM4;   */
+    /* else if (!strcmp(fmt,"oem3" )) format=STRFMT_OEM3;   */
+    /* else if (!strcmp(fmt,"ubx"  )) format=STRFMT_UBX;    */
+    /* else                                                 */
+    if      (!strcmp(fmt,"sbp" )) format=STRFMT_SWIFT;
+    else if (!strcmp(fmt,"json")) format=STRFMT_CRES;
+    /* else if (!strcmp(fmt,"stq"  )) format=STRFMT_STQ;    */
+    /* else if (!strcmp(fmt,"javad")) format=STRFMT_JAVAD;  */
+    /* else if (!strcmp(fmt,"nvs"  )) format=STRFMT_NVS;    */
+    /* else if (!strcmp(fmt,"binex")) format=STRFMT_BINEX;  */
+    /* else if (!strcmp(fmt,"rt17" )) format=STRFMT_RT17;   */
+    /* else if (!strcmp(fmt,"sbf"  )) format=STRFMT_SEPT;   */
+    /* else if (!strcmp(fmt,"cmr"  )) format=STRFMT_CMR;    */
+    /* else if (!strcmp(fmt,"rinex")) format=STRFMT_RINEX;  */
   }
   else {
     paths[0]=path;
     if (!expath(*ifile,paths,1)||!(p=strrchr(path,'.'))) return -1;
-    if      (!strcmp(p,".rtcm2"))  format=STRFMT_RTCM2;
-    else if (!strcmp(p,".rtcm3"))  format=STRFMT_RTCM3;
-    else if (!strcmp(p,".gps"  ))  format=STRFMT_OEM4;
-    else if (!strcmp(p,".ubx"  ))  format=STRFMT_UBX;
-    else if (!strcmp(p,".sbp"  ))  format=STRFMT_SWIFT;
-    else if (!strcmp(p,".bin"  ))  format=STRFMT_CRES;
-    else if (!strcmp(p,".stq"  ))  format=STRFMT_STQ;
-    else if (!strcmp(p,".jps"  ))  format=STRFMT_JAVAD;
-    else if (!strcmp(p,".bnx"  ))  format=STRFMT_BINEX;
-    else if (!strcmp(p,".binex"))  format=STRFMT_BINEX;
-    else if (!strcmp(p,".rt17" ))  format=STRFMT_RT17;
-    else if (!strcmp(p,".sbf"  ))  format=STRFMT_SEPT;
-    else if (!strcmp(p,".cmr"  ))  format=STRFMT_CMR;
-    else if (!strcmp(p,".obs"  ))  format=STRFMT_RINEX;
-    else if (!strcmp(p+3,"o"   ))  format=STRFMT_RINEX;
-    else if (!strcmp(p+3,"O"   ))  format=STRFMT_RINEX;
+    /* if      (!strcmp(p,".rtcm2"))  format=STRFMT_RTCM2;  */
+    /* else if (!strcmp(p,".rtcm3"))  format=STRFMT_RTCM3;  */
+    /* else if (!strcmp(p,".gps"  ))  format=STRFMT_OEM4;   */
+    /* else if (!strcmp(p,".ubx"  ))  format=STRFMT_UBX;    */
+    /* else */
+    if      (!strcmp(p,".sbp"  ))  format=STRFMT_SWIFT;
+    else if (!strcmp(p,".json" ))  format=STRFMT_CRES;
+    /* else if (!strcmp(p,".stq"  ))  format=STRFMT_STQ;    */
+    /* else if (!strcmp(p,".jps"  ))  format=STRFMT_JAVAD;  */
+    /* else if (!strcmp(p,".bnx"  ))  format=STRFMT_BINEX;  */
+    /* else if (!strcmp(p,".binex"))  format=STRFMT_BINEX;  */
+    /* else if (!strcmp(p,".rt17" ))  format=STRFMT_RT17;   */
+    /* else if (!strcmp(p,".sbf"  ))  format=STRFMT_SEPT;   */
+    /* else if (!strcmp(p,".cmr"  ))  format=STRFMT_CMR;    */
+    /* else if (!strcmp(p,".obs"  ))  format=STRFMT_RINEX;  */
+    /* else if (!strcmp(p+3,"o"   ))  format=STRFMT_RINEX;  */
+    /* else if (!strcmp(p+3,"O"   ))  format=STRFMT_RINEX;  */
   }
   return format;
 }
