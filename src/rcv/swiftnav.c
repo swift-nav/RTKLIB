@@ -431,7 +431,8 @@ static int decode_sbp(raw_t *raw)
   int type   = U2(raw->buff+1);
   int sender = U2(raw->buff+3);
 
-  if (sender==0) return 0;
+  if ((sender==0) && (NULL==strstr(raw->opt,"-BASE"))) return 0;
+  if ((sender!=0) && (NULL!=strstr(raw->opt,"-BASE"))) return 0;
 
   trace(3,"decode_sbp: type=%04x len=%d\n",type,raw->len);
 
