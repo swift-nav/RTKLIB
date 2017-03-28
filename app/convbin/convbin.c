@@ -431,8 +431,8 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
     /* else if (!strcmp(fmt,"oem3" )) format=STRFMT_OEM3;   */
     /* else if (!strcmp(fmt,"ubx"  )) format=STRFMT_UBX;    */
     /* else                                                 */
-    if      (!strcmp(fmt,"sbp" )) format=STRFMT_SWIFT;
-    else if (!strcmp(fmt,"json")) format=STRFMT_CRES;
+    if      (!strcmp(fmt,"sbp" )) format=STRFMT_SBP;
+    else if (!strcmp(fmt,"json")) format=STRFMT_SBPJSON;
     /* else if (!strcmp(fmt,"stq"  )) format=STRFMT_STQ;    */
     /* else if (!strcmp(fmt,"javad")) format=STRFMT_JAVAD;  */
     /* else if (!strcmp(fmt,"nvs"  )) format=STRFMT_NVS;    */
@@ -450,8 +450,8 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
     /* else if (!strcmp(p,".gps"  ))  format=STRFMT_OEM4;   */
     /* else if (!strcmp(p,".ubx"  ))  format=STRFMT_UBX;    */
     /* else */
-    if      (!strcmp(p,".sbp"  ))  format=STRFMT_SWIFT;
-    else if (!strcmp(p,".json" ))  format=STRFMT_CRES;
+    if      (!strcmp(p,".sbp"  ))  format=STRFMT_SBP;
+    else if (!strcmp(p,".json" ))  format=STRFMT_SBPJSON;
     /* else if (!strcmp(p,".stq"  ))  format=STRFMT_STQ;    */
     /* else if (!strcmp(p,".jps"  ))  format=STRFMT_JAVAD;  */
     /* else if (!strcmp(p,".bnx"  ))  format=STRFMT_BINEX;  */
