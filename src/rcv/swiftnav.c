@@ -74,6 +74,83 @@ static const uint32_t puRtcmPhaseRangeLockTimeTable[16] = {
     0, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288
 };
 
+static const uint8_t decoding_table[ 256 ] =
+{
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3E,0x00,0x00,0x00,0x3F,
+   0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,
+   0x0F,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,
+   0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F,0x30,0x31,0x32,0x33,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+};
+
+static uint8_t puPayloadTmp[256];
+
+
+static int Base64_Decode( uint8_t *_pcData, uint32_t _uDataLen, uint8_t *_puDecodedData, uint32_t *_puDecodedDataLen ) {
+   uint32_t i, j;
+   uint32_t output_length;
+   uint32_t a, b, c, d, t;
+
+   if ( NULL == _puDecodedData ) {
+      return -1;
+   }
+
+   if ( 0 != (_uDataLen % 4) ) {
+      return -1;
+   }
+
+   output_length = _uDataLen / 4 * 3;
+
+   if ( '=' == _pcData[_uDataLen - 1] ) {
+      output_length--;
+   }
+   if ( '=' == _pcData[_uDataLen - 2] ) {
+      output_length--;
+   }
+
+   if ( output_length > (*_puDecodedDataLen) ) {
+      /* Not enough space in output buffer */
+      return -1;
+   }
+
+   (*_puDecodedDataLen) = output_length;
+
+   for ( i = 0, j = 0; i < _uDataLen; ) {
+      a = ('=' == _pcData[i]) ? 0 : decoding_table[ _pcData[i] ]; i++;
+      b = ('=' == _pcData[i]) ? 0 : decoding_table[ _pcData[i] ]; i++;
+      c = ('=' == _pcData[i]) ? 0 : decoding_table[ _pcData[i] ]; i++;
+      d = ('=' == _pcData[i]) ? 0 : decoding_table[ _pcData[i] ]; i++;
+
+      t = ( a << 3 * 6 )
+        + ( b << 2 * 6 )
+        + ( c << 1 * 6 )
+        + ( d << 0 * 6 );
+
+      if ( j < output_length ) {
+         _puDecodedData[j++] = (t >> 2 * 8) & 0xFF;
+      }
+      if ( j < output_length ) {
+         _puDecodedData[j++] = (t >> 1 * 8) & 0xFF;
+      }
+      if ( j < output_length ) {
+         _puDecodedData[j++] = (t >> 0 * 8) & 0xFF;
+      }
+   } /* for() */
+   return 0;
+} /* Base64_Decode() */
+
+
 /* SBP checksum calculation --------------------------------------------------*/
 static uint16_t sbp_checksum(uint8_t *buff, int len)
 {
@@ -431,8 +508,8 @@ static int decode_sbp(raw_t *raw)
   int type   = U2(raw->buff+1);
   int sender = U2(raw->buff+3);
 
-  if ((sender==0) && (NULL==strstr(raw->opt,"-BASE"))) return 0;
-  if ((sender!=0) && (NULL!=strstr(raw->opt,"-BASE"))) return 0;
+  if ((sender==0) && (NULL==strstr(raw->opt,"CONVBASE"))) return 0;
+  if ((sender!=0) && (NULL!=strstr(raw->opt,"CONVBASE"))) return 0;
 
   trace(3,"decode_sbp: type=%04x len=%d\n",type,raw->len);
 
@@ -478,7 +555,7 @@ static int sync_sbp(uint8_t *buff, uint8_t data)
  *-----------------------------------------------------------------------------*/
 extern int input_sbp(raw_t *raw, uint8_t data)
 {
-  trace(5,"input_sbf: data=%02x\n",data);
+  trace(5,"input_sbp: data=%02x\n",data);
 
   if (raw->nbyte==0) {
     if (sync_sbp(raw->buff,data)) raw->nbyte=1;
@@ -489,7 +566,7 @@ extern int input_sbp(raw_t *raw, uint8_t data)
   if (raw->nbyte<6) return 0;
 
   if ((raw->len=(8 + raw->buff[5]))>MAXRAWLEN) {
-    trace(2,"sbf length error: len=%d\n",raw->len);
+    trace(2,"sbp length error: len=%d\n",raw->len);
     raw->nbyte=0;
     return -1;
   }
@@ -515,6 +592,7 @@ static int endfile(raw_t *raw)
     raw->obuf.n=0;
     return 1;
 }
+
 /* sbf raw block finder --------------------------------------------------------
  * get to the next sbf raw block from file
  * args   : raw_t  *raw   IO     receiver raw data control struct
@@ -525,7 +603,7 @@ extern int input_sbpf(raw_t *raw, FILE *fp)
 {
   int i,data,stat;
 
-  trace(4,"input_sbff:\n");
+  trace(4,"input_sbpf:\n");
 
   if (raw->flag) {
       startfile(raw);
@@ -559,6 +637,92 @@ extern int input_sbpf(raw_t *raw, FILE *fp)
 
   /* decode SBF block */
   stat= decode_sbp(raw);
+
+  clearbuff(raw);
+  return stat;
+}
+
+
+/* sbf json block finder --------------------------------------------------------
+ * get to the next meaningful sbf json message
+ * args   : raw_t  *raw   IO     receiver raw data control struct
+ *          FILE   *fp    I      file pointer
+ * return : status(-2: end of file, -1...9: same as above)
+ *-----------------------------------------------------------------------------*/
+extern int input_sbpjsonf(raw_t *raw, FILE *fp)
+{
+  const char JSON_MSGTYPE_FIELD[] = {"\"msg_type\":"};
+  const char JSON_SENDER_FIELD[]  = {"\"sender\":"};
+  const char JSON_PAYLOAD_FIELD[] = {"\"payload\":"};
+  const char JSON_CRC_FIELD[]  = {"\"crc\":"};
+  uint8_t *pcPayloadBeg, *pcPayloadEnd;
+  int stat,iRet;
+  uint32_t uPayloadSize, uMsgType, uSender, uMsgCrc, uLength;
+  char *pcTmp;
+
+  trace(4,"input_sbpjsonf:\n");
+
+  if (raw->flag) {
+      startfile(raw);
+      raw->flag=0;
+  }
+
+  memset(raw->buff, 0, MAXRAWLEN);
+  pcTmp = fgets((char*)raw->buff, MAXRAWLEN, fp);
+  if (NULL == pcTmp) {
+    return endfile(raw);
+  }
+
+  pcTmp = strstr((char*)raw->buff, JSON_MSGTYPE_FIELD);
+  if (NULL == pcTmp) return 0;
+  iRet = sscanf(pcTmp + sizeof(JSON_MSGTYPE_FIELD), "%u", &uMsgType);
+  if (0 == iRet) return 0;
+
+  /* avoid parsing the payload if the message isn't supported in the first place */
+  if ((uMsgType != ID_MEASEPOCH) &&
+    (uMsgType != ID_MSGEPHGPS) &&
+    (uMsgType != ID_MSGIONGPS)) {
+    return 0;
+  }
+
+  /* sender in clear */
+  pcTmp = strstr((char*)raw->buff, JSON_SENDER_FIELD);
+  if (NULL == pcTmp) return 0;
+  iRet = sscanf(pcTmp + sizeof(JSON_SENDER_FIELD), "%u", &uSender);
+  if (0 == iRet) return 0;
+
+  /* crc */
+  pcTmp = strstr((char*)raw->buff, JSON_CRC_FIELD);
+  if (NULL == pcTmp) return 0;
+  iRet = sscanf(pcTmp + sizeof(JSON_CRC_FIELD), "%u", &uMsgCrc);
+  if (0 == iRet) return 0;
+
+  /* payload */
+  pcTmp = strstr((char*)raw->buff, JSON_PAYLOAD_FIELD);
+  if (NULL == pcTmp) return 0;
+  pcTmp += sizeof(JSON_PAYLOAD_FIELD);
+
+  pcPayloadBeg = (uint8_t*) strchr((char*)pcTmp,        '\"')+1;
+  pcPayloadEnd = (uint8_t*) strchr((char*)pcPayloadBeg, '\"')-1;
+  uPayloadSize = pcPayloadEnd - pcPayloadBeg + 1;
+  /*iPayloadSize = 11 + 17*((iPayloadSize - 11)/17);*/
+  memset(puPayloadTmp, 0, sizeof(puPayloadTmp));
+  uLength = 256;
+  Base64_Decode( pcPayloadBeg, uPayloadSize, puPayloadTmp, &uLength );
+
+  raw->buff[0] = 0x55;                          /* sync char */
+  raw->buff[1] = (uMsgType >> 0) & 0xFF;        /* msg type LSB */
+  raw->buff[2] = (uMsgType >> 8) & 0xFF;        /* msg type MSB */
+  raw->buff[3] = (uSender  >> 0) & 0xFF;        /* sender LSB */
+  raw->buff[4] = (uSender  >> 8) & 0xFF;        /* sender MSB */
+  raw->buff[5] = uLength;                       /* payload length */
+  memcpy(raw->buff+6, puPayloadTmp, uLength);
+  raw->buff[6+uLength] = (uMsgCrc >> 0) & 0xFF; /* CRC LSB */
+  raw->buff[7+uLength] = (uMsgCrc >> 8) & 0xFF; /* CRC MSB */
+
+  /* decode SBF block */
+  raw->len = 8 + uLength;
+  stat = decode_sbp(raw);
 
   clearbuff(raw);
   return stat;

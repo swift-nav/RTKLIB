@@ -428,8 +428,8 @@ extern "C" {
 #define STRFMT_OEM4  2                  /* stream format: NovAtel OEMV/4 */
 #define STRFMT_OEM3  3                  /* stream format: NovAtel OEM3 */
 #define STRFMT_UBX   4                  /* stream format: u-blox LEA-*T */
-#define STRFMT_SWIFT 5                  /* stream format: Swift Navigation Binary Protocol */
-#define STRFMT_CRES  6                  /* stream format: Hemisphere */
+#define STRFMT_SBP     5                  /* stream format: Swift Navigation SBP */
+#define STRFMT_SBPJSON 6                  /* stream format: Swift Navigation SBP-JSON */
 #define STRFMT_STQ   7                  /* stream format: SkyTraq S1315F */
 #define STRFMT_GW10  8                  /* stream format: Furuno GW10 */
 #define STRFMT_JAVAD 9                  /* stream format: JAVAD GRIL/GREIS */
@@ -1657,7 +1657,8 @@ EXPORT int input_lexr  (raw_t *raw, unsigned char data);
 EXPORT int input_oem4f (raw_t *raw, FILE *fp);
 EXPORT int input_oem3f (raw_t *raw, FILE *fp);
 EXPORT int input_ubxf  (raw_t *raw, FILE *fp);
-EXPORT int input_sbpf  (raw_t *raw, FILE *fp);
+EXPORT int input_sbpf     (raw_t *raw, FILE *fp);
+EXPORT int input_sbpjsonf (raw_t *raw, FILE *fp);
 EXPORT int input_cresf (raw_t *raw, FILE *fp);
 EXPORT int input_stqf  (raw_t *raw, FILE *fp);
 EXPORT int input_gw10f (raw_t *raw, FILE *fp);
