@@ -1,0 +1,29 @@
+os: Visual Studio 2013
+
+environment:
+  matrix:
+  - Compiler: mingw
+  - Compiler: msc
+
+#cache:
+#  - C:\mingw64
+
+install:
+  - set PATH=C:\MinGW\bin;C:\MinGW\msys\1.0\bin;%PATH%
+  - set CC=gcc
+  - set INCLUDE=%cd%\src;..\..\..\src;%INCLUDE%
+
+build_script:
+  - ps: |
+      if ($env:Compiler -eq "mingw") {
+        cd ./app/convbin/gcc 
+        make clean all
+      }
+
+artifacts:
+  - path: ./app/convbin/gcc/convbin
+    name: convbin
+
+test_script:
+  - ps: | 
+      echo "Tests go here"
