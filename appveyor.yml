@@ -21,7 +21,7 @@ build_script:
       }
 
 artifacts:
-  - path: ./app/convbin/gcc/convbin
+  - path: app\convbin\gcc\convbin_swift*
     name: convbin
 
 test_script:
