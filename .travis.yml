@@ -9,4 +9,13 @@ matrix:
 
 script:
   - (cd ./app/convbin/gcc/ && make clean all)
-  - (cd ./app/convbin/gcc/ && make clean all)
+
+addons:
+  artifacts:
+    debug: true 
+    paths:
+      - ./app/convbin/gcc
+    working_dir: $TRAVIS_BUILD_DIR
+    target_paths: $TRAVIS_BUILD_NUMBER$TRAVIS_OS_NAME
+    bucket: rtklib-ci-builds
+    s3_region: us-west-2
