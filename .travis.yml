@@ -9,8 +9,6 @@ matrix:
 
 script:
   - (cd ./app/convbin/gcc/ && make clean all)
-  - mkdir artifacts
-  - cp convbin artifacts
 
 addons:
   artifacts:
