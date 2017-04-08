@@ -16,7 +16,7 @@ addons:
   artifacts:
     debug: true 
     paths:
-      - ./app/convbin/gcc/convbin/artifacts
+      - ./app/convbin/gcc/convbin_swift
     working_dir: $TRAVIS_BUILD_DIR
     target_paths: $TRAVIS_BUILD_NUMBER$TRAVIS_OS_NAME
     bucket: rtklib-ci-builds
