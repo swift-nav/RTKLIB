@@ -34,7 +34,7 @@ static const char rcsid[]="$Id:$";
 
 #define NOUTFILE        7       /* number of output files */
 #define TSTARTMARGIN    60.0    /* time margin for file name replacement */
-
+#define SHOW_STATS_PER  (256)
 /* type definition -----------------------------------------------------------*/
 
 typedef struct {                /* stream file type */
@@ -493,7 +493,7 @@ static int scan_obstype(int format, const char *file, rnxopt_t *opt,
         }
         if (opt->te.time&&timediff(str->obs->data[0].time,opt->te)>10.0) break;
 
-        if (++c%11) continue;
+        if ((++c)%SHOW_STATS_PER) continue;
 
         sprintf(msg,"scanning: %s %s%s%s%s%s%s%s",time_str(str->time,0),
                 n[0]?"G":"",n[1]?"R":"",n[2]?"E":"",n[3]?"J":"",
@@ -1035,7 +1035,7 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
         /* input message */
         for (j=0;(type=input_strfile(str))>=-1;j++) {
 
-            if (j%11==1&&(abort=showstat(sess,te,te,n))) break;
+            if (((j%SHOW_STATS_PER)==1) &&(abort=showstat(sess,te,te,n))) break;
 
             /* avioid duplicated if overlapped data */
             if (tend.time&&timediff(str->time,tend)<=0.0) continue;
