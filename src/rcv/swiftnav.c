@@ -331,6 +331,7 @@ static int decode_msgobs(raw_t *raw){
       continue;
     }
 
+    iSatFound = 0;
     for (ii=0; ii<n; ii++) {
       if (raw->obuf.data[ii].sat == sat) {
         iSatFound = 1;
