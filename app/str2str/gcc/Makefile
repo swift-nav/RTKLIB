@@ -9,18 +9,18 @@ CC=gcc
 CTARGET=
 
 #OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=3 -DNEXOBS=3
-OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=3 -DNEXOBS=3 -DSVR_REUSEADDR
+OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=7 -DNEXOBS=3 -DSVR_REUSEADDR
 CFLAGS = -Wall -O3 -ansi -pedantic -static -Wno-unused-but-set-variable -I$(SRC) $(OPTION) $(CTARGET)
-LDLIBS  = -lm -lrt -lpthread
+LDLIBS  = -lm -lpthread
 
-all        : str2str
-str2str    : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
-str2str    : rcvraw.o novatel.o ublox.o swiftnav.o crescent.o skytraq.o gw10.o javad.o
-str2str    : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
-str2str    : septentrio.o cmr.o
+all        : str2str_swift
+str2str_swift    : str2str_swift.o stream.o rtkcmn.o solution.o sbas.o geoid.o
+str2str_swift    : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o gw10.o javad.o
+str2str_swift    : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
+str2str_swift    : septentrio.o cmr.o
 
-str2str.o  : ../str2str.c
-	$(CC) -c $(CFLAGS) ../str2str.c
+str2str_swift.o  : ../str2str_swift.c
+	$(CC) -c $(CFLAGS) ../str2str_swift.c
 stream.o   : $(SRC)/stream.c
 	$(CC) -c $(CFLAGS) $(SRC)/stream.c
 streamsvr.o: $(SRC)/streamsvr.c
