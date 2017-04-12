@@ -148,8 +148,7 @@ static void decodefmt(char *path, int *fmt)
         else if (!strcmp(p,"#nov"  )) *fmt=STRFMT_OEM4;
         else if (!strcmp(p,"#oem3" )) *fmt=STRFMT_OEM3;
         else if (!strcmp(p,"#ubx"  )) *fmt=STRFMT_UBX;
-        else if (!strcmp(p,"#sbp"  )) *fmt=STRFMT_SWIFT;
-        else if (!strcmp(p,"#hemis")) *fmt=STRFMT_CRES;
+        else if (!strcmp(p,"#sbp"  )) *fmt=STRFMT_SBP;
         else if (!strcmp(p,"#stq"  )) *fmt=STRFMT_STQ;
         else if (!strcmp(p,"#gw10" )) *fmt=STRFMT_GW10;
         else if (!strcmp(p,"#javad")) *fmt=STRFMT_JAVAD;
