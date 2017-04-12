@@ -301,7 +301,7 @@ static int decode_msgobs(raw_t *raw){
     uBandCode   = p[16];
 
     /* phase polarity flip option (-INVCP) */
-    if (strstr(raw->opt, "-INVCP")) {
+    if (strstr(raw->opt, "INVCP")) {
       dCarrPhase = -dCarrPhase;
     }
 
@@ -331,6 +331,7 @@ static int decode_msgobs(raw_t *raw){
       continue;
     }
 
+    iSatFound = 0;
     for (ii=0; ii<n; ii++) {
       if (raw->obuf.data[ii].sat == sat) {
         iSatFound = 1;
@@ -455,7 +456,7 @@ static int decode_gpsnav(raw_t *raw) {
   eph.toc = gpst2time(uWeekC,toc);
   eph.ttr = raw->time;
 
-  if (!strstr(raw->opt,"-EPHALL")) {
+  if (!strstr(raw->opt,"EPHALL")) {
     if ((eph.iode==raw->nav.eph[sat-1].iode) &&
         (eph.iodc==raw->nav.eph[sat-1].iodc)) return 0;
   }

@@ -81,7 +81,7 @@ static const char *help[]={
 "    oem3         : NovAtel OEM3 (only in)",
 "    ubx          : ublox LEA-4T/5T/6T (only in)",
 "    sbp          : Swift Navigation SBP",
-"    hemis        : Hemisphere Eclipse/Crescent (only in)",
+"    json         : Swift Navigation SBP-JSON",
 "    stq          : SkyTraq S1315F (only in)",
 "    gw10         : Furuno GW10 (only in)",
 "    javad        : Javad (only in)",
@@ -148,8 +148,8 @@ static void decodefmt(char *path, int *fmt)
         else if (!strcmp(p,"#nov"  )) *fmt=STRFMT_OEM4;
         else if (!strcmp(p,"#oem3" )) *fmt=STRFMT_OEM3;
         else if (!strcmp(p,"#ubx"  )) *fmt=STRFMT_UBX;
-        else if (!strcmp(p,"#sbp"  )) *fmt=STRFMT_SWIFT;
-        else if (!strcmp(p,"#hemis")) *fmt=STRFMT_CRES;
+        else if (!strcmp(p,"#sbp"  )) *fmt=STRFMT_SBP;
+        else if (!strcmp(p,"#json"))  *fmt=STRFMT_SBPJSON;
         else if (!strcmp(p,"#stq"  )) *fmt=STRFMT_STQ;
         else if (!strcmp(p,"#gw10" )) *fmt=STRFMT_GW10;
         else if (!strcmp(p,"#javad")) *fmt=STRFMT_JAVAD;

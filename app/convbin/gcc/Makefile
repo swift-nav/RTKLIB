@@ -27,7 +27,7 @@ endif
 
 LDLIBS= -lm
 ifeq ($(UNAME),Linux)
-LDLIBS+= -lrt
+LDLIBS+=
 endif
 ifeq ($(UNAME),Windows)
 LDLIBS+= -lwinmm
