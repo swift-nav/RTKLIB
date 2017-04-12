@@ -8,14 +8,14 @@ SRC    = ../../../src
 CTARGET= -DENAGLO -DENAQZS -DENACMP -DENAGAL -DENAIRN -DNFREQ=3 -DSVR_REUSEADDR
 
 CFLAGS = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) -I.. -DTRACE $(CTARGET) -g
-LDLIBS  = -lm -lrt -lpthread
+LDLIBS  = -lm -lpthread
 
 all        : rtkrcv
 rtkrcv     : rtkrcv.o vt.o rtkcmn.o rtksvr.o rtkpos.o geoid.o solution.o lambda.o
 rtkrcv     : sbas.o stream.o rcvraw.o rtcm.o preceph.o options.o pntpos.o ppp.o ppp_ar.o
-rtkrcv     : novatel.o ublox.o ss2.o crescent.o skytraq.o gw10.o javad.o nvs.o binex.o
+rtkrcv     : novatel.o ublox.o crescent.o skytraq.o gw10.o javad.o nvs.o binex.o
 rtkrcv     : rt17.o ephemeris.o rinex.o ionex.o rtcm2.o rtcm3.o rtcm3e.o qzslex.o
-rtkrcv     : ppp_corr.o tides.o septentrio.o cmr.o
+rtkrcv     : ppp_corr.o tides.o septentrio.o cmr.o swiftnav.o
 
 rtkrcv.o   : ../rtkrcv.c
 	$(CC) -c $(CFLAGS) ../rtkrcv.c
@@ -59,6 +59,8 @@ ppp_ar.o   : $(SRC)/ppp_ar.c
 	$(CC) -c $(CFLAGS) $(SRC)/ppp_ar.c
 novatel.o  : $(SRC)/rcv/novatel.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/novatel.c
+swiftnav.o  : $(SRC)/rcv/swiftnav.c
+	$(CC) -c $(CFLAGS) $(SRC)/rcv/swiftnav.c
 ublox.o    : $(SRC)/rcv/ublox.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/ublox.c
 ss2.o      : $(SRC)/rcv/ss2.c
@@ -112,6 +114,7 @@ options.o  : $(SRC)/rtklib.h
 pntpos.o   : $(SRC)/rtklib.h
 ppp.o      : $(SRC)/rtklib.h
 novatel.o  : $(SRC)/rtklib.h
+swiftnav.o  : $(SRC)/rtklib.h
 ublox.o    : $(SRC)/rtklib.h
 ss2.o      : $(SRC)/rtklib.h
 crescent.o : $(SRC)/rtklib.h
