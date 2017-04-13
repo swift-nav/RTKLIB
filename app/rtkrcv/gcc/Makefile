@@ -1,4 +1,14 @@
-# makefile for rtkrcv
+# makefile for rtkrcv-swiftnav
+
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
 
 BINDIR = /usr/local/bin
 SRC    = ../../../src
@@ -8,17 +18,33 @@ SRC    = ../../../src
 CTARGET= -DENAGLO -DENAQZS -DENACMP -DENAGAL -DENAIRN -DNFREQ=7 -DNEXOBS=3 -DSVR_REUSEADDR
 
 CFLAGS = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) -I.. -DTRACE $(CTARGET)
-LDLIBS  = -lm -lpthread
+LDLIBS = -lm -lpthread
 
-all        : rtkrcv_swift
-rtkrcv_swift     : rtkrcv_swift.o vt.o rtkcmn.o rtksvr.o rtkpos.o geoid.o solution.o lambda.o
-rtkrcv_swift     : sbas.o stream.o rcvraw.o rtcm.o preceph.o options.o pntpos.o ppp.o ppp_ar.o
-rtkrcv_swift     : novatel.o ublox.o skytraq.o gw10.o javad.o nvs.o binex.o
-rtkrcv_swift     : rt17.o ephemeris.o rinex.o ionex.o rtcm2.o rtcm3.o rtcm3e.o qzslex.o
-rtkrcv_swift     : ppp_corr.o tides.o septentrio.o cmr.o swiftnav.o
+ifeq ($(UNAME),Windows)
+OPTIONS += -DWIN32
+endif
 
-rtkrcv_swift.o   : ../rtkrcv_swift.c
-	$(CC) -c $(CFLAGS) ../rtkrcv_swift.c
+LDLIBS= -lm -lpthread
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
+
+
+all : rtkrcv-swiftnav
+rtkrcv-swiftnav     : rtkrcv.o vt.o rtkcmn.o rtksvr.o rtkpos.o geoid.o solution.o lambda.o
+rtkrcv-swiftnav     : sbas.o stream.o rcvraw.o rtcm.o preceph.o options.o pntpos.o ppp.o ppp_ar.o
+rtkrcv-swiftnav     : novatel.o ublox.o skytraq.o gw10.o javad.o nvs.o binex.o
+rtkrcv-swiftnav     : rt17.o ephemeris.o rinex.o ionex.o rtcm2.o rtcm3.o rtcm3e.o qzslex.o
+rtkrcv-swiftnav     : ppp_corr.o tides.o septentrio.o cmr.o swiftnav.o
+
+rtkrcv-swiftnav  :
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
+
+rtkrcv.o   : ../rtkrcv.c
+	$(CC) -c $(CFLAGS) ../rtkrcv.c
 vt.o       : ../vt.c
 	$(CC) -c $(CFLAGS) ../vt.c
 rtkcmn.o   : $(SRC)/rtkcmn.c
@@ -63,8 +89,6 @@ ublox.o    : $(SRC)/rcv/ublox.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/ublox.c
 swiftnav.o      : $(SRC)/rcv/swiftnav.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/swiftnav.c
-crescent.o : $(SRC)/rcv/crescent.c
-	$(CC) -c $(CFLAGS) $(SRC)/rcv/crescent.c
 skytraq.o  : $(SRC)/rcv/skytraq.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/skytraq.c
 gw10.o     : $(SRC)/rcv/gw10.c
@@ -114,7 +138,6 @@ ppp.o      : $(SRC)/rtklib.h Makefile
 novatel.o  : $(SRC)/rtklib.h Makefile
 ublox.o    : $(SRC)/rtklib.h Makefile
 ss2.o      : $(SRC)/rtklib.h Makefile
-crescent.o : $(SRC)/rtklib.h Makefile
 skytraq.o  : $(SRC)/rtklib.h Makefile
 gw10.o     : $(SRC)/rtklib.h Makefile
 javad.o    : $(SRC)/rtklib.h Makefile

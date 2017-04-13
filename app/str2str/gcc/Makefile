@@ -1,4 +1,13 @@
-# makefile for str2str
+# makefile for str2str-swiftnav
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
 
 BINDIR = /usr/local/bin
 SRC    = ../../../src
@@ -10,17 +19,32 @@ CTARGET=
 
 #OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=3 -DNEXOBS=3
 OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=7 -DNEXOBS=3 -DSVR_REUSEADDR
-CFLAGS = -Wall -O3 -ansi -pedantic -static -Wno-unused-but-set-variable -I$(SRC) $(OPTION) $(CTARGET)
-LDLIBS  = -lm -lpthread
+CFLAGS = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) $(OPTION) $(CTARGET)
 
-all        : str2str_swift
-str2str_swift    : str2str_swift.o stream.o rtkcmn.o solution.o sbas.o geoid.o
-str2str_swift    : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o gw10.o javad.o
-str2str_swift    : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
-str2str_swift    : septentrio.o cmr.o
+ifeq ($(UNAME),Windows)
+OPTIONS += -DWIN32
+endif
 
-str2str_swift.o  : ../str2str_swift.c
-	$(CC) -c $(CFLAGS) ../str2str_swift.c
+LDLIBS= -lm -lpthread
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
+
+
+all : str2str-swiftnav
+str2str-swiftnav    : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
+str2str-swiftnav    : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o gw10.o javad.o
+str2str-swiftnav    : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
+str2str-swiftnav    : septentrio.o cmr.o
+
+str2str-swiftnav  :
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
+
+str2str.o  : ../str2str.c
+	$(CC) -c $(CFLAGS) ../str2str.c
 stream.o   : $(SRC)/stream.c
 	$(CC) -c $(CFLAGS) $(SRC)/stream.c
 streamsvr.o: $(SRC)/streamsvr.c
@@ -41,8 +65,6 @@ ublox.o    : $(SRC)/rcv/ublox.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/ublox.c
 swiftnav.o : $(SRC)/rcv/swiftnav.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/swiftnav.c
-crescent.o : $(SRC)/rcv/crescent.c
-	$(CC) -c $(CFLAGS) $(SRC)/rcv/crescent.c
 skytraq.o  : $(SRC)/rcv/skytraq.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/skytraq.c
 gw10.o     : $(SRC)/rcv/gw10.c
@@ -81,7 +103,6 @@ rcvraw.o   : $(SRC)/rtklib.h Makefile
 novatel.o  : $(SRC)/rtklib.h Makefile
 ublox.o    : $(SRC)/rtklib.h Makefile
 swiftnav.o : $(SRC)/rtklib.h Makefile
-crescent.o : $(SRC)/rtklib.h Makefile
 skytraq.o  : $(SRC)/rtklib.h Makefile
 gw10.o     : $(SRC)/rtklib.h Makefile
 javad.o    : $(SRC)/rtklib.h Makefile
@@ -104,23 +125,23 @@ DEVICE=ttyS1:115200:8:n:1:off
 #DEVICE=ttyUSB0:115200:8:n:1:off
 
 test1:
-	./str2str -in serial://$(DEVICE) -out file://test1.out -t 2
+	./str2str-swiftnav -in serial://$(DEVICE) -out file://test1.out -t 2
 
 test2:
-	./str2str -in serial://$(DEVICE) -out tcpsvr://:2102 -c ../../../data/oem4_raw_10hz.cmd -t 5
+	./str2str-swiftnav -in serial://$(DEVICE) -out tcpsvr://:2102 -c ../../../data/oem4_raw_10hz.cmd -t 5
 
 test3:
-	./str2str -in serial://$(DEVICE) -out ntrips://:sesam@localhost:8000/BUCU0 -c ../../../data/oem4_raw_10hz.cmd -t 5
+	./str2str-swiftnav -in serial://$(DEVICE) -out ntrips://:sesam@localhost:8000/BUCU0 -c ../../../data/oem4_raw_10hz.cmd -t 5
 
 test4:
-	./str2str -in ../oem6_20121107.gps#nov -out oem6_20121107.rtcm3#rtcm3 -sta 123 -msg "1077(10),1087(10),1097(10),1107(10),1117(10),1019,1020"
+	./str2str-swiftnav -in ../oem6_20121107.gps#nov -out oem6_20121107.rtcm3#rtcm3 -sta 123 -msg "1077(10),1087(10),1097(10),1107(10),1117(10),1019,1020"
 
 test5:
-	./str2str -in ../oem6_20121107.gps#nov -out oem6_20121107_gal.rtcm3#rtcm3 -msg "1097(10)"
+	./str2str-swiftnav -in ../oem6_20121107.gps#nov -out oem6_20121107_gal.rtcm3#rtcm3 -msg "1097(10)"
 
 test6:
-	./str2str -in serial://ttyS54:115200#nov -out tcpsvr://:2103#rtcm3 -c ../../../data/oem4_raw_10hz.cmd
+	./str2str-swiftnav -in serial://ttyS54:115200#nov -out tcpsvr://:2103#rtcm3 -c ../../../data/oem4_raw_10hz.cmd
 
 clean:
-	rm -f str2str str2str.exe *.o *.out *.trace
+	rm -f str2str-swiftnav str2str-swiftnav.exe *.o *.out *.trace
 
