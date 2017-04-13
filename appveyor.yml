@@ -18,6 +18,7 @@ build_script:
       if ($env:Compiler -eq "mingw") {
         cd ./app/convbin/gcc 
         make clean all
+      }
       if ($env:Compiler -eq "vs14") {
         cd ./app/convbin/vs14
         msbuild convbin-swiftnav.sln
