@@ -21,12 +21,19 @@ build_script:
       }
       if ($env:Compiler -eq "vs14") {
         cd ./app/convbin/vs14
-        msbuild convbin-swiftnav.sln
+        msbuild convbin-swiftnav.sln /p:Configuration=Release
+        msbuild convbin-swiftnav.sln /p:Configuration=Debug
       }
 
 artifacts:
   - path: app\convbin\gcc\convbin_swift*
-    name: convbin
+    name: convbin_mingw
+
+  - path: app\convbin\vs14\Debug\convbin_swiftnav.exe
+    name: convbin_debug_vs
+  
+  - path: app\convbin\vs14\Release\convbin_swiftnav.exe
+    name: convbin_rel_vs
 
 test_script:
   - ps: | 
