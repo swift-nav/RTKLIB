@@ -1,4 +1,14 @@
-# makefile for rtkrcv
+# makefile for rtkrcv-swiftnav
+
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
 
 BINDIR = /usr/local/bin
 SRC    = ../../../src
@@ -9,6 +19,19 @@ CTARGET= -DENAGLO -DENAQZS -DENACMP -DENAGAL -DENAIRN -DNFREQ=7 -DNEXOBS=3 -DSVR
 
 CFLAGS = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) -I.. -DTRACE $(CTARGET)
 LDLIBS = -lm -lpthread
+
+ifeq ($(UNAME),Windows)
+OPTIONS += -DWIN32
+endif
+
+LDLIBS= -lm -lpthread
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
+
 
 all : rtkrcv-swiftnav
 rtkrcv-swiftnav     : rtkrcv.o vt.o rtkcmn.o rtksvr.o rtkpos.o geoid.o solution.o lambda.o

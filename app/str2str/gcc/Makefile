@@ -1,4 +1,13 @@
 # makefile for str2str-swiftnav
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
 
 BINDIR = /usr/local/bin
 SRC    = ../../../src
@@ -11,7 +20,19 @@ CTARGET=
 #OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=3 -DNEXOBS=3
 OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=7 -DNEXOBS=3 -DSVR_REUSEADDR
 CFLAGS = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) $(OPTION) $(CTARGET)
-LDLIBS = -lm -lpthread
+
+ifeq ($(UNAME),Windows)
+OPTIONS += -DWIN32
+endif
+
+LDLIBS= -lm -lpthread
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
+
 
 all : str2str-swiftnav
 str2str-swiftnav    : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
