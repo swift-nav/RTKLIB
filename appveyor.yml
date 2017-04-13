@@ -1,9 +1,9 @@
-os: Visual Studio 2013
+os: Visual Studio 2014
 
 environment:
   matrix:
   - Compiler: mingw
-  - Compiler: msc
+  - Compiler: vs14
 
 #cache:
 #  - C:\mingw64
@@ -18,6 +18,9 @@ build_script:
       if ($env:Compiler -eq "mingw") {
         cd ./app/convbin/gcc 
         make clean all
+      if ($env:Compiler -eq "vs14") {
+        cd ./app/convbin/vs14
+        msbuild convbin-swiftnav.sln
       }
 
 artifacts:
