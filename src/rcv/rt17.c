@@ -1781,7 +1781,7 @@ static int DecodeType17(raw_t *Raw, unsigned int rif)
             if (Flags1 & M_BIT6) /* L1 data valid */
             {           
                 /* Measure of satellite signal strength (dB) */
-                obs->SNR[0] = R8(p) * 4.0;
+                obs->SNR[0] = (unsigned char)(R8(p) * 4.0);
                 p += 8;
 
                 /* Full L1 C/A code or P-code pseudorange (meters) */
@@ -1794,7 +1794,7 @@ static int DecodeType17(raw_t *Raw, unsigned int rif)
                 p += 8;
 
                 /* L1 Doppler (Hz) */
-                obs->D[0] = R8(p);
+                obs->D[0] = (float)R8(p);
                 p += 8;
 
                 /* Reserved 8 bytes */
@@ -1804,7 +1804,7 @@ static int DecodeType17(raw_t *Raw, unsigned int rif)
             if (Flags1 & M_BIT0) /* L2 data loaded */
             {
                 /* Measure of L2 signal strength (dB) */
-                obs->SNR[1] = R8(p) * 4.0;
+                obs->SNR[1] = (unsigned char)(R8(p) * 4.0);
                 p += 8;
 
                 /* L2 Continuous Phase (cycles) */                
@@ -1830,7 +1830,7 @@ static int DecodeType17(raw_t *Raw, unsigned int rif)
                 p++; /* U1 Reserved byte */
 
                 /* L2 Doppler (Hz) */
-                obs->D[1] = R8(p);
+                obs->D[1] = (float)R8(p);
                 p += 8;
             }
         }
