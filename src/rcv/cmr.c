@@ -2439,7 +2439,7 @@ static int DecodeCmrType4(raw_t *Raw)
 static gtime_t DoubleToGtime(double Double)
 {
     gtime_t Gtime;
-    Gtime.time = floor(Double);
+    Gtime.time = (time_t)floor(Double);
     Gtime.sec = Double - Gtime.time;
     return Gtime;
 }
@@ -2556,8 +2556,8 @@ static int ReferenceCmrObs(raw_t *Raw, gtime_t Time, unsigned char Type, double 
     obs->sat     = b->Sat;
     obs->code[0] = b->Code[0];
     obs->code[1] = b->Code[1];
-    obs->SNR[0]  = SNRATIO(b->SNR[0]);
-    obs->SNR[1]  = SNRATIO(b->SNR[1]);
+    obs->SNR[0]  = (unsigned char)(SNRATIO(b->SNR[0]));
+    obs->SNR[1]  = (unsigned char)(SNRATIO(b->SNR[1]));
     obs->LLI[0]  = b->LLI[0];
     obs->LLI[1]  = b->LLI[1];
 
