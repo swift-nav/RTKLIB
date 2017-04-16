@@ -345,7 +345,7 @@ static int decode_msgobs(raw_t *raw){
         uLockInfo);*/
 
     raw->obuf.data[ii].time = time;
-    raw->obuf.data[ii].sat  = sat;
+    raw->obuf.data[ii].sat  = (unsigned char)sat;
 
     /* store signal info */
     if (uFreq < NFREQ+NEXOBS) {
@@ -419,7 +419,7 @@ static int decode_gpsnav(raw_t *raw) {
   uRes       = U1(puiTmp +   3);
   eph.toes   = U4(puiTmp +   4);
   uWeekE     = U2(puiTmp +   8);
-  eph.sva    = R8(puiTmp +  10);          /* URA */
+  eph.sva    = (int)R8(puiTmp +  10);          /* URA */
   eph.fit    = U4(puiTmp +  14) ? 0 : 4;
   eph.flag   = U1(puiTmp +  15);
 

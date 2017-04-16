@@ -175,7 +175,7 @@ static int decode_stqraw(raw_t *raw)
         
         raw->obs.data[n].P[0]=pr1;
         raw->obs.data[n].L[0]=cp1;
-        raw->obs.data[n].D[0]=!(ind&2)?0.0:R4(p+18);
+        raw->obs.data[n].D[0]=!(ind&2)?0.0f:(float)R4(p+18);
         raw->obs.data[n].SNR[0]=U1(p+1)*4;
         raw->obs.data[n].LLI[0]=0;
         raw->obs.data[n].code[0]=sys==SYS_CMP?CODE_L1I:CODE_L1C;
