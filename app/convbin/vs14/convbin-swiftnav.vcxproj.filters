@@ -5,7 +5,10 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\rcv">
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{e467857c-cd58-4c0e-be68-bef5943d3c0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\rcv">
       <UniqueIdentifier>{21d2225d-5fd3-46c6-bfd3-01bfcffd4b76}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -13,83 +16,83 @@
     <ClCompile Include="..\convbin.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\rinex.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\convrnx.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\ephemeris.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\ionex.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\pntpos.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\preceph.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\rcvraw.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\rtcm.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\rtcm2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\rtcm3.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\rtcm3e.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\sbas.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\binex.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\cmr.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\crescent.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\gw10.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\javad.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\novatel.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\nvs.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\rt17.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\septentrio.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\skytraq.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\swiftnav.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\ublox.c">
-      <Filter>Source Files\rcv</Filter>
+      <Filter>Source Files\src\rcv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\convrnx.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ephemeris.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ionex.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\pntpos.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\preceph.c">
+      <Filter>Source Files\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\qzslex.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\rcvraw.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\rinex.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\rtcm.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\rtcm2.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\rtcm3.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\rtcm3e.c">
+      <Filter>Source Files\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\rtkcmn.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\sbas.c">
+      <Filter>Source Files\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
