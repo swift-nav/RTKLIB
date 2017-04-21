@@ -1,9 +1,9 @@
-os: Visual Studio 2013
+os: Visual Studio 2015
 
 environment:
   matrix:
   - Compiler: mingw
-  - Compiler: msc
+  - Compiler: vs14
 
 #cache:
 #  - C:\mingw64
@@ -19,10 +19,21 @@ build_script:
         cd ./app/convbin/gcc 
         make clean all
       }
+      if ($env:Compiler -eq "vs14") {
+        cd ./app/convbin/vs14
+        msbuild convbin-swiftnav.sln /p:Configuration=Release
+        msbuild convbin-swiftnav.sln /p:Configuration=Debug
+      }
 
 artifacts:
   - path: app\convbin\gcc\convbin_swift*
-    name: convbin
+    name: convbin_mingw
+
+  - path: app\convbin\vs14\Debug\convbin_swiftnav.exe
+    name: convbin_debug_vs
+  
+  - path: app\convbin\vs14\Release\convbin_swiftnav.exe
+    name: convbin_rel_vs
 
 test_script:
   - ps: | 
