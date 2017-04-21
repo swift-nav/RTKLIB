@@ -26,13 +26,13 @@ build_script:
       }
 
 artifacts:
-  - path: app\convbin\gcc\convbin_swift*
+  - path: app\convbin\gcc\convbin-swift*
     name: convbin_mingw
 
-  - path: app\convbin\vs14\Debug\convbin_swiftnav.exe
+  - path: app\convbin\vs14\Debug\convbin-swiftnav.exe
     name: convbin_debug_vs
   
-  - path: app\convbin\vs14\Release\convbin_swiftnav.exe
+  - path: app\convbin\vs14\Release\convbin-swiftnav.exe
     name: convbin_rel_vs
 
 test_script:
