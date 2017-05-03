@@ -41,7 +41,7 @@
 
 static const char rcsid[]="$Id: convbin.c,v 1.1 2008/07/17 22:13:04 ttaka Exp $";
 
-#define PRGNAME   "CONVBIN"
+#define PRGNAME   "CONVBIN-SwiftNav"
 #define TRACEFILE "convbin.trace"
 
 /* help text -----------------------------------------------------------------*/
@@ -49,13 +49,13 @@ static const char *help[]={
     "",
     " Synopsys",
     "",
-    " convbin [option ...] file",
+    " convbin-swiftnav [option ...] file",
     "",
     " Description",
     "",
-    " Convert RTCM, receiver raw data log and RINEX file to RINEX and SBAS/LEX",
-    " message file. SBAS message file complies with RTKLIB SBAS/LEX message",
-    " format. It supports the following messages or files.",
+    " Converts Swift Navigation receiver SBP binary and JSON raw data logs to RINEX files.",
+/*  " SBAS message file complies with RTKLIB SBAS/LEX message format.",
+    " It supports following file formats:",
     "",
     " RTCM 2                : Type 1, 3, 9, 14, 16, 17, 18, 19, 22",
     " RTCM 3                : Type 1002, 1004, 1005, 1006, 1010, 1012, 1019, 1020",
@@ -63,7 +63,6 @@ static const char *help[]={
     " NovAtel OEMV/4,OEMStar: RANGECMPB, RANGEB, RAWEPHEMB, IONUTCB, RAWWASSFRAMEB",
     " NovAtel OEM3          : RGEB, REGD, REPB, FRMB, IONB, UTCB",
     " u-blox LEA-4T/5T/6T   : RXM-RAW, RXM-SFRB",
-    " Swift Navigation      : SBP",
     " Hemisphere            : BIN76, BIN80, BIN94, BIN95, BIN96",
     " SkyTraq S1315F        : msg0xDD, msg0xE0, msg0xDC",
     " GW10                  : msg0x08, msg0x03, msg0x27, msg0x20",
@@ -76,7 +75,7 @@ static const char *help[]={
     " Trimble               : RT17",
     " Septentrio            : SBF",
     " CMR                   : CMR Type 0, 1, 2, 3, 4, CMR+ Type 1, 2, 3",
-    " RINEX                 : OBS, NAV, GNAV, HNAV, LNAV, QNAV",
+    " RINEX                 : OBS, NAV, GNAV, HNAV, LNAV, QNAV",                      */
     "",
     " Options [default]",
     "",
@@ -86,7 +85,7 @@ static const char *help[]={
     "     -tr y/m/d h:m:s  approximated time for RTCM/CMR/CMR+ messages",
     "     -ti tint     observation data interval (s) [all]",
     "     -span span   time span (h) [all]",
-    "     -r format    log format type",
+    "     -r format    log format type:",
     "                  sbp  = Swift Navigation SBP",
     "                  json = Swift Navigation SBP-JSON",
     "     -ro opt      receiver options",
@@ -120,12 +119,12 @@ static const char *help[]={
     "     -s sfile     output SBAS message file",
     "     -trace level output trace level [off]",
     "",
-    " If any output file specified, default output files (<file>.obs,",
+    " If not any output file is specified, default output files (<file>.obs,",
     " <file>.nav, <file>.gnav, <file>.hnav, <file>.qnav, <file>.lnav and",
-    " <file>.sbs) are used.",
+    " <file>.sbs) are used. Empty output files are deleted after processing.",
     "",
-    " If receiver type is not specified, type is recognized by the input",
-    " file extension as follows.",
+    " If log format type is not specified, format type is recognized by the input",
+    " file extension as following:",
     "     *.sbp         Swift Navigation SBP",
     "     *.json        Swift Navigation SBP-JSON",
 };
@@ -472,18 +471,20 @@ int main(int argc, char **argv)
   int format,trace=0,stat;
   char *ifile="",*ofile[7]={0},*dir="";
 
+  fprintf( stderr, "%s v%s (RTKLIB %s%s)\n", PRGNAME, SWIFT_REV, VER_RTKLIB, PATCH_LEVEL );
+
   /* parse command line options */
   format=cmdopts(argc,argv,&opt,&ifile,ofile,&dir,&trace);
 
   if (!*ifile) {
-    fprintf(stderr,"no input file\n");
+    fprintf(stderr,"ERROR: no input file. Use -h option for help.\n");
     return -1;
   }
   if (format<0) {
-    fprintf(stderr,"input format can not be recognized\n");
+    fprintf(stderr,"ERROR: input format can not be recognized. Use -h option for help.\n");
     return -1;
   }
-  sprintf(opt.prog,"%s %s",PRGNAME,VER_RTKLIB);
+  sprintf(opt.prog,"%s %s",PRGNAME,SWIFT_REV);
   sprintf(opt.comment[0],"log: %-55.55s",ifile);
   sprintf(opt.comment[1],"format: %s",formatstrs[format]);
   if (*opt.rcvopt) {
