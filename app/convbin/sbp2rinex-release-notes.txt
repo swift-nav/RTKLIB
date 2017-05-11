@@ -1,6 +1,6 @@
 ===============================================================================
                               Swift Navigation, Inc.
-                          CONVBIN-SwiftNav  Release Notes
+                             sbp2rinex  Release Notes
 
 Executables Download:   support.swiftnav.com
 Source Code Location:   github.com/swift-nav/RTKLIB
