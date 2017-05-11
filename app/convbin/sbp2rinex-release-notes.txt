@@ -8,16 +8,15 @@ Source Code Location:   github.com/swift-nav/RTKLIB
 
 
 -------------------------------------------------------------------------------
-Release 1.0  (Initial Release)                                       2017-05-03
+Release 1.0  (Initial Release)                                       2017-05-11
 -------------------------------------------------------------------------------
 FEATURES:
-* Converts Swift Navigation Piksi Multi GNSS receiver SBP binary and JSON logs to Rinex
+* Converts Swift Navigation Piksi Multi GNSS receiver SBP binary and SBP JSON logs to Rinex
 * Supports GPS L1/L2
 * Executables operate on Windows, Linux and OSX PC
 
 KNOWN ISSUES:
-* Converting specifying start/stop time and observations interval is not working correctly.
+* Convertion with specified start/stop time and observations interval is not working correctly.
 
 NOTES:
 * Implementation is based on RTKLIB v2.4.3 b26
-
