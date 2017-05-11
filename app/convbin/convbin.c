@@ -41,7 +41,7 @@
 
 static const char rcsid[]="$Id: convbin.c,v 1.1 2008/07/17 22:13:04 ttaka Exp $";
 
-#define PRGNAME   "CONVBIN-SwiftNav"
+#define PRGNAME   "sbp2rinex"
 #define TRACEFILE "convbin.trace"
 
 /* help text -----------------------------------------------------------------*/
@@ -49,7 +49,7 @@ static const char *help[]={
     "",
     " Synopsys",
     "",
-    " convbin-swiftnav [option ...] file",
+    " sbp2rinex [option ...] file",
     "",
     " Description",
     "",

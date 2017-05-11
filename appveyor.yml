@@ -26,14 +26,14 @@ build_script:
       }
 
 artifacts:
-  - path: app\convbin\gcc\convbin-swift*
-    name: convbin_mingw
+  - path: app\convbin\gcc\sbp2rinex*
+    name: sbp2rinex_mingw
 
-  - path: app\convbin\vs14\Debug\convbin-swiftnav.exe
-    name: convbin_debug_vs
+  - path: app\convbin\vs14\Debug\sbp2rinex.exe
+    name: sbp2rinex_vs_debug
   
-  - path: app\convbin\vs14\Release\convbin-swiftnav.exe
-    name: convbin_rel_vs
+  - path: app\convbin\vs14\Release\sbp2rinex.exe
+    name: sbp2rinex_vs_release
 
 test_script:
   - ps: | 
