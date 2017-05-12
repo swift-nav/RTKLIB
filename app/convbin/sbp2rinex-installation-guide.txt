@@ -1,0 +1,38 @@
+===============================================================================
+                              Swift Navigation, Inc.
+                           sbp2rinex  Installation Guide
+
+Executables Download:   support.swiftnav.com
+Source Code Location:   github.com/swift-nav/RTKLIB
+===============================================================================
+
+The sbp2rinex converter is a command line tool and is distributed in a compressed 
+file for Windows, Linux and OSX computers.
+
+The binary executable in the archive can be run and used immediately after decompressing.
+For convenience, the steps below provide a possible installation method for your platform 
+to make the converter available globally on the system.
+
+
+Windows
+  1. Decompress (unzip) distribution file to a temporary folder
+  2. Create a tool directory if it doesn't exist yet, e.g. c:\tools\
+  3. Copy sbp2rinex.exe file to the tools folder
+  4. Add above folder name to the system Path variable to be able to call the converter 
+     by the name only
+     (Control Panel -> System -> Advanced System Settings -> Environment Variables -> 
+      System Variables -> Path variable)
+
+
+Linux and OSX
+  1. Decompress (untar) distribution file to a temporary folder
+       e.g. tar -xzvf sbp2rinex-1.0.tar.gz
+  2. Create a tools directory if it doesn't exist yet
+       e.g. sudo mkdir /usr/local/bin
+  3. Copy sbp2rinex file to the tools directory  
+       e.g. sudo cp sbp2rinex /usr/local/bin
+  4. Change file permissions to make is executable for all users
+       e.g. sudo chmod 755 /usr/local/bin/sbp2rinex
+
+
+Refer to sbp2rinex-users-guide.txt for usage details.
