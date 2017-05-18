@@ -949,6 +949,7 @@ void __fastcall TMainWindow::ConvertFile(void)
 	LabelOutFile->Enabled=true;
 	LabelFormat ->Enabled=true;
 	
+
 #if 0
 	// set time-start/end if time not specified
 	if (!TimeStartF->Checked&&rnxopt.tstart.time!=0) {
@@ -1158,20 +1159,21 @@ void __fastcall TMainWindow::SaveOpt(void)
 	ini->WriteInteger("viewer","fontsize",TTextViewer::FontD->Size);
 	ini->WriteInteger("window","width",				  Width);
 	delete ini;
+
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TMainWindow::Panel4Resize(TObject *Sender)
 {
-	TBitBtn *btns[]={BtnPlot,BtnPost,BtnOptions,BtnConvert,BtnExit};
-	int w=(Panel4->Width-2)/5;
-	
-	for (int i=0;i<5;i++) {
-		btns[i]->Width=w;
-		btns[i]->Left=i*w+1;
-	}
-	BtnAbort->Width=BtnConvert->Width;
-	BtnAbort->Left =BtnConvert->Left;
+  TBitBtn *btns[]={BtnPlot,BtnPost,BtnOptions,BtnConvert,BtnExit};
+  int w=(Panel4->Width-2)/5;
+
+  for (int i=0;i<5;i++) {
+    btns[i]->Width=w;
+    btns[i]->Left=i*w+1;
+  }
+  BtnAbort->Width=BtnConvert->Width;
+  BtnAbort->Left =BtnConvert->Left;
 }
 //---------------------------------------------------------------------------
 

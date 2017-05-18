@@ -62,6 +62,8 @@ extern "C" {
 
 #define SWIFT_REV   "1.0"
 
+#define SWIFT_REV   "1.0"
+
 #define COPYRIGHT_RTKLIB \
             "Copyright (C) 2007-2017 T.Takasu\nAll rights reserved."
 
