@@ -781,7 +781,7 @@ static void closefile(FILE **ofp, const rnxopt_t *opt, nav_t *nav)
 static void outrnxevent(FILE *fp, rnxopt_t *opt, int staid, stas_t *stas)
 {
     stas_t *p;
-    double pos[3],enu[3],del[3];
+    double pos[3]={0.0},enu[3]={0.0},del[3]={0.0};
 
     trace(2,"outrnxevent: staid=%d\n",staid);
 
