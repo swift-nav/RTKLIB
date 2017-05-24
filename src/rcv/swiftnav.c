@@ -25,14 +25,14 @@ static const char rcsid[]="$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
 
 
 /* get fields (little-endian) ------------------------------------------------*/
-#define U1(p) (*((uint8_t *)(p)))
-#define I1(p) (*((char *)(p)))
-static uint16_t  U2(uint8_t *p) {uint16_t u; memcpy(&u,p,2); return u;}
+#define U1(p)    (*((uint8_t *)(p)))
+#define I1(p)    (*((int8_t *)(p)))
+static uint16_t  U2(uint8_t *p) {uint16_t   u; memcpy(&u,p,2); return u;}
 static uint32_t  U4(uint8_t *p) {uint32_t   u; memcpy(&u,p,4); return u;}
-static float     R4(uint8_t *p) {float          r; memcpy(&r,p,4); return r;}
-static double    R8(uint8_t *p) {double         r; memcpy(&r,p,8); return r;}
-static int32_t   I4(uint8_t *p) {signed int     u; memcpy(&u,p,4); return u;}
-static short     I2(uint8_t *p) {short          i; memcpy(&i,p,2); return i;}
+static float     R4(uint8_t *p) {float      r; memcpy(&r,p,4); return r;}
+static double    R8(uint8_t *p) {double     r; memcpy(&r,p,8); return r;}
+static int32_t   I4(uint8_t *p) {int32_t    u; memcpy(&u,p,4); return u;}
+static int16_t   I2(uint8_t *p) {int16_t    i; memcpy(&i,p,2); return i;}
 
 /* checksum lookup table -----------------------------------------------------*/
 static const uint32_t CRC_16CCIT_LookUp[256] = {
@@ -652,10 +652,10 @@ extern int input_sbpf(raw_t *raw, FILE *fp)
  *-----------------------------------------------------------------------------*/
 extern int input_sbpjsonf(raw_t *raw, FILE *fp)
 {
-  const char JSON_MSGTYPE_FIELD[] = {"\"msg_type\":"};
-  const char JSON_SENDER_FIELD[]  = {"\"sender\":"};
-  const char JSON_PAYLOAD_FIELD[] = {"\"payload\":"};
-  const char JSON_CRC_FIELD[]  = {"\"crc\":"};
+  const char JSON_MSGTYPE_FIELD[] = "\"msg_type\":";
+  const char JSON_SENDER_FIELD[]  = "\"sender\":";
+  const char JSON_PAYLOAD_FIELD[] = "\"payload\":";
+  const char JSON_CRC_FIELD[]     = "\"crc\":";
   uint8_t *pcPayloadBeg, *pcPayloadEnd;
   int stat,iRet;
   uint32_t uPayloadSize, uMsgType, uSender, uMsgCrc, uLength;
@@ -676,7 +676,7 @@ extern int input_sbpjsonf(raw_t *raw, FILE *fp)
 
   pcTmp = strstr((char*)raw->buff, JSON_MSGTYPE_FIELD);
   if (NULL == pcTmp) return 0;
-  iRet = sscanf(pcTmp + sizeof(JSON_MSGTYPE_FIELD), "%u", &uMsgType);
+  iRet = sscanf(pcTmp + strlen(JSON_MSGTYPE_FIELD), "%u", &uMsgType);
   if (0 == iRet) return 0;
 
   /* avoid parsing the payload if the message isn't supported in the first place */
@@ -689,24 +689,25 @@ extern int input_sbpjsonf(raw_t *raw, FILE *fp)
   /* sender in clear */
   pcTmp = strstr((char*)raw->buff, JSON_SENDER_FIELD);
   if (NULL == pcTmp) return 0;
-  iRet = sscanf(pcTmp + sizeof(JSON_SENDER_FIELD), "%u", &uSender);
+  iRet = sscanf(pcTmp + strlen(JSON_SENDER_FIELD), "%u", &uSender);
   if (0 == iRet) return 0;
 
   /* crc */
   pcTmp = strstr((char*)raw->buff, JSON_CRC_FIELD);
   if (NULL == pcTmp) return 0;
-  iRet = sscanf(pcTmp + sizeof(JSON_CRC_FIELD), "%u", &uMsgCrc);
+  iRet = sscanf(pcTmp + strlen(JSON_CRC_FIELD), "%u", &uMsgCrc);
   if (0 == iRet) return 0;
 
   /* payload */
   pcTmp = strstr((char*)raw->buff, JSON_PAYLOAD_FIELD);
   if (NULL == pcTmp) return 0;
-  pcTmp += sizeof(JSON_PAYLOAD_FIELD);
+  pcTmp += strlen(JSON_PAYLOAD_FIELD);
 
   pcPayloadBeg = (uint8_t*) strchr((char*)pcTmp,        '\"')+1;
   pcPayloadEnd = (uint8_t*) strchr((char*)pcPayloadBeg, '\"')-1;
   uPayloadSize = pcPayloadEnd - pcPayloadBeg + 1;
-  /*iPayloadSize = 11 + 17*((iPayloadSize - 11)/17);*/
+  pcPayloadEnd[1] = 0;
+  /* fprintf(stderr, "%4d: %s\n", uPayloadSize, pcPayloadBeg); */
   memset(puPayloadTmp, 0, sizeof(puPayloadTmp));
   uLength = 256;
   Base64_Decode( pcPayloadBeg, uPayloadSize, puPayloadTmp, &uLength );

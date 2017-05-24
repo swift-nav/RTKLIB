@@ -3223,6 +3223,14 @@ extern int reppath(const char *path, char *rpath, gtime_t time, const char *rov,
     int week,dow,doy,stat=0;
     char rep[64];
 
+    if (NULL == rpath) {
+      fprintf(stderr, "\n\n%s rpath is NULL\n\n", "reppath()");
+      return 0;
+    }
+    if (NULL == path) {
+      fprintf(stderr, "\n\n%s path is NULL\n\n", "reppath()");
+      return 0;
+    }
     strcpy(rpath,path);
 
     if (!strstr(rpath,"%")) return 0;

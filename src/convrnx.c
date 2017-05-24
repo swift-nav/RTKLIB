@@ -34,7 +34,7 @@
 
 static const char rcsid[]="$Id:$";
 
-#define NOUTFILE        9       /* number of output files */
+#define NOUTFILE        7       /* number of output files */
 #define TSTARTMARGIN    60.0    /* time margin for file name replacement */
 #define SHOW_STATS_PER  (256)
 /* type definition -----------------------------------------------------------*/
@@ -152,9 +152,9 @@ static void rtcm2opt(const rtcm_t *rtcm, const stas_t *stas, rnxopt_t *opt)
     const sta_t *sta=NULL;
     double pos[3],enu[3];
     int i,staid=-1;
-    
+
     trace(3,"rtcm2opt:\n");
-    
+
     for (p=stas;p;p=p->next) {
         sta=&p->sta;
         staid=p->staid;
@@ -471,9 +471,9 @@ static void setopt_obstype(const unsigned char *codes,
 static void update_stas(stas_t **stas, strfile_t *str)
 {
     stas_t *p;
-    
+
     if (str->format!=STRFMT_RTCM2&&str->format!=STRFMT_RTCM3) return;
-    
+
     for (p=*stas;p;p=p->next) {
         if (p->staid==str->rtcm.staid) {
             p->sta=str->rtcm.sta;
@@ -496,35 +496,35 @@ static int scan_obstype(int format, char **files, int nf, rnxopt_t *opt,
     unsigned char types[8][33]={{0}};
     char msg[128];
     int i,j,k,l,m,c=0,type,sys,abort=0,n[NOUTFILE]={0};
-    
+
     trace(3,"scan_obstype: nf=%s, opt=%s\n",nf,opt);
-    
+
     if (!(str=gen_strfile(format,opt->rcvopt,*time))) return 0;
-    
+
     for (m=0;m<nf&&!abort;m++) {
-        
+
         if (!open_strfile(str,files[m])) {
             continue;
         }
         /* scan codes and station info in input file */
         while ((type=input_strfile(str))>=-1) {
-            
+
             if (type==5) { /* update station list */
                 update_stas(stas,str);
                 continue;
             }
             if (type!=1||str->obs->n<=0) continue;
-            
+
             if (!opt->ts.time||timediff(str->obs->data[0].time,opt->ts)>=0.001) {
-                 
+
                 for (i=0;i<str->obs->n;i++) {
                     sys=satsys(str->obs->data[i].sat,NULL);
                     for (l=0;navsys[l];l++) if (navsys[l]==sys) break;
                     if (!navsys[l]) continue;
-                    
+
                     for (j=0;j<NFREQ+NEXOBS;j++) {
                         if (!str->obs->data[i].code[j]) continue;
-                        
+
                         for (k=0;k<n[l];k++) {
                             if (codes[l][k]==str->obs->data[i].code[j]) break;
                         }
@@ -543,9 +543,9 @@ static int scan_obstype(int format, char **files, int nf, rnxopt_t *opt,
                 if (!time->time) *time=str->obs->data[0].time;
             }
             if (opt->te.time&&timediff(str->obs->data[0].time,opt->te)>10.0) break;
-            
+
             if ((++c)%SHOW_STATS_PER) continue;
-            
+
             sprintf(msg,"scanning: %s %s%s%s%s%s%s%s",time_str(str->time,0),
                     n[0]?"G":"",n[1]?"R":"",n[2]?"E":"",n[3]?"J":"",
                     n[4]?"S":"",n[5]?"C":"",n[6]?"I":"");
@@ -554,9 +554,9 @@ static int scan_obstype(int format, char **files, int nf, rnxopt_t *opt,
         close_strfile(str);
     }
     free_strfile(str);
-    
+
     showmsg("");
-    
+
     if (abort) {
         trace(2,"aborted in scan\n");
         return 0;
@@ -673,7 +673,7 @@ static void set_obstype(int format, rnxopt_t *opt)
     int i;
 
     trace(3,"set_obstype: format=%d\n",format);
-    
+
     for (i=0;i<NOUTFILE;i++) {
 
         switch (format) {
@@ -782,9 +782,9 @@ static void outrnxevent(FILE *fp, rnxopt_t *opt, int staid, stas_t *stas)
 {
     stas_t *p;
     double pos[3],enu[3],del[3];
-    
+
     trace(2,"outrnxevent: staid=%d\n",staid);
-    
+
     for (p=stas;p;p=p->next) {
         if (p->staid==staid) break;
     }
@@ -792,14 +792,14 @@ static void outrnxevent(FILE *fp, rnxopt_t *opt, int staid, stas_t *stas)
     fprintf(fp,"station ID: %4d%44s%-20s\n",staid,"","COMMENT");
     fprintf(fp,"%-60s%-20s\n",opt->marker,"MARKER NAME");
     if (!p) return;
-    
+
     fprintf(fp,"%-20.20s%-20.20s%-20.20s%-20s\n",p->sta.recsno,
             p->sta.rectype,p->sta.recver,"REC # / TYPE / VERS");
     fprintf(fp,"%-20.20s%-20.20s%-20.20s%-20s\n",p->sta.antsno,
             p->sta.antdes,"","ANT # / TYPE");
     fprintf(fp,"%14.4f%14.4f%14.4f%-18s%-20s\n",p->sta.pos[0],
             p->sta.pos[1],p->sta.pos[2],"","APPROX POSITION XYZ");
-    
+
     /* antenna delta */
     if (norm(p->sta.del,3)>0.0) {
         if (!p->sta.deltype&&norm(p->sta.del,3)>0.0) { /* enu */
@@ -842,7 +842,7 @@ static void convobs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *staid,
 
     /* restore slips */
     restslips(slips,str->obs->data,str->obs->n);
-    
+
     /* output event if staid changed */
     if ((str->format==STRFMT_RTCM2||str->format==STRFMT_RTCM3)&&
         str->rtcm.staid!=*staid) {
@@ -889,7 +889,7 @@ static void convnav(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
     else if (sys==SYS_GLO) {
 
         if (opt->exsats[str->sat-1]==1||!screent(str->time,ts2,te2,0.0)) return;
-        
+
         if (ofp[1]&&!sep_nav) {
 
             /* output rinex nav */
@@ -907,15 +907,15 @@ static void convnav(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
     else if (sys==SYS_SBS) {
 
         if (opt->exsats[str->sat-1]==1||!screent(str->time,ts1,te1,0.0)) return;
-        
+
         if (ofp[1]&&!sep_nav) {
 
             /* output rinex nav */
             outrnxhnavb(ofp[1],opt,str->nav->seph+prn-MINPRNSBS);
             n[1]++;
         }
-        
-        if (ofp[3]&&sep_nav) {  
+
+        if (ofp[3]&&sep_nav) {
             /* output rinex hnav */
             outrnxhnavb(ofp[3],opt,str->nav->seph+prn-MINPRNSBS);
             n[3]++;
@@ -924,7 +924,7 @@ static void convnav(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
     else if (sys==SYS_QZS) {
 
         if (opt->exsats[str->sat-1]==1||!screent(str->time,ts1,te1,0.0)) return;
-        
+
         if (ofp[1]&&!sep_nav) {
 
             /* output rinex nav */
@@ -940,14 +940,14 @@ static void convnav(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
     }
     else if (sys==SYS_GAL) {
         if (opt->exsats[str->sat-1]==1||!screent(str->time,ts1,te1,0.0)) return;
-        
+
         if (ofp[1]&&!sep_nav) {
 
             /* output rinex nav */
             outrnxnavb(ofp[1],opt,str->nav->eph+str->sat-1);
             n[1]++;
         }
-        
+
         if (ofp[5]&&sep_nav) {
             /* output rinex lnav */
             outrnxnavb(ofp[5],opt,str->nav->eph+str->sat-1);
@@ -956,7 +956,7 @@ static void convnav(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
     }
     else if (sys==SYS_CMP) {
         if (opt->exsats[str->sat-1]==1||!screent(str->time,ts1,te1,0.0)) return;
-        
+
         if (ofp[1]&&!sep_nav) {
 
             /* output rinex nav */
@@ -964,7 +964,7 @@ static void convnav(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
             n[1]++;
         }
         if (ofp[6]&&sep_nav) {
-            
+
             /* output rinex cnav */
             outrnxnavb(ofp[6],opt,str->nav->eph+str->sat-1);
             n[6]++;
@@ -972,7 +972,7 @@ static void convnav(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
     }
     else if (sys==SYS_IRN) {
         if (opt->exsats[str->sat-1]==1||!screent(str->time,ts1,te1,0.0)) return;
-        
+
         if (ofp[1]&&!sep_nav) {
 
             /* output rinex nav */
@@ -980,7 +980,7 @@ static void convnav(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
             n[1]++;
         }
         if (ofp[7]&&sep_nav) {
-            
+
             /* output rinex inav */
             outrnxnavb(ofp[7],opt,str->nav->eph+str->sat-1);
             n[7]++;
@@ -1008,7 +1008,7 @@ static void convsbs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
         return;
     }
     if (!(sat=satno(sys,prn))||opt->exsats[sat-1]==1) return;
-    
+
     if (ofp[NOUTFILE-1]) { /* output sbas log */
 
         if (screent(gpst2time(str->raw.sbsmsg.week,str->raw.sbsmsg.tow),opt->ts,
@@ -1018,7 +1018,7 @@ static void convsbs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
     }
     if (!(opt->navsys&SYS_SBS)||msg!=9||
         !screent(str->time,ts1,te1,0.0)) return;
-    
+
     if (ofp[1]&&!sep_nav) {
 
         /* output rinex nav */
@@ -1101,7 +1101,7 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
     int i,j,nf,type,n[NOUTFILE+1]={0},staid=-1,abort=0;
     char path[1024],*paths[NOUTFILE],s[NOUTFILE][1024];
     char *epath[MAXEXFILE]={0},*staname=*opt->staid?opt->staid:"0000";
-    
+
     trace(3,"convrnx_s: sess=%d format=%d file=%s ofile=%s %s %s %s %s %s %s %s %s\n",
           sess,format,file,ofile[0],ofile[1],ofile[2],ofile[3],ofile[4],
           ofile[5],ofile[6],ofile[7],ofile[8]);
@@ -1123,7 +1123,7 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
     if (format==STRFMT_RTCM2||format==STRFMT_RTCM3) {
         time=opt->trtcm;
     }
-    if (opt->scanobs) {        
+    if (opt->scanobs) {
         /* scan observation types and station parameters */
         if (!scan_obstype(format,epath,nf,opt,&stas,&time)) return 0;
     }
@@ -1160,7 +1160,7 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
 
         /* input message */
         for (j=0;(type=input_strfile(str))>=-1;j++) {
-            
+
             if (((j%SHOW_STATS_PER)==1) &&(abort=showstat(sess,te,te,n))) break;
 
             /* avioid duplicated if overlapped data */
@@ -1207,7 +1207,7 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
     if (ts.time>0) showstat(sess,ts,te,n);
 
     for (i=0;i<MAXEXFILE;i++) free(epath[i]);
-    
+
     for (p=stas;p;p=next) {
         next=p->next;
         free(p);
@@ -1249,11 +1249,11 @@ extern int convrnx(int format, rnxopt_t *opt, const char *file, char **ofile)
     rnxopt_t opt_=*opt;
     double tu,ts;
     int i,week,stat=1;
-    
+
     trace(3,"convrnx: format=%d file=%s ofile=%s %s %s %s %s %s %s %s %s\n",
           format,file,ofile[0],ofile[1],ofile[2],ofile[3],ofile[4],ofile[5],
           ofile[6],ofile[7],ofile[8]);
-    
+
 
     showmsg("");
 
