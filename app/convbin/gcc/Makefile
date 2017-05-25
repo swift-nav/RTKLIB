@@ -1,6 +1,8 @@
 #
 # makefile for sbp2rinex
 #
+
+SHELL := /bin/bash#
 ifeq ($(OS),Windows_NT)
     UNAME := Windows
 else
@@ -131,45 +133,22 @@ install:
 clean:
 	rm -f sbp2rinex sbp2rinex.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
 
-test : test1 test2 test3 test4 test5 test7 test8 test9 test10 test11 test12 test13
-test : test14 test15
 
-test1:
-	./sbp2rinex -r nov $(DATDIR)/oemv_200911218.gps -ti 10 -d . -os
-test2:
-	./sbp2rinex -r hemis $(DATDIR)/cres_20080526.bin -ti 10 -d . -f 1 -od -os
-test3:
-	./sbp2rinex $(DATDIR)/ubx_20080526.ubx -o ubx_test.obs -d . -f 1 -ts 2008/5/26 6:00 -te 2008/5/26 6:10
+test : test1 test2 test3 test4 test5 testclean
+
+test1: # binary sbp 
+	@echo -e "\n\n****** Test1: sbp binary ********\n"
+	sbp2rinex $(DATDIR)/2017-05-12-v1.1.26.sbp -o 2017-05-12-v1.1.26-bin.obs
+test2: # sbp json with spaces
+	@echo -e "\n\n****** Test2: sbp json ********\n"
+	sbp2rinex $(DATDIR)/2017-05-12-v1.1.26.sbp.json -o 2017-05-12-v1.1.26-json.obs -n 2017-05-12-v1.1.26-json.nav
+test3: test1 test2 # ensure outputs from test1 and test2 are bit exact minus first two lines
+	@echo -e "\n\n****** Test3: compare json and binary output ********\n"
+	diff -q <(tail -n +5 2017-05-12-v1.1.26-json.obs) <(tail -n +5 2017-05-12-v1.1.26-bin.obs)
 test4:
-	./sbp2rinex $(DATDIR)/ubx_20080526.ubx -n ubx_test.nav -d .
-test5:
-	./sbp2rinex $(DATDIR)/ubx_20080526.ubx -h ubx_test.hnav -s ubx_test.sbs -d . -x 129
-test7:
-	./sbp2rinex $(DATDIR)/testglo.rtcm2 -tr 2009/12/18 23:20 -d .
-test8:
-	./sbp2rinex $(DATDIR)/testglo.rtcm3 -os -tr 2009/12/18 23:20 -d .
-test9:
-	./sbp2rinex -v 3 -f 6 -r nov $(DATDIR)/oemv_200911218.gps -od -os -o rnx3_test.obs -n rnx3_test.nav -d .
-test10:
-	./sbp2rinex $(DATDIR)/testglo.rtcm3 -os -tr 2009/12/18 23:20 -d .
-test11:
-	./sbp2rinex $(DATDIR)/javad_20110115.jps -d out -c JAV1
-test12:
-	./sbp2rinex $(DATDIR)/javad_20110115.jps -d out -v 3.00 -f 3 -od -os
-test13:
-	./sbp2rinex $(DATDIR)/javad_20110115.jps -d out -o test13.obs -v 3 -hc test1 -hc test2 -hm MARKER -hn MARKERNO -ht MARKKERTYPE -ho OBSERVER/AGENCY -hr 1234/RECEIVER/V.0.1.2 -ha ANTNO/ANTENNA -hp 1234.567/8901.234/5678.901 -hd 0.123/0.234/0.567
-test14:
-	./sbp2rinex $(DATDIR)/javad_20110115.jps -d out -o test14.obs -v 3 -y S -y J -x 2 -x R19 -x R21
-test15:
-	./sbp2rinex $(DATDIR)/javad_20110115.jps -d out -o test15.obs -v 3 -ro "-GL1P -GL2C"
-test16:
-	./sbp2rinex $(DATDIR)/javad_20110115.jps -d out -o test15.obs -v 3 -ro "-GL1P -GL2C"
-test17:
-	./sbp2rinex $(DATDIR)/GMSD7_20121014.rtcm3 -tr 2012/10/14 0:00:00
-test18:
-	./sbp2rinex $(DATDIR)/GMSD7_20121014.rtcm3 -scan -v 3.01 -f 6 -od -os -tr 2012/10/14 0:00:00
-test21:
-	stty raw < /dev/ttyACM0
-	./sbp2rinex -r ubx -o ubx.obs -n ubx.nav -s ubx.sbs -h ubx.hnav /dev/ttyACM0
-
-
+	@echo -e "\n\n***** Test: json with spaces********\n"
+	sbp2rinex $(DATDIR)/2017-05-12-v1.1.26-spaces.sbp.json -o 2017-05-12-v1.1.26-json-spaces.obs -n 2017-05-12-v1.1.26-json.nav
+test5: test1 test4  # make sure JSON with spaces are bit exact minus first two lines
+	diff -q <(tail -n +5 2017-05-12-v1.1.26-json-spaces.obs) <(tail -n +5 2017-05-12-v1.1.26-bin.obs)
+testclean:
+	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs 
