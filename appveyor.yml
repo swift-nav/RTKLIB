@@ -12,15 +12,16 @@ install:
   - set PATH=C:\MinGW\bin;C:\MinGW\msys\1.0\bin;%PATH%
   - set CC=gcc
   - set INCLUDE=%cd%\src;..\..\..\src;%INCLUDE%
+  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mnaoumov/Invoke-NativeApplication/master/exec.ps1" -OutFile ".\exec1.ps1"
 
 build_script:
   - ps: |
       if ($env:Compiler -eq "mingw") {
-        cd ./app/convbin/gcc 
+        cd ($env:APPVEYOR_BUILD_FOLDER + "\app\convbin\gcc")
         make clean all
       }
       if ($env:Compiler -eq "vs14") {
-        cd ./app/convbin/vs14
+        cd ($env:APPVEYOR_BUILD_FOLDER + "\app\convbin\vs14")
         msbuild convbin-swiftnav.sln /p:Configuration=Release
         msbuild convbin-swiftnav.sln /p:Configuration=Debug
       }
@@ -37,4 +38,29 @@ artifacts:
 
 test_script:
   - ps: | 
-      echo "Tests go here"
+      if ($env:Compiler -eq "mingw") {
+        . ($env:APPVEYOR_BUILD_FOLDER + "\exec1.ps1")
+        cd ($env:APPVEYOR_BUILD_FOLDER + "\app\convbin\gcc")
+        exec {& make test}
+      }
+  - ps: |
+      if ($env:Compiler -eq "vs14") {
+        . ($env:APPVEYOR_BUILD_FOLDER + "\exec1.ps1")
+        cd ($env:APPVEYOR_BUILD_FOLDER + "\app\convbin\vs14\Release")
+        echo ""
+        echo "******Test1 sbp2rinex on sbp binary*****"
+        echo ""
+        exec {& .\sbp2rinex ($env:APPVEYOR_BUILD_FOLDER + "\test\data\rcvraw\2017-05-12-v1.1.26.sbp") -o 2017-05-12-v1.1.26.sbp.obs -n 2017-05-12-v1.1.26.sbp.nav } 
+        echo ""
+        echo "******Test2 sbp2rinex on sbp json*****"
+        echo ""
+        exec {& .\sbp2rinex ($env:APPVEYOR_BUILD_FOLDER + "\test\data\rcvraw\2017-05-12-v1.1.26.sbp.json") -o 2017-05-12-v1.1.26.sbp.json.obs -n 2017-05-12-v1.1.26.sbp.json.nav } 
+        #& .\sbp2rinex ($env:APPVEYOR_BUILD_FOLDER + "\test\data\rcvraw\2017-05-12-v1.1.26-spaces.sbp.json") -o 2017-05-12-v1.1.26-nospaces.sbp.json.obs -n 2017-05-12-v1.1.26-nospaces.sbp.json.nav | out-null
+        echo ""
+        echo "******Test3 compare outputs from json and binary*****"
+        echo ""
+        diff (gc 2017-05-12-v1.1.26.sbp.obs | select -Skip 5 ) (gc 2017-05-12-v1.1.26.sbp.json.obs | select -Skip 5 ) 
+        #diff (cat 2017-05-12-v1.1.26.sbp.nav) (cat 2017-05-12-v1.1.26-nospaces.sbp.json.nav) 
+      }
+
+      

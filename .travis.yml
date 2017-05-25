@@ -8,7 +8,7 @@ matrix:
      osx_image: Xcode 8.2
 
 script:
-  - (cd ./app/convbin/gcc/ && make clean all)
+  - (cd ./app/convbin/gcc/ && make clean all test)
 
 addons:
   artifacts:

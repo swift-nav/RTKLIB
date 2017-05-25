@@ -22,9 +22,13 @@ OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS
 
 CC=gcc
 CFLAGS=-O2 -ansi -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
+DATDIR=../../../test/data/rcvraw
+SEP="/"
 
 ifeq ($(UNAME),Windows)
 OPTIONS += -DWIN32
+DATDIR=..\\..\\..\\test\\data\\rcvraw
+SEP="\\"
 endif
 
 LDLIBS= -lm
@@ -125,7 +129,6 @@ qzslex.o   : $(SRC)/rtklib.h Makefile
 septentrio.o: $(SRC)/rtklib.h Makefile
 cmr.o      : $(SRC)/rtklib.h Makefile
 
-DATDIR = ../../../test/data/rcvraw
 
 install:
 	cp sbp2rinex $(BINDIR)
@@ -134,21 +137,24 @@ clean:
 	rm -f sbp2rinex sbp2rinex.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
 
 
-test : test1 test2 test3 test4 test5 testclean
+test : test1 test2 test3 testclean
 
 test1: # binary sbp 
 	@echo -e "\n\n****** Test1: sbp binary ********\n"
-	sbp2rinex $(DATDIR)/2017-05-12-v1.1.26.sbp -o 2017-05-12-v1.1.26-bin.obs
+	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26.sbp -o 2017-05-12-v1.1.26-bin.obs
 test2: # sbp json with spaces
 	@echo -e "\n\n****** Test2: sbp json ********\n"
-	sbp2rinex $(DATDIR)/2017-05-12-v1.1.26.sbp.json -o 2017-05-12-v1.1.26-json.obs -n 2017-05-12-v1.1.26-json.nav
+	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26.sbp.json -o 2017-05-12-v1.1.26-json.obs -n 2017-05-12-v1.1.26-json.nav
 test3: test1 test2 # ensure outputs from test1 and test2 are bit exact minus first two lines
 	@echo -e "\n\n****** Test3: compare json and binary output ********\n"
-	diff -q <(tail -n +5 2017-05-12-v1.1.26-json.obs) <(tail -n +5 2017-05-12-v1.1.26-bin.obs)
+	tail -n +5 ./2017-05-12-v1.1.26-json.obs > 2017-05-12-v1.1.26-json.trunc.obs
+	tail -n +5 ./2017-05-12-v1.1.26-bin.obs > 2017-05-12-v1.1.26-bin.trunc.obs
+	diff -q 2017-05-12-v1.1.26-json.trunc.obs 2017-05-12-v1.1.26-bin.trunc.obs
 test4:
-	@echo -e "\n\n***** Test: json with spaces********\n"
-	sbp2rinex $(DATDIR)/2017-05-12-v1.1.26-spaces.sbp.json -o 2017-05-12-v1.1.26-json-spaces.obs -n 2017-05-12-v1.1.26-json.nav
-test5: test1 test4  # make sure JSON with spaces are bit exact minus first two lines
-	diff -q <(tail -n +5 2017-05-12-v1.1.26-json-spaces.obs) <(tail -n +5 2017-05-12-v1.1.26-bin.obs)
+	@echo -e "\n\n***** Test: json without spaces********\n"
+	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26-nospaces.sbp.json -o 2017-05-12-v1.1.26-json-nospaces.obs -n 2017-05-12-v1.1.26-json.nav
+test5: test1 test4  # make sure JSON with no spaces are bit exact minus first two lines
+	tail -n +5 ./2017-05-12-v1.1.26-json-nospaces.obs > 2017-05-12-v1.1.26-json-nospaces.trunc.obs
+	diff -q  2017-05-12-v1.1.26-json-nospaces.obs 2017-05-12-v1.1.26-bin.trunc.obs 
 testclean:
 	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs 
