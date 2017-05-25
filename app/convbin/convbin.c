@@ -41,6 +41,7 @@
 
 static const char rcsid[]="$Id: convbin.c,v 1.1 2008/07/17 22:13:04 ttaka Exp $";
 
+#define NOUTFILE        7       /* number of output files */
 #define PRGNAME   "sbp2rinex"
 #define TRACEFILE "convbin.trace"
 
@@ -152,7 +153,7 @@ static int convbin(int format, rnxopt_t *opt, const char *ifile, char **file,
     char *dir)
 {
   int i,def;
-  char work[1024],ofile_[7][1024]={"","","","","","",""},*ofile[7],*p;
+  char work[1024],ofile_[NOUTFILE][1024]={"","","","","","",""},*ofile[NOUTFILE]={0},*p;
   char *extnav=opt->rnxver<=2.99||opt->navsys==SYS_GPS?"N":"P";
   char *extlog=format==STRFMT_LEXR?"lex":"sbs";
 
@@ -226,7 +227,7 @@ static int convbin(int format, rnxopt_t *opt, const char *ifile, char **file,
     else strcat(ofile[6],".");
     strcat(ofile[6],extlog);
   }
-  for (i=0;i<7;i++) {
+  for (i=0;i<NOUTFILE;i++) {
     if (!*dir||!*ofile[i]) continue;
     if ((p=strrchr(ofile[i],FILEPATHSEP))) strcpy(work,p+1);
     else strcpy(work,ofile[i]);
@@ -469,7 +470,7 @@ int main(int argc, char **argv)
 {
   rnxopt_t opt={{0}};
   int format,trace=0,stat;
-  char *ifile="",*ofile[7]={0},*dir="";
+  char *ifile="",*ofile[NOUTFILE]={0},*dir="";
 
   fprintf( stderr, "%s v%s (RTKLIB %s%s)\n", PRGNAME, SWIFT_REV, VER_RTKLIB, PATCH_LEVEL );
 
