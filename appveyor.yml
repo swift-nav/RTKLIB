@@ -60,7 +60,14 @@ test_script:
         echo "******Test3 compare outputs from json and binary*****"
         echo ""
         diff (gc 2017-05-12-v1.1.26.sbp.obs | select -Skip 5 ) (gc 2017-05-12-v1.1.26.sbp.json.obs | select -Skip 5 ) 
-        #diff (cat 2017-05-12-v1.1.26.sbp.nav) (cat 2017-05-12-v1.1.26-nospaces.sbp.json.nav) 
+        echo ""
+        echo "******Test4 sbp2rinex on sbp json without spaces*****"
+        echo ""
+        exec {& .\sbp2rinex ($env:APPVEYOR_BUILD_FOLDER + "\test\data\rcvraw\2017-05-12-v1.1.26-nospaces.sbp.json") -o 2017-05-12-v1.1.26-nospaces.sbp.json.obs -n 2017-05-12-v1.1.26-nospaces.sbp.json.nav } 
+        echo ""
+        echo "******Test5 compare outputs from json without spaces and binary*****"
+        echo ""
+        diff (gc 2017-05-12-v1.1.26.sbp.obs | select -Skip 5 ) (gc 2017-05-12-v1.1.26-nospaces.sbp.json.obs | select -Skip 5 ) 
       }
 
       

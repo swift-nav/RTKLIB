@@ -137,7 +137,7 @@ clean:
 	rm -f sbp2rinex sbp2rinex.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
 
 
-test : test1 test2 test3 testclean
+test : test1 test2 test3 test4 test5 testclean
 
 test1: # binary sbp 
 	@echo -e "\n\n****** Test1: sbp binary ********\n"
@@ -155,6 +155,6 @@ test4:
 	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26-nospaces.sbp.json -o 2017-05-12-v1.1.26-json-nospaces.obs -n 2017-05-12-v1.1.26-json.nav
 test5: test1 test4  # make sure JSON with no spaces are bit exact minus first two lines
 	tail -n +5 ./2017-05-12-v1.1.26-json-nospaces.obs > 2017-05-12-v1.1.26-json-nospaces.trunc.obs
-	diff -q  2017-05-12-v1.1.26-json-nospaces.obs 2017-05-12-v1.1.26-bin.trunc.obs 
+	diff 2017-05-12-v1.1.26-json-nospaces.trunc.obs 2017-05-12-v1.1.26-bin.trunc.obs 
 testclean:
 	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs 
