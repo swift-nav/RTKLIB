@@ -339,32 +339,30 @@ static int decode_msgobs(raw_t *raw){
       }
     }
 
-/*    fprintf(stderr, "%.1f (raw->halfc[%d][%d]) %u  uLockInfo %u \n",
-        0.001*tow,
-        sat-1, uFreq, (raw->halfc[sat-1][uFreq]),
-        uLockInfo);*/
-
     raw->obuf.data[ii].time = time;
     raw->obuf.data[ii].sat  = (unsigned char)sat;
 
     /* store signal info */
     if (uFreq < NFREQ+NEXOBS) {
-      raw->obuf.data[ii].L[uFreq]    = dCarrPhase;
-      raw->obuf.data[ii].P[uFreq]    = dPseudoRng;
-      raw->obuf.data[ii].D[uFreq]    = (float) dDoppler;
+      raw->obuf.data[ii].P[uFreq]    =
+         (uFlags & 0x1) ?                    dPseudoRng : 0.0;
+      raw->obuf.data[ii].L[uFreq]    =
+        ((uFlags & 0x2) && (uLockInfo==0)) ? dCarrPhase : 0.0;
+      raw->obuf.data[ii].D[uFreq]    =
+         (uFlags & 0x8) ?                    dDoppler   : 0.0;
       raw->obuf.data[ii].SNR[uFreq]  = uCN0;
       raw->obuf.data[ii].code[uFreq] = uCode;
 
       uPrevLockTime = puRtcmPhaseRangeLockTimeTable[(raw->halfc[sat-1][uFreq])];
       uCurrLockTime = puRtcmPhaseRangeLockTimeTable[uLockInfo];
-      uSlip  = (uLockInfo==0) ? 0x1 : 0x0;
-      uSlip |= calculate_loss_of_lock(dDeltaTime*1000.0, uPrevLockTime, uCurrLockTime);
+      uSlip = calculate_loss_of_lock(dDeltaTime*1000.0, uPrevLockTime, uCurrLockTime);
       uHalfC = (uFlags & 0x4) ? 0:1;
       if (uHalfC) {
-        uSlip |= 0x2; /* half-cycle ambiguity */
+        uSlip |= 0x2; /* half-cycle ambiguity unresolved */
       }
 
       raw->obuf.data[ii].LLI[uFreq] |= uSlip;
+      /* using the field below just to store previous lock info */
       raw->halfc[sat-1][uFreq] = uLockInfo;
     }
 
