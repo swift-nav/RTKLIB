@@ -345,11 +345,11 @@ static int decode_msgobs(raw_t *raw){
     /* store signal info */
     if (uFreq < NFREQ+NEXOBS) {
       raw->obuf.data[ii].P[uFreq]    =
-         (uFlags & 0x1) ?                    dPseudoRng : 0.0;
+         (uFlags & 0x1) ?                   dPseudoRng : 0.0;
       raw->obuf.data[ii].L[uFreq]    =
-        ((uFlags & 0x2) && (uLockInfo==0)) ? dCarrPhase : 0.0;
+        ((uFlags & 0x2) || (uLockInfo>0)) ? dCarrPhase : 0.0;
       raw->obuf.data[ii].D[uFreq]    =
-         (uFlags & 0x8) ?                    dDoppler   : 0.0;
+         (uFlags & 0x8) ?                   dDoppler   : 0.0;
       raw->obuf.data[ii].SNR[uFreq]  = uCN0;
       raw->obuf.data[ii].code[uFreq] = uCode;
 
