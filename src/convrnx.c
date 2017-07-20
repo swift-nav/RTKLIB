@@ -828,6 +828,9 @@ static void convobs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *staid,
                     stas_t *stas, int *n, unsigned char slips[][NFREQ+NEXOBS])
 {
     gtime_t time;
+    prcopt_t prcopt=prcopt_default;
+    sol_t sol={{0}};
+    char msg[128];
 
     trace(3,"convobs :\n");
 
@@ -852,8 +855,13 @@ static void convobs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *staid,
         *staid=str->rtcm.staid;
     }
 
+    /* point positioning with last obs data */
+    if (!pntpos(str->obs->data,str->obs->n,str->nav,&prcopt,&sol,NULL,NULL,msg)) {
+      trace(2,"point position error (%s)\n",msg);
+    }
+
     /* output rinex obs */
-    outrnxobsb(ofp[0],opt,str->obs->data,str->obs->n,0);
+    outrnxobsb(ofp[0],opt,str->obs->data,str->obs->n,0,sol.dtr[0]);
 
     if (opt->tstart.time==0) opt->tstart=time;
     opt->tend=time;
