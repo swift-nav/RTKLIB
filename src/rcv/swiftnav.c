@@ -887,6 +887,7 @@ extern int input_sbpjsonf(raw_t *raw, FILE *fp)
 
   pcPayloadBeg = (uint8_t*) strchr((char*)pcTmp,        '\"')+1;
   pcPayloadEnd = (uint8_t*) strchr((char*)pcPayloadBeg, '\"')-1;
+  if ((NULL == pcPayloadBeg) || (NULL == pcPayloadEnd)) return 0;
   uPayloadSize = pcPayloadEnd - pcPayloadBeg + 1;
   pcPayloadEnd[1] = 0;
   /* fprintf(stderr, "%4d: %s\n", uPayloadSize, pcPayloadBeg); */
