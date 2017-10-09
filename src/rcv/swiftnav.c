@@ -405,7 +405,7 @@ static int decode_msgobs(raw_t *raw){
       raw->obuf.data[ii].L[uFreq]    =
         ((uFlags & 0x2) || (uLockInfo>0)) ? dCarrPhase : 0.0;
       raw->obuf.data[ii].D[uFreq]    =
-         (uFlags & 0x8) ?                   dDoppler   : 0.0;
+         (uFlags & 0x8) ?                   (float)dDoppler : 0.0f;
       raw->obuf.data[ii].SNR[uFreq]  = uCN0;
       raw->obuf.data[ii].code[uFreq] = uCode;
 
@@ -614,8 +614,8 @@ static int decode_glonav(raw_t *raw) {
   geph.tof  = utc2gpst(gpst2time(uWeekE, dSeconds));
   geph.iode = (int) puiTmp[119];
 
-  geph.sva    = R8(puiTmp +   8);   /* URA */
-  geph.age    = R8(puiTmp +  16);   /* fit interval */
+  geph.sva    = (int)R8(puiTmp + 8);/* URA */
+  geph.age    = U4(puiTmp + 16);    /* fit interval */
   geph.svh    = puiTmp[21];         /* health */
   geph.gamn   = R8(puiTmp +  22);   /* */
   geph.taun   = R8(puiTmp +  30);   /* */
