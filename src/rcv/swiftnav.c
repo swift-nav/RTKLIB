@@ -356,6 +356,11 @@ static int decode_msgobs(raw_t *raw){
     uSatId      = p[15];
     uBandCode   = p[16];
 
+    /* Check for RAIM exclusion */
+    if ( (uFlags & 0x80) && (NULL == strstr(raw->opt, "INCLRAIMOBS")) ) {
+      continue;
+    }
+
     /* phase polarity flip option (-INVCP) */
     if (strstr(raw->opt, "INVCP")) {
       dCarrPhase = -dCarrPhase;
