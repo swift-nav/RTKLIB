@@ -356,7 +356,12 @@ static int decode_msgobs(raw_t *raw){
     uSatId      = p[15];
     uBandCode   = p[16];
 
-    /* phase polarity flip option (-INVCP) */
+    /* Check for RAIM exclusion */
+    if ( (uFlags & 0x80) && (NULL == strstr(raw->opt, "OBSALL")) ) {
+      continue;
+    }
+
+    /* phase polarity flip option (INVCP) */
     if (strstr(raw->opt, "INVCP")) {
       dCarrPhase = -dCarrPhase;
     }
@@ -635,7 +640,7 @@ static int decode_glonav(raw_t *raw) {
 
   geph.frq    = (int) puiTmp[118] - 8;
 
-  if (!strstr(raw->opt,"-EPHALL")) {
+  if (!strstr(raw->opt,"EPHALL")) {
     if (geph.iode==raw->nav.geph[prn-1].iode) return 0; /* unchanged */
   }
 
