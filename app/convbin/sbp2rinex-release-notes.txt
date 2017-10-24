@@ -8,6 +8,21 @@ Source Code Location:   github.com/swift-nav/RTKLIB
 
 
 -------------------------------------------------------------------------------
+Release 1.1                                                          2017-10-24
+-------------------------------------------------------------------------------
+CHANGES:
+* GLONASS L1/L2 support added
+* Updated to RTKLIB v2.4.3 b27
+* Receiver option OBSALL added
+* JSON file parsing improved
+* Observation flags handling corrected
+* Usage help information updated
+
+KNOWN ISSUES:
+none
+
+
+-------------------------------------------------------------------------------
 Release 1.0  (Initial Release)                                       2017-05-12
 -------------------------------------------------------------------------------
 FEATURES:
