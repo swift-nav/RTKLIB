@@ -408,7 +408,7 @@ static int decode_msgobs(raw_t *raw){
       raw->obuf.data[ii].P[uFreq]    =
          (uFlags & 0x1) ?                   dPseudoRng : 0.0;
       raw->obuf.data[ii].L[uFreq]    =
-        ((uFlags & 0x2) || (uLockInfo>0)) ? dCarrPhase : 0.0;
+        ((uFlags & 0x2) && (uLockInfo>0)) ? dCarrPhase : 0.0;
       raw->obuf.data[ii].D[uFreq]    =
          (uFlags & 0x8) ?                   (float)dDoppler : 0.0f;
       raw->obuf.data[ii].SNR[uFreq]  = uCN0;
@@ -417,7 +417,7 @@ static int decode_msgobs(raw_t *raw){
       uPrevLockTime = puRtcmPhaseRangeLockTimeTable[(raw->halfc[sat-1][uFreq])];
       uCurrLockTime = puRtcmPhaseRangeLockTimeTable[uLockInfo];
       uSlip = calculate_loss_of_lock(dDeltaTime*1000.0, uPrevLockTime, uCurrLockTime);
-      uHalfC = (uFlags & 0x4) ? 0:1;
+      uHalfC = (uFlags & 0x4) ? 0 : (uFlags & 0x2);
       if (uHalfC) {
         uSlip |= 0x2; /* half-cycle ambiguity unresolved */
       }
