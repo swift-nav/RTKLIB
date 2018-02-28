@@ -1074,7 +1074,7 @@ static void setapppos(strfile_t *str, rnxopt_t *opt)
 /* show status message -------------------------------------------------------*/
 static int showstat(int sess, gtime_t ts, gtime_t te, int *n)
 {
-    const char type[]="ONGHQLCISE";
+    const char type[]="ONGHQLSE";
     char msg[1024]="",*p=msg,s[64];
     int i;
 
