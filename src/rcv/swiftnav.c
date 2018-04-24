@@ -136,7 +136,7 @@ static const uint32_t CRC_16CCIT_LookUp[256] = {
 
 /* it's easy to derive a function for the values below, but I'd rather map the
  * table explicitly from the RTCM standard document */
-static const uint32_t puRtcmPhaseRangeLockTimeTable[16] = {
+static const uint32_t rtcm_phase_lock_table[16] = {
     0,    32,   64,    128,   256,   512,    1024,   2048,
     4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288};
 
@@ -341,12 +341,12 @@ static uint8_t calculate_loss_of_lock(double dt, uint32_t prev_lock_time,
 /* decode SBF measurements message (observables) -----------------------------*/
 static int decode_msgobs(raw_t *raw) {
   gtime_t time;
-  double tow, dResTow, dPseudoRng, dCarrPhase, dDoppler, dDeltaTime;
+  double tow, dResTow, pseudorange, carr_phase, freq_doppler, delta_time;
   int16_t i, ii, sat, n, week;
   uint8_t *p = (raw->buff) + 6; /* jump to TOW location */
-  uint8_t uNobs, uLockInfo;
-  uint32_t sys, uPrevLockTime = 0, uCurrLockTime = 0;
-  uint8_t uFlags, uSatId, uBandCode, uCN0, uCode, uFreq, uSlip, uHalfC;
+  uint8_t num_obs, lock_info;
+  uint32_t sys, prev_lockt = 0, curr_lockt = 0;
+  uint8_t flags, sat_id, band_code, cn0_int, code, freq, slip, half_cycle_amb;
   int iDidFlush = 0, iSatFound = 0;
 
   trace(4, "SBF decode_msgobs: len=%d\n", raw->len);
@@ -355,15 +355,15 @@ static int decode_msgobs(raw_t *raw) {
   tow = U4(p);         /* TOW in ms */
   dResTow = I4(p + 4); /* residual Time Of Week */
   week = U2(p + 8);    /* GPS week */
-  uNobs = p[10];       /* number of observations in message */
-  /*  uSeqSize = uNobs>>4; */
-  /*  uSeqIdx  = uNobs&0xf; */
-  uNobs = ((raw->len) - 19) / 17;
+  num_obs = p[10];       /* number of observations in message */
+  /*  uSeqSize = num_obs>>4; */
+  /*  uSeqIdx  = num_obs&0xf; */
+  num_obs = ((raw->len) - 19) / 17;
 
   time = gpst2time(week, tow * 0.001 + dResTow * 1e-9);
   /* start new observation period */
-  dDeltaTime = fabs(timediff(time, raw->time));
-  if ((dDeltaTime) > 1E-6) {
+  delta_time = fabs(timediff(time, raw->time));
+  if ((delta_time) > 1E-6) {
     n = 0;
     iDidFlush = flushobuf(raw);
   } else {
@@ -375,74 +375,84 @@ static int decode_msgobs(raw_t *raw) {
   p = p + 11;
 
   /* add observations */
-  for (i = 0; i < uNobs && i < MAXOBS; i++, p += 17) {
+  for (i = 0; i < num_obs && i < MAXOBS; i++, p += 17) {
 
-    dPseudoRng = U4(p) * 0.02;  /* pseudorange observation in 2cm units */
-    dCarrPhase = I4(p + 4);     /* carrier phase integer cycles */
-    dCarrPhase += p[8] / 256.0; /* carrier phase fractional cycles */
-    dDoppler = I2(p + 9);       /* Doppler shift in integer Hz */
-    dDoppler += p[11] / 256.0;  /* fractional part of Doppler shift */
-    uCN0 = p[12];               /* C/N0 */
-    uLockInfo = p[13] & 0xf;    /* lock time */
-    uFlags = p[14];             /* observation flags */
-    uSatId = p[15];
-    uBandCode = p[16];
+    pseudorange = U4(p) * 0.02;  /* pseudorange observation in 2cm units */
+    carr_phase = I4(p + 4);     /* carrier phase integer cycles */
+    carr_phase += p[8] / 256.0; /* carrier phase fractional cycles */
+    freq_doppler = I2(p + 9);       /* Doppler shift in integer Hz */
+    freq_doppler += p[11] / 256.0;  /* fractional part of Doppler shift */
+    cn0_int = p[12];               /* C/N0 */
+    lock_info = p[13] & 0xf;    /* lock time */
+    flags = p[14];             /* observation flags */
+    sat_id = p[15];
+    band_code = p[16];
 
     /* Check for RAIM exclusion */
-    if ((uFlags & 0x80) && (NULL == strstr(raw->opt, "OBSALL"))) {
+    if ((flags & 0x80) && (NULL == strstr(raw->opt, "OBSALL"))) {
       continue;
     }
 
     /* phase polarity flip option (INVCP) */
     if (strstr(raw->opt, "INVCP")) {
-      dCarrPhase = -dCarrPhase;
+      carr_phase = -carr_phase;
     }
 
-    switch (uBandCode) {
+    switch (band_code) {
     case 0: /* GPS L1C/A */
-      uCode = CODE_L1C;
+      code = CODE_L1C;
       sys = SYS_GPS;
-      uFreq = 0;
+      freq = 0;
       break;
     case 1: /* GPS L2CM */
-      uCode = CODE_L2S;
+      code = CODE_L2S;
       sys = SYS_GPS;
-      uFreq = 1;
+      freq = 1;
       break;
     case 2: /* SBAS L1C/A */
-      uCode = CODE_L1C;
+      code = CODE_L1C;
       sys = SYS_SBS;
-      uFreq = 0;
+      freq = 0;
       break;
     case 3: /* Glonass L1C/A */
-      uCode = CODE_L1C;
+      code = CODE_L1C;
       sys = SYS_GLO;
-      uFreq = 0;
+      freq = 0;
       break;
     case 4: /* Glonass L2C/A */
-      uCode = CODE_L2C;
+      code = CODE_L2C;
       sys = SYS_GLO;
-      uFreq = 1;
+      freq = 1;
       break;
     case 5: /* GPS L1P */
-      uCode = CODE_L1P;
+      code = CODE_L1P;
       sys = SYS_GPS;
-      uFreq = 0;
+      freq = 0;
       break;
     case 6: /* GPS L2P */
-      uCode = CODE_L2P;
+      code = CODE_L2P;
       sys = SYS_GPS;
-      uFreq = 1;
+      freq = 1;
+      break;
+    case 12: /* Beidou B1 */
+      code = CODE_L1I;
+      sys = SYS_CMP;
+      freq = 0;
+      break;
+    case 13: /* Beidou B2 */
+      code = CODE_L7I;
+      sys = SYS_CMP;
+      freq = 1;
       break;
     default:
-      uCode = CODE_NONE;
+      code = CODE_NONE;
       sys = SYS_GPS;
-      uFreq = 0;
+      freq = 0;
       break;
     }
 
     /* store satellite number */
-    sat = satno(sys, uSatId);
+    sat = satno(sys, sat_id);
     if (sat == 0) {
       continue;
     }
@@ -459,27 +469,27 @@ static int decode_msgobs(raw_t *raw) {
     raw->obuf.data[ii].sat = (unsigned char)sat;
 
     /* store signal info */
-    if (uFreq < NFREQ + NEXOBS) {
-      raw->obuf.data[ii].P[uFreq] = (uFlags & 0x1) ? dPseudoRng : 0.0;
-      raw->obuf.data[ii].L[uFreq] =
-          ((uFlags & 0x2) && (uLockInfo > 0)) ? dCarrPhase : 0.0;
-      raw->obuf.data[ii].D[uFreq] = (uFlags & 0x8) ? (float)dDoppler : 0.0f;
-      raw->obuf.data[ii].SNR[uFreq] = uCN0;
-      raw->obuf.data[ii].code[uFreq] = uCode;
+    if (freq < NFREQ + NEXOBS) {
+      raw->obuf.data[ii].P[freq] = (flags & 0x1) ? pseudorange : 0.0;
+      raw->obuf.data[ii].L[freq] = (flags & 0x2) ? carr_phase : 0.0;
+      raw->obuf.data[ii].D[freq] = (flags & 0x8) ? (float)freq_doppler : 0.0f;
+      raw->obuf.data[ii].SNR[freq] = cn0_int;
+      raw->obuf.data[ii].code[freq] = code;
 
-      uPrevLockTime =
-          puRtcmPhaseRangeLockTimeTable[(raw->halfc[sat - 1][uFreq])];
-      uCurrLockTime = puRtcmPhaseRangeLockTimeTable[uLockInfo];
-      uSlip = calculate_loss_of_lock(dDeltaTime * 1000.0, uPrevLockTime,
-                                     uCurrLockTime);
-      uHalfC = (uFlags & 0x4) ? 0 : (uFlags & 0x2);
-      if (uHalfC) {
-        uSlip |= 0x2; /* half-cycle ambiguity unresolved */
+      if (flags & 0x2) {
+        prev_lockt = rtcm_phase_lock_table[(raw->halfc[sat - 1][freq])];
+        curr_lockt = rtcm_phase_lock_table[lock_info];
+        slip = calculate_loss_of_lock(delta_time * 1000.0, prev_lockt,
+                                       curr_lockt);
+        half_cycle_amb = (flags & 0x4) ? 0 : 1;
+        if (half_cycle_amb) {
+          slip |= 0x2; /* half-cycle ambiguity unresolved */
+        }
+
+        raw->obuf.data[ii].LLI[freq] |= slip;
+        /* using the field below just to store previous lock info */
+        raw->halfc[sat - 1][freq] = lock_info;
       }
-
-      raw->obuf.data[ii].LLI[uFreq] |= uSlip;
-      /* using the field below just to store previous lock info */
-      raw->halfc[sat - 1][uFreq] = uLockInfo;
     }
 
     /* Receiver channel goes up */
