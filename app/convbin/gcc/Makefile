@@ -18,7 +18,7 @@ BINDIR = /usr/local/bin
 SRC    = ../../../src
 
 INCLUDE= -I$(SRC)
-OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=9 -DNEXOBS=3
+OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS=3
 
 CC=gcc
 CFLAGS=-O2 -ansi -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
@@ -44,7 +44,7 @@ all  : sbp2rinex
 sbp2rinex  : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
 sbp2rinex  : rtcm.o rtcm2.o rtcm3.o rtcm3e.o pntpos.o ephemeris.o ionex.o
 sbp2rinex  : novatel.o swiftnav.o ublox.o skytraq.o gw10.o javad.o nvs.o
-sbp2rinex  : binex.o rt17.o qzslex.o septentrio.o cmr.o tersus.o 
+sbp2rinex  : binex.o rt17.o qzslex.o septentrio.o cmr.o
 
 sbp2rinex  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
@@ -101,9 +101,7 @@ septentrio.o: $(SRC)/rcv/septentrio.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/septentrio.c
 cmr.o      : $(SRC)/rcv/cmr.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/cmr.c
-tersus.o      : $(SRC)/rcv/tersus.c
-	$(CC) -c $(CFLAGS) $(SRC)/rcv/tersus.c
-  
+
 convbin.o  : $(SRC)/rtklib.h Makefile
 rtkcmn.o   : $(SRC)/rtklib.h Makefile
 rinex.o    : $(SRC)/rtklib.h Makefile
@@ -130,7 +128,6 @@ rt17.o     : $(SRC)/rtklib.h Makefile
 qzslex.o   : $(SRC)/rtklib.h Makefile
 septentrio.o: $(SRC)/rtklib.h Makefile
 cmr.o      : $(SRC)/rtklib.h Makefile
-tersus.o      : $(SRC)/rtklib.h Makefile
 
 
 install:
@@ -138,6 +135,7 @@ install:
 
 clean:
 	rm -f sbp2rinex sbp2rinex.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
+
 
 test : test1 test2 test3 test4 test5 testclean
 
