@@ -18,7 +18,7 @@ BINDIR = /usr/local/bin
 SRC    = ../../../src
 
 INCLUDE= -I$(SRC)
-OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=9 -DNEXOBS=3
+OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS=3
 
 CC=gcc
 CFLAGS=-O2 -ansi -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
@@ -103,7 +103,7 @@ cmr.o      : $(SRC)/rcv/cmr.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/cmr.c
 tersus.o      : $(SRC)/rcv/tersus.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/tersus.c
-  
+
 convbin.o  : $(SRC)/rtklib.h Makefile
 rtkcmn.o   : $(SRC)/rtklib.h Makefile
 rinex.o    : $(SRC)/rtklib.h Makefile
