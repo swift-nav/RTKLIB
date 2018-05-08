@@ -104,33 +104,33 @@ cmr.o      : $(SRC)/rcv/cmr.c
 tersus.o      : $(SRC)/rcv/tersus.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/tersus.c
 
-convbin.o  : $(SRC)/rtklib.h Makefile
-rtkcmn.o   : $(SRC)/rtklib.h Makefile
-rinex.o    : $(SRC)/rtklib.h Makefile
-sbas.o     : $(SRC)/rtklib.h Makefile
-preceph.o  : $(SRC)/rtklib.h Makefile
-rcvraw.o   : $(SRC)/rtklib.h Makefile
-convrnx.o  : $(SRC)/rtklib.h Makefile
-rtcm.o     : $(SRC)/rtklib.h Makefile
-rtcm2.o    : $(SRC)/rtklib.h Makefile
-rtcm3.o    : $(SRC)/rtklib.h Makefile
-rtcm3e.o   : $(SRC)/rtklib.h Makefile
-pntpos.o   : $(SRC)/rtklib.h Makefile
-ephemeris.o: $(SRC)/rtklib.h Makefile
-ionex.o    : $(SRC)/rtklib.h Makefile
-novatel.o  : $(SRC)/rtklib.h Makefile
-swiftnav.o : $(SRC)/rtklib.h Makefile
-ublox.o    : $(SRC)/rtklib.h Makefile
-skytraq.o  : $(SRC)/rtklib.h Makefile
-gw10.o     : $(SRC)/rtklib.h Makefile
-javad.o    : $(SRC)/rtklib.h Makefile
-nvs.o      : $(SRC)/rtklib.h Makefile
-binex.o    : $(SRC)/rtklib.h Makefile
-rt17.o     : $(SRC)/rtklib.h Makefile
-qzslex.o   : $(SRC)/rtklib.h Makefile
-septentrio.o: $(SRC)/rtklib.h Makefile
-cmr.o      : $(SRC)/rtklib.h Makefile
-tersus.o      : $(SRC)/rtklib.h Makefile
+convbin.o  : $(SRC)/rtklib.h makefile
+rtkcmn.o   : $(SRC)/rtklib.h makefile
+rinex.o    : $(SRC)/rtklib.h makefile
+sbas.o     : $(SRC)/rtklib.h makefile
+preceph.o  : $(SRC)/rtklib.h makefile
+rcvraw.o   : $(SRC)/rtklib.h makefile
+convrnx.o  : $(SRC)/rtklib.h makefile
+rtcm.o     : $(SRC)/rtklib.h makefile
+rtcm2.o    : $(SRC)/rtklib.h makefile
+rtcm3.o    : $(SRC)/rtklib.h makefile
+rtcm3e.o   : $(SRC)/rtklib.h makefile
+pntpos.o   : $(SRC)/rtklib.h makefile
+ephemeris.o: $(SRC)/rtklib.h makefile
+ionex.o    : $(SRC)/rtklib.h makefile
+novatel.o  : $(SRC)/rtklib.h makefile
+swiftnav.o : $(SRC)/rtklib.h makefile
+ublox.o    : $(SRC)/rtklib.h makefile
+skytraq.o  : $(SRC)/rtklib.h makefile
+gw10.o     : $(SRC)/rtklib.h makefile
+javad.o    : $(SRC)/rtklib.h makefile
+nvs.o      : $(SRC)/rtklib.h makefile
+binex.o    : $(SRC)/rtklib.h makefile
+rt17.o     : $(SRC)/rtklib.h makefile
+qzslex.o   : $(SRC)/rtklib.h makefile
+septentrio.o: $(SRC)/rtklib.h makefile
+cmr.o      : $(SRC)/rtklib.h makefile
+tersus.o      : $(SRC)/rtklib.h makefile
 
 
 install:
