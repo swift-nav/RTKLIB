@@ -876,7 +876,7 @@ static void closefile(FILE **ofp, const rnxopt_t *opt, nav_t *nav)
 static void outrnxevent(FILE *fp, rnxopt_t *opt, int staid, stas_t *stas)
 {
     stas_t *p;
-    double pos[3],enu[3],del[3];
+    double pos[3]={0},enu[3]={0},del[3]={0};
 
     trace(2,"outrnxevent: staid=%d\n",staid);
 
@@ -1279,7 +1279,7 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
         /* input message */
         for (j=0;(type=input_strfile(str))>=-1;j++) {
 
-            if (j%11==1&&(abort=showstat(sess,te,te,n))) break;
+            if (j%121==1 && (abort=showstat(sess,te,te,n))) break;
 
             /* avioid duplicated if overlapped data */
             if (tend.time&&timediff(str->time,tend)<=0.0) continue;
