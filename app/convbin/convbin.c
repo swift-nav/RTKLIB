@@ -42,127 +42,79 @@
 #include <stdarg.h>
 #include "rtklib.h"
 
-#define PRGNAME   "CONVBIN"
+#define PRGNAME   "sbp2rinex"
 #define TRACEFILE "convbin.trace"
 #define NOUTFILE        9       /* number of output files */
 
 /* help text -----------------------------------------------------------------*/
 static const char *help[]={
-"",
-" Synopsys",
-"",
-" convbin [option ...] file",
-"",
-" Description",
-"",
-" Convert RTCM, receiver raw data log and RINEX file to RINEX and SBAS/LEX",
-" message file. SBAS message file complies with RTKLIB SBAS/LEX message",
-" format. It supports the following messages or files.",
-"",
-" RTCM 2                : Type 1, 3, 9, 14, 16, 17, 18, 19, 22",
-" RTCM 3                : Type 1002, 1004, 1005, 1006, 1010, 1012, 1019, 1020",
-"                         Type 1071-1127 (MSM except for compact msg)",
-" NovAtel OEMV/4,OEMStar: RANGECMPB, RANGEB, RAWEPHEMB, IONUTCB, RAWWASSFRAMEB",
-" NovAtel OEM3          : RGEB, REGD, REPB, FRMB, IONB, UTCB",
-" u-blox LEA-4T/5T/6T   : RXM-RAW, RXM-SFRB",
-" NovAtel Superstar II  : ID#20, ID#21, ID#22, ID#23, ID#67",
-" Hemisphere            : BIN76, BIN80, BIN94, BIN95, BIN96",
-" SkyTraq S1315F        : msg0xDD, msg0xE0, msg0xDC",
-" GW10                  : msg0x08, msg0x03, msg0x27, msg0x20",
-" Javad                 : [R*],[r*],[*R],[*r],[P*],[p*],[*P],[*p],[D*],[*d],",
-"                         [E*],[*E],[F*],[TC],[GE],[NE],[EN],[QE],[UO],[IO],",
-"                         [WD]",
-" NVS                   : BINR",
-" BINEX                 : big-endian, regular CRC, forward record (0xE2)",
-"                         0x01-01,0x01-02,0x01-03,0x01-04,0x01-06,0x7f-05",
-" Trimble               : RT17",
-" Septentrio            : SBF",
-" CMR                   : CMR Type 0, 1, 2, 3, 4, CMR+ Type 1, 2, 3",
-" TERSUS                : RANGECMPB, RANGEB, GPSEPHEMB, GLOEPHEMERISB,",
-"                         BDSEPHEMERISB",
-" RINEX                 : OBS, NAV, GNAV, HNAV, LNAV, QNAV",
-"",
-" Options [default]",
-"",
-"     file         input receiver binary log file",
-"     -ts y/m/d h:m:s  start time [all]",
-"     -te y/m/d h:m:s  end time [all]",
-"     -tr y/m/d h:m:s  approximated time for RTCM/CMR/CMR+ messages",
-"     -ti tint     observation data interval (s) [all]",
-"     -tt ttol     observation data epoch tolerance (s) [0.005]",
-"     -span span   time span (h) [all]",
-"     -r format    log format type",
-"                  rtcm2= RTCM 2",
-"                  rtcm3= RTCM 3",
-"                  nov  = NovAtel OEMV/4/6,OEMStar",
-"                  oem3 = NovAtel OEM3",
-"                  ubx  = ublox LEA-4T/5T/6T/7T/M8T",
-"                  ss2  = NovAtel Superstar II",
-"                  hemis= Hemisphere Eclipse/Crescent",
-"                  stq  = SkyTraq S1315F",
-"                  javad= Javad",
-"                  nvs  = NVS NV08C BINR",
-"                  binex= BINEX",
-"                  rt17 = Trimble RT17",
-"                  sbf  = Septentrio SBF",
-"                  cmr  = CMR/CMR+",
-"                  tersus= TERSUS",
-"                  rinex= RINEX",
-"     -ro opt      receiver options",
-"     -f freq      number of frequencies [7]",
-"     -hc comment  rinex header: comment line",
-"     -hm marker   rinex header: marker name",
-"     -hn markno   rinex header: marker number",
-"     -ht marktype rinex header: marker type",
-"     -ho observ   rinex header: oberver name and agency separated by /",
-"     -hr rec      rinex header: receiver number, type and version separated by /",
-"     -ha ant      rinex header: antenna number and type separated by /",
-"     -hp pos      rinex header: approx position x/y/z separated by /",
-"     -hd delta    rinex header: antenna delta h/e/n separated by /",
-"     -v ver       rinex version [3.03]",
-"     -oi          include iono correction in rinex nav header [off]",
-"     -ot          include time correction in rinex nav header [off]",
-"     -ol          include leap seconds in rinex nav header [off]",
-"     -scan        scan input file [off]",
-"     -halfc       half-cycle ambiguity correction [off]",
-"     -mask   [sig[,...]] signal mask(s) (sig={G|R|E|J|S|C|I}L{1C|1P|1W|...})",
-"     -nomask [sig[,...]] signal no mask (same as above)",
-"     -x sat       exclude satellite",
-"     -y sys       exclude systems (G:GPS,R:GLO,E:GAL,J:QZS,S:SBS,C:BDS,I:IRN)",
-"     -d dir       output directory [same as input file]",
-"     -c staid     use RINEX file name convention with staid [off]",
-"     -o ofile     output RINEX OBS file",
-"     -n nfile     output RINEX NAV file",
-"     -g gfile     output RINEX GNAV file",
-"     -h hfile     output RINEX HNAV file",
-"     -q qfile     output RINEX QNAV file",
-"     -l lfile     output RINEX LNAV file",
-"     -b cfile     output RINEX CNAV file",
-"     -i ifile     output RINEX INAV file",
-"     -s sfile     output SBAS message file",
-"     -trace level output trace level [off]",
-"",
-" If any output file specified, default output files (<file>.obs,",
-" <file>.nav, <file>.gnav, <file>.hnav, <file>.qnav, <file>.lnav and",
-" <file>.sbs) are used.",
-"",
-" If receiver type is not specified, type is recognized by the input",
-" file extension as follows.",
-"     *.rtcm2       RTCM 2",
-"     *.rtcm3       RTCM 3",
-"     *.gps         NovAtel OEMV/4/6,OEMStar",
-"     *.ubx         u-blox LEA-4T/5T/6T/7T/M8T",
-"     *.log         NovAtel Superstar II",
-"     *.bin         Hemisphere Eclipse/Crescent",
-"     *.stq         SkyTraq S1315F",
-"     *.jps         Javad",
-"     *.bnx,*binex  BINEX",
-"     *.rt17        Trimble RT17",
-"     *.sbf         Septentrio SBF",
-"     *.cmr         CMR/CMR+",
-"     *.trs         TERSUS",
-"     *.obs,*.*o    RINEX OBS"
+    "",
+    " Converts Swift Navigation receiver SBP binary and SBP JSON raw data logs to RINEX files.",
+    "",
+    " Usage:",
+    "",
+    "     sbp2rinex [option ...] file",
+    " SBAS message file complies with RTKLIB SBAS/LEX message format.",
+    "",
+    " Options [default]:",
+    "",
+    "     file         receiver log file",
+    "     -ts y/m/d h:m:s  start time [all]",
+    "     -te y/m/d h:m:s  end time [all]",
+    "     -tr y/m/d h:m:s  approximated time for RTCM/CMR/CMR+ messages",
+    "     -ti tint     observation data interval (s) [all]",
+    "     -span span   time span (h) [all]",
+    "     -r format    log format type:",
+    "                  sbp       - Swift Navigation SBP",
+    "                  json      - Swift Navigation SBP-JSON",
+    "     -ro opt,opt  receiver option(s) (use comma between multiple opt):",
+    "                  CONVBASE  - convert base station observations",
+    "                  EPHALL    - include all ephemeris",
+    "                  INVCP     - invert carrier phase polarity",
+    "                  OBSALL    - include observations with RAIM flag set",
+    "     -f freq      number of frequencies [2]",
+    "     -hc comment  rinex header: comment line",
+    "     -hm marker   rinex header: marker name",
+    "     -hn markno   rinex header: marker number",
+    "     -ht marktype rinex header: marker type",
+    "     -ho observ   rinex header: oberver name and agency separated by /",
+    "     -hr rec      rinex header: receiver number, type and version separated by /",
+    "     -ha ant      rinex header: antenna number and type separated by /",
+    "     -hp pos      rinex header: approx position x/y/z separated by /",
+    "     -hd delta    rinex header: antenna delta h/e/n separated by /",
+    "     -v ver       rinex version [3.00]",
+    "     -oi          include iono correction in rinex nav header [off]",
+    "     -ot          include time correction in rinex nav header [off]",
+    "     -ol          include leap seconds in rinex nav header [off]",
+    "     -halfc       half-cycle ambiguity correction [off]",
+    "     -mask   [sig[,...]] signal mask(s) (sig={G|R|E|J|S|C|I}L{1C|1P|1W|...})",
+    "     -nomask [sig[,...]] signal no mask (same as above)",
+    "     -x sat       exclude satellite",
+    "     -y sys       exclude systems (G:GPS,R:GLO,E:GAL,J:QZS,S:SBS,C:BDS,I:IRN)",
+    "     -d dir       output directory [same as input file]",
+    "     -c staid     use RINEX file name convention with staid [off]",
+    "     -o ofile     output RINEX OBS file",
+    "     -n nfile     output RINEX NAV file",
+    "     -g gfile     output RINEX GNAV file",
+    "     -h hfile     output RINEX HNAV file",
+    "     -q qfile     output RINEX QNAV file",
+    "     -l lfile     output RINEX LNAV file",
+    "     -s sfile     output SBAS message file",
+    "     -trace level output trace level [off]",
+    "",
+    " If not any output file is specified, default output files <file>.obs,",
+    " <file>.nav, <file>.gnav, <file>.hnav, <file>.qnav, <file>.lnav and",
+    " <file>.sbs are used. Empty output files are deleted after processing.",
+    "",
+    " If log format type is not specified, format type is recognized by the input",
+    " file extension as following:",
+    "     *.sbp        Swift Navigation SBP",
+    "     *.json       Swift Navigation SBP-JSON",
 };
+
+void settspan(gtime_t ts, gtime_t te) {}
+void settime(gtime_t time) {}
+
 /* print help ----------------------------------------------------------------*/
 static void printhelp(void)
 {
@@ -485,22 +437,22 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
     if (nf>=7) opt->freqtype|=FREQTYPE_L9;
 
     if (*fmt) {
-        if      (!strcmp(fmt,"rtcm2")) format=STRFMT_RTCM2;
-        else if (!strcmp(fmt,"rtcm3")) format=STRFMT_RTCM3;
-        else if (!strcmp(fmt,"nov"  )) format=STRFMT_OEM4;
-        else if (!strcmp(fmt,"oem3" )) format=STRFMT_OEM3;
-        else if (!strcmp(fmt,"ubx"  )) format=STRFMT_UBX;
-        else if (!strcmp(fmt,"sbp"  )) format=STRFMT_SBP;
-        else if (!strcmp(fmt,"json")) format=STRFMT_SBPJSON;
-        else if (!strcmp(fmt,"stq"  )) format=STRFMT_STQ;
-        else if (!strcmp(fmt,"javad")) format=STRFMT_JAVAD;
-        else if (!strcmp(fmt,"nvs"  )) format=STRFMT_NVS;
-        else if (!strcmp(fmt,"binex")) format=STRFMT_BINEX;
-        else if (!strcmp(fmt,"rt17" )) format=STRFMT_RT17;
-        else if (!strcmp(fmt,"sbf"  )) format=STRFMT_SEPT;
-        else if (!strcmp(fmt,"cmr"  )) format=STRFMT_CMR;
+        if      (!strcmp(fmt,"rtcm2"))  format=STRFMT_RTCM2;
+        else if (!strcmp(fmt,"rtcm3"))  format=STRFMT_RTCM3;
+        else if (!strcmp(fmt,"nov"  ))  format=STRFMT_OEM4;
+        else if (!strcmp(fmt,"oem3" ))  format=STRFMT_OEM3;
+        else if (!strcmp(fmt,"ubx"  ))  format=STRFMT_UBX;
+        else if (!strcmp(fmt,"sbp"  ))  format=STRFMT_SBP;
+        else if (!strcmp(fmt,"json"))   format=STRFMT_SBPJSON;
+        else if (!strcmp(fmt,"stq"  ))  format=STRFMT_STQ;
+        else if (!strcmp(fmt,"javad"))  format=STRFMT_JAVAD;
+        else if (!strcmp(fmt,"nvs"  ))  format=STRFMT_NVS;
+        else if (!strcmp(fmt,"binex"))  format=STRFMT_BINEX;
+        else if (!strcmp(fmt,"rt17" ))  format=STRFMT_RT17;
+        else if (!strcmp(fmt,"sbf"  ))  format=STRFMT_SEPT;
+        else if (!strcmp(fmt,"cmr"  ))  format=STRFMT_CMR;
         else if (!strcmp(fmt,"tersus")) format=STRFMT_TERSUS;
-        else if (!strcmp(fmt,"rinex")) format=STRFMT_RINEX;
+        else if (!strcmp(fmt,"rinex"))  format=STRFMT_RINEX;
     }
     else {
         paths[0]=path;
@@ -510,7 +462,7 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
         else if (!strcmp(p,".gps"  ))  format=STRFMT_OEM4;
         else if (!strcmp(p,".ubx"  ))  format=STRFMT_UBX;
         else if (!strcmp(p,".sbp"  ))  format=STRFMT_SBP;
-        else if (!strcmp(p,".json"  ))  format=STRFMT_SBPJSON;
+        else if (!strcmp(p,".json"  )) format=STRFMT_SBPJSON;
         else if (!strcmp(p,".stq"  ))  format=STRFMT_STQ;
         else if (!strcmp(p,".jps"  ))  format=STRFMT_JAVAD;
         else if (!strcmp(p,".bnx"  ))  format=STRFMT_BINEX;

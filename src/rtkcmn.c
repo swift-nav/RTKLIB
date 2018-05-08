@@ -218,8 +218,8 @@ const char *formatstrs[32]={    /* stream format strings */
     "NovAtel OEM6",             /*  2 */
     "NovAtel OEM3",             /*  3 */
     "u-blox",                   /*  4 */
-    "SBP",             /*  5 */
-    "SBP-JSON",               /*  6 */
+    "Swift Navigation SBP",     /*  5 */
+    "Swift Navigation SBP-JSON",/*  6 */
     "SkyTraq",                  /*  7 */
     "GW10",                     /*  8 */
     "Javad",                    /*  9 */
@@ -3225,6 +3225,14 @@ extern int reppath(const char *path, char *rpath, gtime_t time, const char *rov,
     int week,dow,doy,stat=0;
     char rep[64];
 
+    if (NULL == rpath) {
+      fprintf(stderr, "\n\n%s rpath is NULL\n\n", "reppath()");
+      return 0;
+    }
+    if (NULL == path) {
+      fprintf(stderr, "\n\n%s path is NULL\n\n", "reppath()");
+      return 0;
+    }
     strcpy(rpath,path);
 
     if (!strstr(rpath,"%")) return 0;

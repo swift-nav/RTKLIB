@@ -102,7 +102,7 @@ static int decode_xf5raw(raw_t *raw)
     dTowGPS = dTowUTC + gpsutcTimescale;
     
     /* Tweak pseudoranges to allow Rinex to represent the NVS time of measure */
-    dTowInt  = 10.0*floor((dTowGPS/10.0)+0.5);
+    dTowInt  = (int)(10.0*floor((dTowGPS/10.0)+0.5));
     dTowFrac = dTowGPS - (double) dTowInt;
     time=gpst2time(week, dTowInt*0.001);
     
@@ -264,7 +264,7 @@ static int decode_gloephem(int sat, raw_t *raw)
         geph.acc[0]=R8(p+51) * 1e+6;
         geph.acc[1]=R8(p+59) * 1e+6;
         geph.acc[2]=R8(p+67) * 1e+6;
-        tb = R8(p+75) * 1e-3;
+        tb = (int)(R8(p+75) * 1e-3);
         tk = tb;
         geph.gamn  =R4(p+83);
         geph.taun  =R4(p+87) * 1e-3;

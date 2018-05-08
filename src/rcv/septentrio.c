@@ -366,7 +366,7 @@ static int decode_measepoch(raw_t *raw){
             continue;
         };
 
-        raw->obs.data[n].sat=sat;
+        raw->obs.data[n].sat=(unsigned char)sat;
 
         /* start new observation period */
         if (fabs(timediff(raw->obs.data[0].time,raw->time))>1E-9) {
@@ -403,7 +403,7 @@ static int decode_measepoch(raw_t *raw){
             raw->obs.data[n].P[h]    = psr;
             raw->obs.data[n].D[h]    = (float)dopplerType1;
             raw->obs.data[n].SNR[h]  = (unsigned char)(SNR_DBHZ*4.0);
-            raw->obs.data[n].code[h] = code;
+            raw->obs.data[n].code[h] = (unsigned char)code;
 
             /* lock to signal indication */
             if ((ObsInfo&0x4)==0x4) raw->obs.data[n].LLI[h]|=0x2; /* half-cycle ambiguity */
@@ -411,7 +411,7 @@ static int decode_measepoch(raw_t *raw){
                 LockTime = LockTime>254?254:LockTime; /* limit locktime to sizeof(unsigned char) */
                 if (locktime[sat][signType1]>LockTime) raw->obs.data[n].LLI[h]|=0x1;
                 raw->lockt[sat][h]       = (unsigned char)LockTime;
-                locktime[sat][signType1] = LockTime;
+                locktime[sat][signType1] = (unsigned char)LockTime;
             };
         }
 
@@ -2083,7 +2083,7 @@ static int decode_sbslongcorrh(raw_t* raw)
         t=(int)U4(p+14+i*sbLength+32)-(int)tow%86400;
         if      (t<=-43200) t+=86400;
         else if (t>  43200) t-=86400;
-        raw->nav.sbssat.sat[no-1].lcorr.t0=gpst2time(week,tow+t);
+        raw->nav.sbssat.sat[no-1].lcorr.t0=gpst2time(week,(double)(tow+t));
     };
 
     return 0;

@@ -936,7 +936,7 @@ void  MainWindow::SvrStart(void)
     int itype[]={STR_SERIAL,STR_TCPCLI,STR_TCPSVR,STR_NTRIPCLI,STR_FILE,STR_FTP,STR_HTTP};
     int otype[]={STR_SERIAL,STR_TCPCLI,STR_TCPSVR,STR_NTRIPSVR,STR_FILE};
     int i,strs[MAXSTRRTK]={0},sat,ex,stropt[8]={0};
-    char *paths[8],*cmds[3]={0},*rcvopts[3]={0};
+    char *paths[8],*cmds[3]={0},*cmds_periodic[3]={0},*rcvopts[3]={0};
     char buff[1024],*p;
     gtime_t time=timeget();
     pcvs_t pcvr,pcvs;
@@ -1090,9 +1090,11 @@ void  MainWindow::SvrStart(void)
     strsetopt(stropt);
     
     // start rtk server
-    if (!rtksvrstart(&rtksvr,SvrCycle,SvrBuffSize,strs,paths,Format,NavSelect,
-                     cmds,rcvopts,NmeaCycle,NmeaReq,nmeapos,&PrcOpt,solopt,
-                     &monistr)) {
+    if (!rtksvrstart(&rtksvr, SvrCycle, SvrBuffSize, strs,
+                     paths, Format, NavSelect, cmds,
+                     cmds_periodic, rcvopts, NmeaCycle, NmeaReq,
+                     nmeapos, &PrcOpt, solopt, &monistr,
+                     buff)) {
         traceclose();
         for (i=0;i<8;i++) delete[] paths[i];
         for (i=0;i<3;i++) delete[] rcvopts[i];

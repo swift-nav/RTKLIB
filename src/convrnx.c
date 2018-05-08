@@ -640,7 +640,7 @@ static int scan_obstype(int format, char **files, int nf, rnxopt_t *opt,
             }
             if (opt->te.time&&timediff(str->obs->data[0].time,opt->te)>10.0) break;
 
-            if (++c%11) continue;
+            if (++c%256) continue;
 
             sprintf(msg,"scanning: %s %s%s%s%s%s%s%s",time_str(str->time,0),
                     n[0]?"G":"",n[1]?"R":"",n[2]?"E":"",n[3]?"J":"",
@@ -1124,6 +1124,7 @@ static void convsbs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
     if (!(sat=satno(sys,prn))||opt->exsats[sat-1]==1) return;
 
     if (ofp[NOUTFILE-1]) { /* output sbas log */
+
         if (screent(gpst2time(str->raw.sbsmsg.week,str->raw.sbsmsg.tow),opt->ts,
                     opt->te,0.0)) {
             sbsoutmsg(ofp[NOUTFILE-1],&str->raw.sbsmsg); n[NOUTFILE-1]++;

@@ -60,6 +60,8 @@ extern "C" {
 
 #define PATCH_LEVEL "b29"               /* patch level */
 
+#define SWIFT_REV   "1.1"
+
 #define COPYRIGHT_RTKLIB \
             "Copyright (C) 2007-2017 T.Takasu\nAll rights reserved."
 
@@ -432,8 +434,9 @@ extern "C" {
 #define STRFMT_OEM4  2                  /* stream format: NovAtel OEMV/4 */
 #define STRFMT_OEM3  3                  /* stream format: NovAtel OEM3 */
 #define STRFMT_UBX   4                  /* stream format: u-blox LEA-*T */
-#define STRFMT_SBP   5                  /* stream format: Swiftnav SBP */
-#define STRFMT_SBPJSON  6               /* stream format: Swiftnav SBP-JSON */
+#define STRFMT_SBP     5                  /* stream format: Swift Navigation SBP */
+#define STRFMT_SBPJSON 6                  /* stream format: Swift Navigation SBP-JSON */
+
 #define STRFMT_STQ   7                  /* stream format: SkyTraq S1315F */
 #define STRFMT_GW10  8                  /* stream format: Furuno GW10 */
 #define STRFMT_JAVAD 9                  /* stream format: JAVAD GRIL/GREIS */

@@ -1007,7 +1007,7 @@ static unsigned char *decode_bnx_7f_05_obs(raw_t *raw, unsigned char *buff,
             }
             data->P[i]=range[k];
             data->L[i]=wl<=0.0?0.0:phase[k]/wl;
-            data->D[i]=dopp[k];
+            data->D[i]=(float)dopp[k];
             data->SNR[i]=(unsigned char)(cnr[k]/0.25+0.5);
             data->code[i]=codes[code[k]&0x3F];
             data->LLI[i]=slip[k]?1:0;
@@ -1032,7 +1032,7 @@ static unsigned char *decode_bnx_7f_05_obs(raw_t *raw, unsigned char *buff,
             }
             data->P[i]=range[k];
             data->L[i]=wl<=0.0?0.0:phase[k]/wl;
-            data->D[i]=dopp[k];
+            data->D[i]=(float)dopp[k];
             data->SNR[i]=(unsigned char)(cnr[k]/0.25+0.5);
             data->code[i]=codes[code[k]&0x3F];
             data->LLI[i]=slip[k]?1:0;
