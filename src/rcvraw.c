@@ -865,7 +865,7 @@ extern int init_raw(raw_t *raw, int format)
 
     trace(3,"init_raw: format=%d\n",format);
 
-    raw->time=raw->tobs=time0;
+    raw->time = time0;
     raw->ephsat=0;
     raw->sbsmsg=sbsmsg0;
     raw->msgtype[0]='\0';

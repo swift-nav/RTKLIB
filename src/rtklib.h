@@ -60,8 +60,6 @@ extern "C" {
 
 #define PATCH_LEVEL "b29"               /* patch level */
 
-#define SWIFT_REV   "1.1"
-
 #define COPYRIGHT_RTKLIB \
             "Copyright (C) 2007-2017 T.Takasu\nAll rights reserved."
 
@@ -126,7 +124,7 @@ extern "C" {
 #define TSYS_IRN    6                   /* time system: IRNSS time */
 
 #ifndef NFREQ
-#define NFREQ       3                   /* number of carrier frequencies */
+#define NFREQ       7                   /* number of carrier frequencies */
 #endif
 #define NFREQGLO    2                   /* number of carrier frequencies of GLONASS */
 
@@ -1580,7 +1578,7 @@ EXPORT int readrnxt(const char *file, int rcv, gtime_t ts, gtime_t te,
 EXPORT int readrnxc(const char *file, nav_t *nav);
 EXPORT int outrnxobsh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
 EXPORT int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
-                      int epflag);
+                      int epflag, double _dClockBias);
 EXPORT int outrnxnavh (FILE *fp, const rnxopt_t *opt, const nav_t *nav);
 EXPORT int outrnxgnavh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
 EXPORT int outrnxhnavh(FILE *fp, const rnxopt_t *opt, const nav_t *nav);
