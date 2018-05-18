@@ -21,8 +21,12 @@ static const char rcsid[] = "$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
 
 #define ID_MEASEPOCH 0x004A      /* observation */
 #define ID_MSGEPHGPS_DEP1 0x0081 /* GPS L1 C/A nav message (deprecated) */
-#define ID_MSGEPHGPS 0x0086      /* GPS L1 C/A nav message */
-#define ID_MSGEPHGLO 0x0088      /* Glonass L1/L2 OF nav message */
+#define ID_MSGEPHGPS_DEP2 0x0086 /* GPS L1 C/A nav message (deprecated) */
+#define ID_MSGEPHGPS 0x008A      /* GPS L1 C/A nav message */
+#define ID_MSGEPHBDS 0x0089      /* BDS B1/B2 D1 nav message */
+#define ID_MSGEPHGAL 0x0095      /* GAL E1 I/NAV message */
+#define ID_MSGEPHGLO_DEP1 0x0088 /* Glonass L1/L2 OF nav message (deprecated) */
+#define ID_MSGEPHGLO 0x008B      /* Glonass L1/L2 OF nav message */
 #define ID_MSGIONGPS 0x0090      /* GPS ionospheric parameters */
 #define ID_MSG_SBAS_RAW 0x7777   /* SBAS data */
 
@@ -516,7 +520,7 @@ static gtime_t adjweek(gtime_t time, double tow) {
 
 /* common part of GPS eph decoding (navigation data)
  * --------------------------*/
-static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
+static void decode_gpsnav_common_dep1(uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
 
@@ -558,6 +562,140 @@ static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->toc = gpst2time(uWeekC, dToc);
 }
 
+/* common part of GPS eph decoding (navigation data)
+ * --------------------------*/
+static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
+  uint16_t uWeekE, uWeekC;
+  double dToc;
+
+  _pEph->toes = U4(_pBuff + 4);
+  uWeekE = U2(_pBuff + 8);
+  _pEph->sva = uraindex(R4(_pBuff + 10)); /* URA index */
+  _pEph->fit = U4(_pBuff + 14) ? 0 : 4;
+  _pEph->flag = U1(_pBuff + 18);
+
+  _pEph->tgd[0] = R4(_pBuff + 20);
+  _pEph->crs = R4(_pBuff + 24);
+  _pEph->crc = R4(_pBuff + 28);
+  _pEph->cuc = R4(_pBuff + 32);
+  _pEph->cus = R4(_pBuff + 36);
+  _pEph->cic = R4(_pBuff + 40);
+  _pEph->cis = R4(_pBuff + 44);
+
+  _pEph->deln = R4(_pBuff + 48);
+  _pEph->M0 = R8(_pBuff + 52);
+  _pEph->e = R8(_pBuff + 60);
+  _pEph->A = pow(R8(_pBuff + 68), 2);
+  _pEph->OMG0 = R8(_pBuff + 76);
+  _pEph->OMGd = R8(_pBuff + 84);
+  _pEph->omg = R8(_pBuff + 92);
+  _pEph->i0 = R8(_pBuff + 100);
+  _pEph->idot = R4(_pBuff + 108);
+
+  _pEph->f0 = R4(_pBuff + 112);
+  _pEph->f1 = R4(_pBuff + 116);
+  _pEph->f2 = R4(_pBuff + 120);
+
+  dToc = U4(_pBuff + 124);
+  uWeekC = U2(_pBuff + 128); /* WN */
+  _pEph->iode = U1(_pBuff + 130);
+  _pEph->iodc = U2(_pBuff + 131);
+
+  _pEph->week = adjgpsweek(uWeekE);
+  _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
+  _pEph->toc = gpst2time(uWeekC, dToc);
+}
+
+/* common part of BDS eph decoding (navigation data)
+ * --------------------------*/
+static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
+  uint16_t uWeekE, uWeekC;
+  double dToc;
+
+  _pEph->toes = U4(_pBuff + 4);
+  uWeekE = U2(_pBuff + 8);
+  _pEph->sva = uraindex(R4(_pBuff + 10)); /* URA index */
+  _pEph->fit = U4(_pBuff + 14) ? 0 : 4;
+  _pEph->flag = U1(_pBuff + 18);
+
+  _pEph->tgd[0] = R4(_pBuff + 20);
+  _pEph->tgd[1] = R4(_pBuff + 24);
+  _pEph->crs = R4(_pBuff + 28);
+  _pEph->crc = R4(_pBuff + 32);
+  _pEph->cuc = R4(_pBuff + 36);
+  _pEph->cus = R4(_pBuff + 40);
+  _pEph->cic = R4(_pBuff + 44);
+  _pEph->cis = R4(_pBuff + 48);
+
+  _pEph->deln = R4(_pBuff + 52);
+  _pEph->M0 = R8(_pBuff + 56);
+  _pEph->e = R8(_pBuff + 64);
+  _pEph->A = pow(R8(_pBuff + 72), 2);
+  _pEph->OMG0 = R8(_pBuff + 80);
+  _pEph->OMGd = R8(_pBuff + 88);
+  _pEph->omg = R8(_pBuff + 96);
+  _pEph->i0 = R8(_pBuff + 104);
+  _pEph->idot = R4(_pBuff + 112);
+
+  _pEph->f0 = R8(_pBuff + 116);
+  _pEph->f1 = R4(_pBuff + 124);
+  _pEph->f2 = R4(_pBuff + 128);
+
+  dToc = U4(_pBuff + 132);
+  uWeekC = U2(_pBuff + 136); /* WN */
+  _pEph->iode = U1(_pBuff + 138);
+  _pEph->iodc = U2(_pBuff + 139);
+
+  _pEph->week = adjgpsweek(uWeekE);
+  _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
+  _pEph->toc = gpst2time(uWeekC, dToc);
+}
+
+/* common part of GAL eph decoding (navigation data)
+ * --------------------------*/
+static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
+  uint16_t uWeekE, uWeekC;
+  double dToc;
+
+  _pEph->toes = U4(_pBuff + 4);
+  uWeekE = U2(_pBuff + 8);
+  _pEph->sva = uraindex(R4(_pBuff + 10)); /* URA index */
+  _pEph->fit = U4(_pBuff + 14) ? 0 : 4;
+  _pEph->flag = U1(_pBuff + 18);
+
+  _pEph->tgd[0] = R4(_pBuff + 20);
+  _pEph->tgd[1] = R4(_pBuff + 24);
+  _pEph->crs = R4(_pBuff + 28);
+  _pEph->crc = R4(_pBuff + 32);
+  _pEph->cuc = R4(_pBuff + 36);
+  _pEph->cus = R4(_pBuff + 40);
+  _pEph->cic = R4(_pBuff + 44);
+  _pEph->cis = R4(_pBuff + 48);
+
+  _pEph->deln = R4(_pBuff + 52);
+  _pEph->M0 = R8(_pBuff + 56);
+  _pEph->e = R8(_pBuff + 64);
+  _pEph->A = pow(R8(_pBuff + 72), 2);
+  _pEph->OMG0 = R8(_pBuff + 80);
+  _pEph->OMGd = R8(_pBuff + 88);
+  _pEph->omg = R8(_pBuff + 96);
+  _pEph->i0 = R8(_pBuff + 104);
+  _pEph->idot = R4(_pBuff + 112);
+
+  _pEph->f0 = R8(_pBuff + 116);
+  _pEph->f1 = R8(_pBuff + 124);
+  _pEph->f2 = R4(_pBuff + 132);
+
+  dToc = U4(_pBuff + 136);
+  uWeekC = U2(_pBuff + 140); /* WN */
+  _pEph->iode = U2(_pBuff + 142);
+  _pEph->iodc = U2(_pBuff + 144);
+
+  _pEph->week = adjgpsweek(uWeekE);
+  _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
+  _pEph->toc = gpst2time(uWeekC, dToc);
+}
+
 /* decode deprecated SBP nav message for GPS (navigation data)
  * ----------------*/
 static int decode_gpsnav_dep1(raw_t *raw) {
@@ -585,7 +723,7 @@ static int decode_gpsnav_dep1(raw_t *raw) {
 
   eph.code = U1(puiTmp + 2);
 
-  decode_gpsnav_common(puiTmp, &eph);
+  decode_gpsnav_common_dep1(puiTmp, &eph);
 
   eph.ttr = raw->time;
 
@@ -602,7 +740,7 @@ static int decode_gpsnav_dep1(raw_t *raw) {
 }
 
 /* decode SBP nav message for GPS (navigation data) --------------------------*/
-static int decode_gpsnav(raw_t *raw) {
+static int decode_gpsnav_dep2(raw_t *raw) {
 
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
@@ -611,6 +749,55 @@ static int decode_gpsnav(raw_t *raw) {
   trace(4, "SBP decode_gpsnav: len=%d\n", raw->len);
 
   if ((raw->len) < 191) {
+    trace(2, "SBP decode_gpsnav frame length error: len=%d\n", raw->len);
+    return -1;
+  }
+
+  prn = puiTmp[0];
+  if (!((prn >= 1) && (prn <= 37))) {
+    trace(2, "SBP decode_gpsnav prn error: sat=%d\n", prn);
+    return -1;
+  }
+
+  sat = satno(SYS_GPS, prn);
+  if (sat == 0)
+    return -1;
+
+  eph.code = puiTmp[1];
+  if ((CODE_GPS_L1CA != eph.code)) {
+    trace(2, "Unrecognised code %d for G%02d\n", eph.code, prn);
+    return -1;
+  }
+
+  decode_gpsnav_common_dep1(puiTmp - 2, &eph);
+
+  eph.ttr = raw->time;
+
+  if (!strstr(raw->opt, "EPHALL")) {
+    if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
+      return 0;
+    }
+  }
+
+  trace(2, "decoded eph for G%02d\n", prn);
+
+  eph.sat = sat;
+  raw->nav.eph[sat - 1] = eph;
+  raw->ephsat = sat;
+  return 2;
+}
+
+/* decode SBP nav message for GPS (navigation data) --------------------------*/
+static int decode_gpsnav(raw_t *raw) {
+
+  uint8_t *puiTmp = (raw->buff) + 6;
+  eph_t eph = {0};
+  uint8_t prn, sat;
+
+  trace(4, "SBP decode_gpsnav: len=%d\n", raw->len);
+
+  if ((raw->len) < 139) {
     trace(2, "SBP decode_gpsnav frame length error: len=%d\n", raw->len);
     return -1;
   }
@@ -650,9 +837,107 @@ static int decode_gpsnav(raw_t *raw) {
   return 2;
 }
 
+/* decode SBP nav message for BDS (navigation data) --------------------------*/
+static int decode_bdsnav(raw_t *raw) {
+
+  uint8_t *puiTmp = (raw->buff) + 6;
+  eph_t eph = {0};
+  uint8_t prn, sat;
+
+  trace(4, "SBP decode_bdsnav: len=%d\n", raw->len);
+
+  if ((raw->len) < 147) {
+    trace(2, "SBP decode_bdsnav frame length error: len=%d\n", raw->len);
+    return -1;
+  }
+
+  prn = puiTmp[0];
+  if (!((prn >= 1) && (prn <= 37))) {
+    trace(2, "SBP decode_bdsnav prn error: sat=%d\n", prn);
+    return -1;
+  }
+
+  sat = satno(SYS_CMP, prn);
+  if (sat == 0)
+    return -1;
+
+  eph.code = puiTmp[1];
+  if ((CODE_BDS2_B11 != eph.code)) {
+    trace(2, "Unrecognised code %d for C%02d\n", eph.code, prn);
+    return -1;
+  }
+
+  decode_bdsnav_common(puiTmp - 2, &eph);
+
+  eph.ttr = raw->time;
+
+  if (!strstr(raw->opt, "EPHALL")) {
+    if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
+      return 0;
+    }
+  }
+
+  trace(2, "decoded eph for C%02d\n", prn);
+
+  eph.sat = sat;
+  raw->nav.eph[sat - 1] = eph;
+  raw->ephsat = sat;
+  return 2;
+}
+
+/* decode SBP nav message for GAL (navigation data) --------------------------*/
+static int decode_galnav(raw_t *raw) {
+
+  uint8_t *puiTmp = (raw->buff) + 6;
+  eph_t eph = {0};
+  uint8_t prn, sat;
+
+  trace(4, "SBP decode_galnav: len=%d\n", raw->len);
+
+  if ((raw->len) < 152) {
+    trace(2, "SBP decode_galnav frame length error: len=%d\n", raw->len);
+    return -1;
+  }
+
+  prn = puiTmp[0];
+  if (!((prn >= 1) && (prn <= 50))) {
+    trace(2, "SBP decode_galnav prn error: sat=%d\n", prn);
+    return -1;
+  }
+
+  sat = satno(SYS_GAL, prn);
+  if (sat == 0)
+    return -1;
+
+  eph.code = puiTmp[1];
+  if ((CODE_GAL_E1B != eph.code)) {
+    trace(2, "Unrecognised code %d for E%02d\n", eph.code, prn);
+    return -1;
+  }
+
+  decode_galnav_common(puiTmp - 2, &eph);
+
+  eph.ttr = raw->time;
+
+  if (!strstr(raw->opt, "EPHALL")) {
+    if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
+      return 0;
+    }
+  }
+
+  trace(2, "decoded eph for E%02d\n", prn);
+
+  eph.sat = sat;
+  raw->nav.eph[sat - 1] = eph;
+  raw->ephsat = sat;
+  return 2;
+}
+
 /* decode SBP nav message for Glonass (navigation data)
  * --------------------------*/
-static int decode_glonav(raw_t *raw) {
+static int decode_glonav_dep1(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   geph_t geph = {0};
   uint8_t prn, sat, code;
@@ -713,6 +998,82 @@ static int decode_glonav(raw_t *raw) {
   geph.acc[2] = R8(puiTmp + 110);
 
   geph.frq = (int)puiTmp[118] - 8;
+
+  if (!strstr(raw->opt, "EPHALL")) {
+    if (geph.iode == raw->nav.geph[prn - 1].iode)
+      return 0; /* unchanged */
+  }
+
+  trace(2, "decoded eph for R%02d\n", prn);
+
+  raw->nav.geph[prn - 1] = geph;
+  raw->ephsat = sat;
+  return 2;
+}
+
+/* decode SBP nav message for Glonass (navigation data)
+ * --------------------------*/
+static int decode_glonav(raw_t *raw) {
+  uint8_t *puiTmp = (raw->buff) + 6;
+  geph_t geph = {0};
+  uint8_t prn, sat, code;
+  uint16_t uWeekE;
+  double dSeconds;
+
+  trace(4, "SBP decode_glonav: len=%d\n", raw->len);
+
+  if ((raw->len) < 104) {
+    trace(2, "SBP decode_glonav frame length error: len=%d\n", raw->len);
+    return -1;
+  }
+
+  prn = puiTmp[0]; /* Glonass sid.sat */
+  sat = satno(SYS_GLO, prn);
+
+  if (sat == 0)
+    return -1;
+
+  if (!((prn >= 1) && (prn <= 28))) {
+    trace(2, "SBP decode_glonav prn error: prn=%d\n", prn);
+    return -1;
+  }
+
+  geph.sat = sat;
+  code = puiTmp[1];
+
+  if ((code != CODE_GLO_L1OF) && (code != CODE_GLO_L2OF)) {
+    trace(2, "SBP decode_glonav code error: code=%d\n", code);
+  }
+
+  dSeconds = (double)U4(puiTmp + 2);
+  uWeekE = U2(puiTmp + 6);
+  geph.toe = gpst2time(uWeekE, dSeconds);
+
+  dSeconds = dSeconds - floor(dSeconds / SEC_DAY) * SEC_DAY;
+  dSeconds = floor((dSeconds + 900) / 1800) * 1800;
+  geph.tof = utc2gpst(gpst2time(uWeekE, dSeconds));
+  geph.iode = (int)puiTmp[91];
+
+  geph.sva = (int)R4(puiTmp + 8); /* URA */
+  geph.age = U4(puiTmp + 12);     /* fit interval */
+  geph.svh = puiTmp[17];          /* health */
+  geph.gamn = R4(puiTmp + 18);    /* */
+  geph.taun = R4(puiTmp + 22);    /* */
+  geph.dtaun = R4(puiTmp + 26);   /* */
+
+  geph.pos[0] = R8(puiTmp + 30);
+  geph.pos[1] = R8(puiTmp + 38);
+  geph.pos[2] = R8(puiTmp + 46);
+
+  geph.vel[0] = R8(puiTmp + 54);
+  geph.vel[1] = R8(puiTmp + 62);
+  geph.vel[2] = R8(puiTmp + 70);
+
+  geph.acc[0] = R4(puiTmp + 78);
+  geph.acc[1] = R4(puiTmp + 82);
+  geph.acc[2] = R4(puiTmp + 86);
+
+  geph.frq = (int)puiTmp[90] - 8;
 
   if (!strstr(raw->opt, "EPHALL")) {
     if (geph.iode == raw->nav.geph[prn - 1].iode)
@@ -835,8 +1196,16 @@ static int decode_sbp(raw_t *raw) {
     return decode_msgobs(raw);
   case ID_MSGEPHGPS_DEP1:
     return decode_gpsnav_dep1(raw);
+  case ID_MSGEPHGPS_DEP2:
+    return decode_gpsnav_dep2(raw);
   case ID_MSGEPHGPS:
     return decode_gpsnav(raw);
+  case ID_MSGEPHBDS:
+    return decode_bdsnav(raw);
+  case ID_MSGEPHGAL:
+    return decode_galnav(raw);
+  case ID_MSGEPHGLO_DEP1:
+    return decode_glonav_dep1(raw);
   case ID_MSGEPHGLO:
     return decode_glonav(raw);
   case ID_MSGIONGPS:
@@ -997,7 +1366,9 @@ extern int input_sbpjsonf(raw_t *raw, FILE *fp) {
   /* avoid parsing the payload if the message isn't supported in the first place
    */
   if ((uMsgType != ID_MEASEPOCH) && (uMsgType != ID_MSGEPHGPS_DEP1) &&
-      (uMsgType != ID_MSGEPHGPS) && (uMsgType != ID_MSGEPHGLO) &&
+      (uMsgType != ID_MSGEPHGPS_DEP2) && (uMsgType != ID_MSGEPHGPS) &&
+      (uMsgType != ID_MSGEPHBDS) && (uMsgType != ID_MSGEPHGAL) &&
+      (uMsgType != ID_MSGEPHGLO_DEP1) && (uMsgType != ID_MSGEPHGLO) &&
       (uMsgType != ID_MSGIONGPS) && (uMsgType != ID_MSG_SBAS_RAW)) {
     return 0;
   }
