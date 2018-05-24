@@ -30,6 +30,10 @@ static const char rcsid[] = "$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
 
 #define SEC_DAY 86400.0
 
+/** Constant difference of Beidou time from GPS time */
+#define BDS_WEEK_TO_GPS_WEEK 1356
+#define BDS_SECOND_TO_GPS_SECOND 14
+
 /* get fields (little-endian) ------------------------------------------------*/
 #define U1(p) (*((uint8_t *)(p)))
 #define I1(p) (*((int8_t *)(p)))
@@ -566,7 +570,7 @@ static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
 
-  _pEph->toes = U4(_pBuff + 4);
+  _pEph->toes = U4(_pBuff + 4) - BDS_SECOND_TO_GPS_SECOND;
   uWeekE = U2(_pBuff + 8);
   _pEph->sva = uraindex(R4(_pBuff + 10)); /* URA index */
   _pEph->fit = U4(_pBuff + 14) ? 0 : 4;
@@ -600,7 +604,7 @@ static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U1(_pBuff + 138);
   _pEph->iodc = U2(_pBuff + 139);
 
-  _pEph->week = adjgpsweek(uWeekE);
+  _pEph->week = adjgpsweek(uWeekE) - BDS_WEEK_TO_GPS_WEEK;
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
 }
