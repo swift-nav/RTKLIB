@@ -1026,7 +1026,7 @@ static int decode_glonav(raw_t *raw) {
 
   trace(4, "SBP decode_glonav: len=%d\n", raw->len);
 
-  if ((raw->len) < 104) {
+  if ((raw->len) < 100) {
     trace(2, "SBP decode_glonav frame length error: len=%d\n", raw->len);
     return -1;
   }
