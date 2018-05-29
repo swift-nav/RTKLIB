@@ -585,24 +585,24 @@ static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->cic = R4(_pBuff + 44);
   _pEph->cis = R4(_pBuff + 48);
 
-  _pEph->deln = R4(_pBuff + 52);
-  _pEph->M0 = R8(_pBuff + 56);
-  _pEph->e = R8(_pBuff + 64);
-  _pEph->A = pow(R8(_pBuff + 72), 2);
-  _pEph->OMG0 = R8(_pBuff + 80);
-  _pEph->OMGd = R8(_pBuff + 88);
-  _pEph->omg = R8(_pBuff + 96);
-  _pEph->i0 = R8(_pBuff + 104);
-  _pEph->idot = R4(_pBuff + 112);
+  _pEph->deln = R8(_pBuff + 52);
+  _pEph->M0 = R8(_pBuff + 60);
+  _pEph->e = R8(_pBuff + 68);
+  _pEph->A = pow(R8(_pBuff + 76), 2);
+  _pEph->OMG0 = R8(_pBuff + 84);
+  _pEph->OMGd = R8(_pBuff + 92);
+  _pEph->omg = R8(_pBuff + 100);
+  _pEph->i0 = R8(_pBuff + 108);
+  _pEph->idot = R8(_pBuff + 116);
 
-  _pEph->f0 = R8(_pBuff + 116);
-  _pEph->f1 = R4(_pBuff + 124);
-  _pEph->f2 = R4(_pBuff + 128);
+  _pEph->f0 = R8(_pBuff + 124);
+  _pEph->f1 = R4(_pBuff + 132);
+  _pEph->f2 = R4(_pBuff + 136);
 
-  dToc = U4(_pBuff + 132);
-  uWeekC = U2(_pBuff + 136); /* WN */
-  _pEph->iode = U1(_pBuff + 138);
-  _pEph->iodc = U2(_pBuff + 139);
+  dToc = U4(_pBuff + 140);
+  uWeekC = U2(_pBuff + 144); /* WN */
+  _pEph->iode = U1(_pBuff + 146);
+  _pEph->iodc = U2(_pBuff + 147);
 
   _pEph->week = adjgpsweek(uWeekE) - BDS_WEEK_TO_GPS_WEEK;
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
@@ -630,24 +630,24 @@ static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->cic = R4(_pBuff + 44);
   _pEph->cis = R4(_pBuff + 48);
 
-  _pEph->deln = R4(_pBuff + 52);
-  _pEph->M0 = R8(_pBuff + 56);
-  _pEph->e = R8(_pBuff + 64);
-  _pEph->A = pow(R8(_pBuff + 72), 2);
-  _pEph->OMG0 = R8(_pBuff + 80);
-  _pEph->OMGd = R8(_pBuff + 88);
-  _pEph->omg = R8(_pBuff + 96);
-  _pEph->i0 = R8(_pBuff + 104);
-  _pEph->idot = R4(_pBuff + 112);
+  _pEph->deln = R8(_pBuff + 52);
+  _pEph->M0 = R8(_pBuff + 60);
+  _pEph->e = R8(_pBuff + 68);
+  _pEph->A = pow(R8(_pBuff + 76), 2);
+  _pEph->OMG0 = R8(_pBuff + 84);
+  _pEph->OMGd = R8(_pBuff + 92);
+  _pEph->omg = R8(_pBuff + 100);
+  _pEph->i0 = R8(_pBuff + 108);
+  _pEph->idot = R8(_pBuff + 116);
 
-  _pEph->f0 = R8(_pBuff + 116);
-  _pEph->f1 = R8(_pBuff + 124);
-  _pEph->f2 = R4(_pBuff + 132);
+  _pEph->f0 = R8(_pBuff + 124);
+  _pEph->f1 = R8(_pBuff + 132);
+  _pEph->f2 = R4(_pBuff + 140);
 
-  dToc = U4(_pBuff + 136);
-  uWeekC = U2(_pBuff + 140); /* WN */
-  _pEph->iode = U2(_pBuff + 142);
-  _pEph->iodc = U2(_pBuff + 144);
+  dToc = U4(_pBuff + 144);
+  uWeekC = U2(_pBuff + 148); /* WN */
+  _pEph->iode = U2(_pBuff + 150);
+  _pEph->iodc = U2(_pBuff + 152);
 
   _pEph->week = adjgpsweek(uWeekE);
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
@@ -755,7 +755,7 @@ static int decode_bdsnav(raw_t *raw) {
 
   trace(4, "SBP decode_bdsnav: len=%d\n", raw->len);
 
-  if ((raw->len) < 147) {
+  if ((raw->len) < 155) {
     trace(2, "SBP decode_bdsnav frame length error: len=%d\n", raw->len);
     return -1;
   }
@@ -804,7 +804,7 @@ static int decode_galnav(raw_t *raw) {
 
   trace(4, "SBP decode_galnav: len=%d\n", raw->len);
 
-  if ((raw->len) < 152) {
+  if ((raw->len) < 160) {
     trace(2, "SBP decode_galnav frame length error: len=%d\n", raw->len);
     return -1;
   }
