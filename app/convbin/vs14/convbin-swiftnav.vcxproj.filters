@@ -25,6 +25,9 @@
     <ClCompile Include="..\..\..\src\rcv\crescent.c">
       <Filter>Source Files\src\rcv</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\rcv\tersus.c">
+      <Filter>Source Files\src\rcv</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\rcv\gw10.c">
       <Filter>Source Files\src\rcv</Filter>
     </ClCompile>

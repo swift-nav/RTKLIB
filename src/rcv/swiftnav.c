@@ -407,49 +407,59 @@ static int decode_msgobs(raw_t *raw) {
     }
 
     switch (band_code) {
-    case 0: /* GPS L1C/A */
+    case CODE_GPS_L1CA:
       code = CODE_L1C;
       sys = SYS_GPS;
       freq = 0;
       break;
-    case 1: /* GPS L2CM */
+    case CODE_GPS_L2CM:
       code = CODE_L2S;
       sys = SYS_GPS;
       freq = 1;
       break;
-    case 2: /* SBAS L1C/A */
+    case CODE_SBAS_L1CA:
       code = CODE_L1C;
       sys = SYS_SBS;
       freq = 0;
       break;
-    case 3: /* Glonass L1C/A */
+    case CODE_GLO_L1OF:
       code = CODE_L1C;
       sys = SYS_GLO;
       freq = 0;
       break;
-    case 4: /* Glonass L2C/A */
+    case CODE_GLO_L2OF:
       code = CODE_L2C;
       sys = SYS_GLO;
       freq = 1;
       break;
-    case 5: /* GPS L1P */
+    case CODE_GPS_L1P:
       code = CODE_L1P;
       sys = SYS_GPS;
       freq = 0;
       break;
-    case 6: /* GPS L2P */
+    case CODE_GPS_L2P:
       code = CODE_L2P;
       sys = SYS_GPS;
       freq = 1;
       break;
-    case 12: /* Beidou B1 */
+    case CODE_BDS2_B11:
       code = CODE_L1I;
       sys = SYS_CMP;
       freq = 0;
       break;
-    case 13: /* Beidou B2 */
+    case CODE_BDS2_B2:
       code = CODE_L7I;
       sys = SYS_CMP;
+      freq = 1;
+      break;
+    case CODE_GAL_E1X:
+      code = CODE_L1X;
+      sys = SYS_GAL;
+      freq = 0;
+      break;
+    case CODE_GAL_E7X:
+      code = CODE_L7X;
+      sys = SYS_GAL;
       freq = 1;
       break;
     default:

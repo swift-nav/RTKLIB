@@ -44,7 +44,7 @@ all  : sbp2rinex
 sbp2rinex  : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
 sbp2rinex  : rtcm.o rtcm2.o rtcm3.o rtcm3e.o pntpos.o ephemeris.o ionex.o
 sbp2rinex  : novatel.o swiftnav.o ublox.o skytraq.o gw10.o javad.o nvs.o
-sbp2rinex  : binex.o rt17.o qzslex.o septentrio.o cmr.o
+sbp2rinex  : binex.o rt17.o qzslex.o septentrio.o cmr.o tersus.o 
 
 sbp2rinex  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
@@ -101,33 +101,36 @@ septentrio.o: $(SRC)/rcv/septentrio.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/septentrio.c
 cmr.o      : $(SRC)/rcv/cmr.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/cmr.c
+tersus.o      : $(SRC)/rcv/tersus.c
+	$(CC) -c $(CFLAGS) $(SRC)/rcv/tersus.c
 
-convbin.o  : $(SRC)/rtklib.h Makefile
-rtkcmn.o   : $(SRC)/rtklib.h Makefile
-rinex.o    : $(SRC)/rtklib.h Makefile
-sbas.o     : $(SRC)/rtklib.h Makefile
-preceph.o  : $(SRC)/rtklib.h Makefile
-rcvraw.o   : $(SRC)/rtklib.h Makefile
-convrnx.o  : $(SRC)/rtklib.h Makefile
-rtcm.o     : $(SRC)/rtklib.h Makefile
-rtcm2.o    : $(SRC)/rtklib.h Makefile
-rtcm3.o    : $(SRC)/rtklib.h Makefile
-rtcm3e.o   : $(SRC)/rtklib.h Makefile
-pntpos.o   : $(SRC)/rtklib.h Makefile
-ephemeris.o: $(SRC)/rtklib.h Makefile
-ionex.o    : $(SRC)/rtklib.h Makefile
-novatel.o  : $(SRC)/rtklib.h Makefile
-swiftnav.o : $(SRC)/rtklib.h Makefile
-ublox.o    : $(SRC)/rtklib.h Makefile
-skytraq.o  : $(SRC)/rtklib.h Makefile
-gw10.o     : $(SRC)/rtklib.h Makefile
-javad.o    : $(SRC)/rtklib.h Makefile
-nvs.o      : $(SRC)/rtklib.h Makefile
-binex.o    : $(SRC)/rtklib.h Makefile
-rt17.o     : $(SRC)/rtklib.h Makefile
-qzslex.o   : $(SRC)/rtklib.h Makefile
-septentrio.o: $(SRC)/rtklib.h Makefile
-cmr.o      : $(SRC)/rtklib.h Makefile
+convbin.o  : $(SRC)/rtklib.h makefile
+rtkcmn.o   : $(SRC)/rtklib.h makefile
+rinex.o    : $(SRC)/rtklib.h makefile
+sbas.o     : $(SRC)/rtklib.h makefile
+preceph.o  : $(SRC)/rtklib.h makefile
+rcvraw.o   : $(SRC)/rtklib.h makefile
+convrnx.o  : $(SRC)/rtklib.h makefile
+rtcm.o     : $(SRC)/rtklib.h makefile
+rtcm2.o    : $(SRC)/rtklib.h makefile
+rtcm3.o    : $(SRC)/rtklib.h makefile
+rtcm3e.o   : $(SRC)/rtklib.h makefile
+pntpos.o   : $(SRC)/rtklib.h makefile
+ephemeris.o: $(SRC)/rtklib.h makefile
+ionex.o    : $(SRC)/rtklib.h makefile
+novatel.o  : $(SRC)/rtklib.h makefile
+swiftnav.o : $(SRC)/rtklib.h makefile
+ublox.o    : $(SRC)/rtklib.h makefile
+skytraq.o  : $(SRC)/rtklib.h makefile
+gw10.o     : $(SRC)/rtklib.h makefile
+javad.o    : $(SRC)/rtklib.h makefile
+nvs.o      : $(SRC)/rtklib.h makefile
+binex.o    : $(SRC)/rtklib.h makefile
+rt17.o     : $(SRC)/rtklib.h makefile
+qzslex.o   : $(SRC)/rtklib.h makefile
+septentrio.o: $(SRC)/rtklib.h makefile
+cmr.o      : $(SRC)/rtklib.h makefile
+tersus.o      : $(SRC)/rtklib.h makefile
 
 
 install:
@@ -135,7 +138,6 @@ install:
 
 clean:
 	rm -f sbp2rinex sbp2rinex.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
-
 
 test : test1 test2 test3 test4 test5 testclean
 

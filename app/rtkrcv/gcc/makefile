@@ -38,7 +38,7 @@ rtkrcv-swiftnav     : rtkrcv.o vt.o rtkcmn.o rtksvr.o rtkpos.o geoid.o solution.
 rtkrcv-swiftnav     : sbas.o stream.o rcvraw.o rtcm.o preceph.o options.o pntpos.o ppp.o ppp_ar.o
 rtkrcv-swiftnav     : novatel.o ublox.o skytraq.o gw10.o javad.o nvs.o binex.o
 rtkrcv-swiftnav     : rt17.o ephemeris.o rinex.o ionex.o rtcm2.o rtcm3.o rtcm3e.o qzslex.o
-rtkrcv-swiftnav     : ppp_corr.o tides.o septentrio.o cmr.o swiftnav.o
+rtkrcv-swiftnav     : ppp_corr.o tides.o septentrio.o cmr.o tersus.o swiftnav.o
 
 rtkrcv-swiftnav  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
@@ -117,41 +117,45 @@ septentrio.o: $(SRC)/rcv/septentrio.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/septentrio.c
 cmr.o      : $(SRC)/rcv/cmr.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/cmr.c
+tersus.o   : $(SRC)/rcv/tersus.c
+	$(CC) -c $(CFLAGS) $(SRC)/rcv/tersus.c
 
-rtkrcv.o   : $(SRC)/rtklib.h ../vt.h  Makefile
-rtkcmn.o   : $(SRC)/rtklib.h Makefile
-rtksvr.o   : $(SRC)/rtklib.h Makefile
-rtkpos.o   : $(SRC)/rtklib.h Makefile
-geoid.o    : $(SRC)/rtklib.h Makefile
-solution.o : $(SRC)/rtklib.h Makefile
-lambda.o   : $(SRC)/rtklib.h Makefile
-sbas.o     : $(SRC)/rtklib.h Makefile
-rcvraw.o   : $(SRC)/rtklib.h Makefile
-rtcm.o     : $(SRC)/rtklib.h Makefile
-rtcm2.o    : $(SRC)/rtklib.h Makefile
-rtcm3.o    : $(SRC)/rtklib.h Makefile
-rtcm3e.o   : $(SRC)/rtklib.h Makefile
-preceph.o  : $(SRC)/rtklib.h Makefile
-options.o  : $(SRC)/rtklib.h Makefile
-pntpos.o   : $(SRC)/rtklib.h Makefile
-ppp.o      : $(SRC)/rtklib.h Makefile
-novatel.o  : $(SRC)/rtklib.h Makefile
-ublox.o    : $(SRC)/rtklib.h Makefile
-ss2.o      : $(SRC)/rtklib.h Makefile
-skytraq.o  : $(SRC)/rtklib.h Makefile
-gw10.o     : $(SRC)/rtklib.h Makefile
-javad.o    : $(SRC)/rtklib.h Makefile
-nvs.o      : $(SRC)/rtklib.h Makefile
-binex.o    : $(SRC)/rtklib.h Makefile
-rt17.o     : $(SRC)/rtklib.h Makefile
-septentrio.o: $(SRC)/rtklib.h Makefile
-cmr.o      : $(SRC)/rtklib.h Makefile
-ephemeris.o: $(SRC)/rtklib.h Makefile
-rinex.o    : $(SRC)/rtklib.h Makefile
-ionex.o    : $(SRC)/rtklib.h Makefile
-qzslex.o   : $(SRC)/rtklib.h Makefile
-tides.o    : $(SRC)/rtklib.h Makefile
-ppp_corr.o : $(SRC)/rtklib.h Makefile
+rtkrcv.o   : $(SRC)/rtklib.h ../vt.h  makefile
+rtkcmn.o   : $(SRC)/rtklib.h makefile
+rtksvr.o   : $(SRC)/rtklib.h makefile
+rtkpos.o   : $(SRC)/rtklib.h makefile
+geoid.o    : $(SRC)/rtklib.h makefile
+solution.o : $(SRC)/rtklib.h makefile
+lambda.o   : $(SRC)/rtklib.h makefile
+sbas.o     : $(SRC)/rtklib.h makefile
+rcvraw.o   : $(SRC)/rtklib.h makefile
+rtcm.o     : $(SRC)/rtklib.h makefile
+rtcm2.o    : $(SRC)/rtklib.h makefile
+rtcm3.o    : $(SRC)/rtklib.h makefile
+rtcm3e.o   : $(SRC)/rtklib.h makefile
+preceph.o  : $(SRC)/rtklib.h makefile
+options.o  : $(SRC)/rtklib.h makefile
+pntpos.o   : $(SRC)/rtklib.h makefile
+ppp.o      : $(SRC)/rtklib.h makefile
+novatel.o  : $(SRC)/rtklib.h makefile
+ublox.o    : $(SRC)/rtklib.h makefile
+swiftnav.o    : $(SRC)/rtklib.h makefile
+tersus.o    : $(SRC)/rtklib.h makefile
+ss2.o      : $(SRC)/rtklib.h makefile
+skytraq.o  : $(SRC)/rtklib.h makefile
+gw10.o     : $(SRC)/rtklib.h makefile
+javad.o    : $(SRC)/rtklib.h makefile
+nvs.o      : $(SRC)/rtklib.h makefile
+binex.o    : $(SRC)/rtklib.h makefile
+rt17.o     : $(SRC)/rtklib.h makefile
+septentrio.o: $(SRC)/rtklib.h makefile
+cmr.o      : $(SRC)/rtklib.h makefile
+ephemeris.o: $(SRC)/rtklib.h makefile
+rinex.o    : $(SRC)/rtklib.h makefile
+ionex.o    : $(SRC)/rtklib.h makefile
+qzslex.o   : $(SRC)/rtklib.h makefile
+tides.o    : $(SRC)/rtklib.h makefile
+ppp_corr.o : $(SRC)/rtklib.h makefile
 
 install:
 	cp rtkrcv $(BINDIR)

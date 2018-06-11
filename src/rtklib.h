@@ -58,9 +58,7 @@ extern "C" {
 
 #define VER_RTKLIB  "2.4.3"             /* library version */
 
-#define PATCH_LEVEL "b27"               /* patch level */
-
-#define SWIFT_REV   "1.1"
+#define PATCH_LEVEL "b29"               /* patch level */
 
 #define COPYRIGHT_RTKLIB \
             "Copyright (C) 2007-2017 T.Takasu\nAll rights reserved."
@@ -126,7 +124,7 @@ extern "C" {
 #define TSYS_IRN    6                   /* time system: IRNSS time */
 
 #ifndef NFREQ
-#define NFREQ       3                   /* number of carrier frequencies */
+#define NFREQ       7                   /* number of carrier frequencies */
 #endif
 #define NFREQGLO    2                   /* number of carrier frequencies of GLONASS */
 
@@ -224,7 +222,11 @@ extern "C" {
 #endif
 #define MAXRCV      64                  /* max receiver number (1 to MAXRCV) */
 #define MAXOBSTYPE  64                  /* max number of obs type in RINEX */
+#ifdef OBS_100HZ
 #define DTTOL       0.005               /* tolerance of time difference (s) */
+#else
+#define DTTOL       0.025               /* tolerance of time difference (s) */
+#endif
 #define MAXDTOE     7200.0              /* max time difference to GPS Toe (s) */
 #define MAXDTOE_QZS 7200.0              /* max time difference to QZSS Toe (s) */
 #define MAXDTOE_GAL 10800.0             /* max time difference to Galileo Toe (s) */
@@ -432,6 +434,7 @@ extern "C" {
 #define STRFMT_UBX   4                  /* stream format: u-blox LEA-*T */
 #define STRFMT_SBP     5                  /* stream format: Swift Navigation SBP */
 #define STRFMT_SBPJSON 6                  /* stream format: Swift Navigation SBP-JSON */
+
 #define STRFMT_STQ   7                  /* stream format: SkyTraq S1315F */
 #define STRFMT_GW10  8                  /* stream format: Furuno GW10 */
 #define STRFMT_JAVAD 9                  /* stream format: JAVAD GRIL/GREIS */
@@ -440,16 +443,17 @@ extern "C" {
 #define STRFMT_RT17  12                 /* stream format: Trimble RT17 */
 #define STRFMT_SEPT  13                 /* stream format: Septentrio */
 #define STRFMT_CMR   14                 /* stream format: CMR/CMR+ */
-#define STRFMT_LEXR  15                 /* stream format: Furuno LPY-10000 */
-#define STRFMT_RINEX 16                 /* stream format: RINEX */
-#define STRFMT_SP3   17                 /* stream format: SP3 */
-#define STRFMT_RNXCLK 18                /* stream format: RINEX CLK */
-#define STRFMT_SBAS  19                 /* stream format: SBAS messages */
-#define STRFMT_NMEA  20                 /* stream format: NMEA 0183 */
+#define STRFMT_TERSUS 15                /* stream format: TERSUS */
+#define STRFMT_LEXR  16                 /* stream format: Furuno LPY-10000 */
+#define STRFMT_RINEX 17                 /* stream format: RINEX */
+#define STRFMT_SP3   18                 /* stream format: SP3 */
+#define STRFMT_RNXCLK 19                /* stream format: RINEX CLK */
+#define STRFMT_SBAS  20                 /* stream format: SBAS messages */
+#define STRFMT_NMEA  21                 /* stream format: NMEA 0183 */
 #ifndef EXTLEX
-#define MAXRCVFMT    14                 /* max number of receiver format */
+#define MAXRCVFMT    15                 /* max number of receiver format */
 #else
-#define MAXRCVFMT    15
+#define MAXRCVFMT    16
 #endif
 
 #define STR_MODE_R  0x1                 /* stream mode: read */
@@ -470,6 +474,12 @@ extern "C" {
 #define DLOPT_KEEPCMP 0x02              /* download option: keep compressed file */
 #define DLOPT_HOLDERR 0x04              /* download option: hold on error file */
 #define DLOPT_HOLDLST 0x08              /* download option: hold on listing file */
+
+#define LLI_SLIP    0x01                /* LLI: cycle-slip */
+#define LLI_HALFC   0x02                /* LLI: half-cycle not resovled */
+#define LLI_BOCTRK  0x04                /* LLI: boc tracking of mboc signal */
+#define LLI_HALFA   0x40                /* LLI: half-cycle added */
+#define LLI_HALFS   0x80                /* LLI: half-cycle subtracted */
 
 #define IMUFMT_KVH  1                   /* imu data format KVH */
 
@@ -907,6 +917,7 @@ typedef struct {        /* solution type */
     float  qr[6];       /* position variance/covariance (m^2) */
                         /* {c_xx,c_yy,c_zz,c_xy,c_yz,c_zx} or */
                         /* {c_ee,c_nn,c_uu,c_en,c_nu,c_ue} */
+    float  qv[6];       /* velocity variance/covariance (m^2/s^2) */
     double dtr[6];      /* receiver clock bias to time systems (s) */
     unsigned char type; /* type (0:xyz-ecef,1:enu-baseline) */
     unsigned char stat; /* solution status (SOLQ_???) */
@@ -1089,6 +1100,7 @@ typedef struct {        /* solution options type */
     int degf;           /* latitude/longitude format (0:ddd.ddd,1:ddd mm ss) */
     int outhead;        /* output header (0:no,1:yes) */
     int outopt;         /* output processing options (0:no,1:yes) */
+    int outvel;         /* output velocity options (0:no,1:yes) */
     int datum;          /* datum (0:WGS84,1:Tokyo) */
     int height;         /* height (0:ellipsoidal,1:geodetic) */
     int geoid;          /* geoid model (0:EGM96,1:JGD2000) */
@@ -1120,6 +1132,7 @@ typedef struct {        /* file options type */
 typedef struct {        /* RINEX options type */
     gtime_t ts,te;      /* time start/end */
     double tint;        /* time interval (s) */
+    double ttol;        /* time tolerance (s) */
     double tunit;       /* time unit for multiple-session (s) */
     double rnxver;      /* RINEX version */
     int navsys;         /* navigation system */
@@ -1212,7 +1225,7 @@ typedef struct half_cyc_tag {  /* half-cycle correction list type */
 
 typedef struct {        /* receiver raw data control type */
     gtime_t time;       /* message time */
-    gtime_t tobs;       /* observation data time */
+    gtime_t tobs[MAXSAT][NFREQ+NEXOBS]; /* observation data time */
     obs_t obs;          /* observation data */
     obs_t obuf;         /* observation data buffer */
     nav_t nav;          /* satellite ephemerides */
@@ -1642,11 +1655,12 @@ EXPORT void free_rt17 (raw_t *raw);
 EXPORT void free_cmr  (raw_t *raw);
 EXPORT int update_cmr (raw_t *raw, rtksvr_t *svr, obs_t *obs);
 
+#define SWIFT_REV "1.5"
+
 EXPORT int input_oem4  (raw_t *raw, unsigned char data);
 EXPORT int input_oem3  (raw_t *raw, unsigned char data);
 EXPORT int input_ubx   (raw_t *raw, unsigned char data);
 EXPORT int input_sbp   (raw_t *raw, unsigned char data);
-EXPORT int input_cres  (raw_t *raw, unsigned char data);
 EXPORT int input_stq   (raw_t *raw, unsigned char data);
 EXPORT int input_gw10  (raw_t *raw, unsigned char data);
 EXPORT int input_javad (raw_t *raw, unsigned char data);
@@ -1655,13 +1669,13 @@ EXPORT int input_bnx   (raw_t *raw, unsigned char data);
 EXPORT int input_rt17  (raw_t *raw, unsigned char data);
 EXPORT int input_sbf   (raw_t *raw, unsigned char data);
 EXPORT int input_cmr   (raw_t *raw, unsigned char data);
+EXPORT int input_tersus(raw_t *raw, unsigned char data);
 EXPORT int input_lexr  (raw_t *raw, unsigned char data);
 EXPORT int input_oem4f (raw_t *raw, FILE *fp);
 EXPORT int input_oem3f (raw_t *raw, FILE *fp);
 EXPORT int input_ubxf  (raw_t *raw, FILE *fp);
-EXPORT int input_sbpf     (raw_t *raw, FILE *fp);
+EXPORT int input_sbpf  (raw_t *raw, FILE *fp);
 EXPORT int input_sbpjsonf (raw_t *raw, FILE *fp);
-EXPORT int input_cresf (raw_t *raw, FILE *fp);
 EXPORT int input_stqf  (raw_t *raw, FILE *fp);
 EXPORT int input_gw10f (raw_t *raw, FILE *fp);
 EXPORT int input_javadf(raw_t *raw, FILE *fp);
@@ -1670,6 +1684,7 @@ EXPORT int input_bnxf  (raw_t *raw, FILE *fp);
 EXPORT int input_rt17f (raw_t *raw, FILE *fp);
 EXPORT int input_sbff  (raw_t *raw, FILE *fp);
 EXPORT int input_cmrf  (raw_t *raw, FILE *fp);
+EXPORT int input_tersusf(raw_t *raw, FILE *fp);
 EXPORT int input_lexrf (raw_t *raw, FILE *fp);
 
 EXPORT int gen_ubx (const char *msg, unsigned char *buff);
