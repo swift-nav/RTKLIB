@@ -85,7 +85,7 @@ typedef enum code_e {
   CODE_GPS_L5I = 9,
   CODE_GPS_L5Q = 10,
   CODE_GPS_L5X = 11,  /* combined L5 tracking */
-  CODE_BDS2_B11 = 12, /* data channel at 1526 * 1.023 MHz */
+  CODE_BDS2_B1 = 12, /* data channel at 1526 * 1.023 MHz */
   CODE_BDS2_B2 = 13,  /* data channel at 1180 * 1.023 MHz */
   CODE_GAL_E1B = 14,  /* data channel at E1 (1540 * 1.023 MHz) */
   CODE_GAL_E1C = 15,  /* pilot channel at E1 */
@@ -442,7 +442,7 @@ static int decode_msgobs(raw_t *raw) {
       sys = SYS_GPS;
       freq = 1;
       break;
-    case CODE_BDS2_B11:
+    case CODE_BDS2_B1:
       code = CODE_L1I;
       sys = SYS_CMP;
       freq = 0;
@@ -876,7 +876,7 @@ static int decode_bdsnav(raw_t *raw) {
     return -1;
 
   eph.code = puiTmp[1];
-  if ((CODE_BDS2_B11 != eph.code)) {
+  if ((CODE_BDS2_B1 != eph.code) && (CODE_BDS2_B2 != eph.code)) {
     trace(2, "Unrecognised code %d for C%02d\n", eph.code, prn);
     return -1;
   }
@@ -925,7 +925,7 @@ static int decode_galnav(raw_t *raw) {
     return -1;
 
   eph.code = puiTmp[1];
-  if ((CODE_GAL_E1B != eph.code)) {
+  if ((CODE_GAL_E1X != eph.code) && (CODE_GAL_E7X != eph.code)) {
     trace(2, "Unrecognised code %d for E%02d\n", eph.code, prn);
     return -1;
   }
