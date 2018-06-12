@@ -21,7 +21,7 @@ INCLUDE= -I$(SRC)
 OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS=3
 
 CC=gcc
-CFLAGS=-O2 -ansi -std=c99 -pedantic -Wall $(INCLUDE) $(OPTIONS)
+CFLAGS=-O2 -ansi -std=c99 -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
 DATDIR=../../../test/data/rcvraw
 SEP="/"
 
