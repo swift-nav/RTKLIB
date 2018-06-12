@@ -452,10 +452,30 @@ static int decode_msgobs(raw_t *raw) {
       sys = SYS_CMP;
       freq = 1;
       break;
+    case CODE_GAL_E1B:
+      code = CODE_L1B;
+      sys = SYS_GAL;
+      freq = 0;
+      break;
+    case CODE_GAL_E1C:
+      code = CODE_L1C;
+      sys = SYS_GAL;
+      freq = 0;
+      break;
     case CODE_GAL_E1X:
       code = CODE_L1X;
       sys = SYS_GAL;
       freq = 0;
+      break;
+    case CODE_GAL_E7I:
+      code = CODE_L7I;
+      sys = SYS_GAL;
+      freq = 1;
+      break;
+    case CODE_GAL_E7Q:
+      code = CODE_L7Q;
+      sys = SYS_GAL;
+      freq = 1;
       break;
     case CODE_GAL_E7X:
       code = CODE_L7X;
