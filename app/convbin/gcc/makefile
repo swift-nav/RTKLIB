@@ -21,7 +21,7 @@ INCLUDE= -I$(SRC)
 OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS=3
 
 CC=gcc
-CFLAGS=-g -ansi -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
+CFLAGS=-O2 -ansi -std=c99 -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
 DATDIR=../../../test/data/rcvraw
 SEP="/"
 
@@ -44,7 +44,7 @@ all  : sbp2rinex
 sbp2rinex  : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
 sbp2rinex  : rtcm.o rtcm2.o rtcm3.o rtcm3e.o pntpos.o ephemeris.o ionex.o
 sbp2rinex  : novatel.o swiftnav.o ublox.o skytraq.o gw10.o javad.o nvs.o
-sbp2rinex  : binex.o rt17.o qzslex.o septentrio.o cmr.o tersus.o 
+sbp2rinex  : binex.o rt17.o qzslex.o septentrio.o cmr.o tersus.o
 
 sbp2rinex  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
@@ -141,7 +141,7 @@ clean:
 
 test : test1 test2 test3 test4 test5 testclean
 
-test1: # binary sbp 
+test1: # binary sbp
 	@echo -e "\n\n****** Test1: sbp binary ********\n"
 	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26.sbp -o 2017-05-12-v1.1.26-bin.obs
 test2: # sbp json with spaces
@@ -157,6 +157,6 @@ test4:
 	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26-nospaces.sbp.json -o 2017-05-12-v1.1.26-json-nospaces.obs -n 2017-05-12-v1.1.26-json.nav
 test5: test1 test4  # make sure JSON with no spaces are bit exact minus first two lines
 	tail -n +5 ./2017-05-12-v1.1.26-json-nospaces.obs > 2017-05-12-v1.1.26-json-nospaces.trunc.obs
-	diff 2017-05-12-v1.1.26-json-nospaces.trunc.obs 2017-05-12-v1.1.26-bin.trunc.obs 
+	diff 2017-05-12-v1.1.26-json-nospaces.trunc.obs 2017-05-12-v1.1.26-bin.trunc.obs
 testclean:
-	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs 
+	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs

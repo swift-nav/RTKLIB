@@ -110,6 +110,45 @@ typedef enum code_e {
   CODE_COUNT
 } code_t;
 
+typedef struct {uint32_t code; uint32_t sys; uint32_t freq;} bandcode_t;
+
+static bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
+    [CODE_GPS_L1CA] = {CODE_L1C, SYS_GPS, 0},
+    [CODE_GPS_L2CM] = {CODE_L2S, SYS_GPS, 1},
+    [CODE_SBAS_L1CA] = {CODE_L1C, SYS_SBS, 0},
+    [CODE_GLO_L1OF] = {CODE_L1C, SYS_GLO, 0},
+    [CODE_GLO_L2OF] = {CODE_L2C, SYS_GLO, 1},
+    [CODE_GPS_L1P] = {CODE_L1P, SYS_GPS, 0},
+    [CODE_GPS_L2P] = {CODE_L2P, SYS_GPS, 1},
+    [CODE_GPS_L2CL] = {CODE_L2L, SYS_GPS, 1},
+    [CODE_GPS_L2CX] = {CODE_L2X, SYS_GPS, 1},
+    [CODE_GPS_L5I] = {CODE_L5I, SYS_GPS, 2},
+    [CODE_GPS_L5Q] = {CODE_L5Q, SYS_GPS, 2},
+    [CODE_GPS_L5X] = {CODE_L5X, SYS_GPS, 2},
+    [CODE_BDS2_B1] = {CODE_L1I, SYS_CMP, 0},
+    [CODE_BDS2_B2] = {CODE_L7I, SYS_CMP, 1},
+    [CODE_GAL_E1B] = {CODE_L1B, SYS_GAL, 0},
+    [CODE_GAL_E1C] = {CODE_L1C, SYS_GAL, 0},
+    [CODE_GAL_E1X] = {CODE_L1X, SYS_GAL, 0},
+    [CODE_GAL_E6B] = {CODE_L6B, SYS_GAL, 3},
+    [CODE_GAL_E6C] = {CODE_L6C, SYS_GAL, 3},
+    [CODE_GAL_E6X] = {CODE_L6X, SYS_GAL, 3},
+    [CODE_GAL_E7I] = {CODE_L7I, SYS_GAL, 1},
+    [CODE_GAL_E7Q] = {CODE_L7Q, SYS_GAL, 1},
+    [CODE_GAL_E7X] = {CODE_L7X, SYS_GAL, 1},
+    [CODE_GAL_E8] = {CODE_L8X, SYS_GAL, 4},
+    [CODE_GAL_E5I] = {CODE_L5I, SYS_GAL, 2},
+    [CODE_GAL_E5Q] = {CODE_L5Q, SYS_GAL, 2},
+    [CODE_GAL_E5X] = {CODE_L5X, SYS_GAL, 2},
+    [CODE_QZS_L1CA] = {CODE_L1C, SYS_QZS, 0},
+    [CODE_QZS_L2CM] = {CODE_L2S, SYS_QZS, 1},
+    [CODE_QZS_L2CL] = {CODE_L2L, SYS_QZS, 1},
+    [CODE_QZS_L2CX] = {CODE_L2X, SYS_QZS, 1},
+    [CODE_QZS_L5I] = {CODE_L5I, SYS_QZS, 2},
+    [CODE_QZS_L5Q] = {CODE_L5Q, SYS_QZS, 2},
+    [CODE_QZS_L5X] = {CODE_L5X, SYS_QZS, 2}
+};
+
 /* checksum lookup table -----------------------------------------------------*/
 static const uint32_t CRC_16CCIT_LookUp[256] = {
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7, 0x8108,
@@ -253,32 +292,7 @@ static uint16_t sbp_checksum(uint8_t *buff, int len) {
   return crc;
 }
 
-/* 8-bit week -> full week ---------------------------------------------------*/
-static void adj_utcweek(gtime_t time, double *utc) {
-  int week;
 
-  if (utc[3] >= 256.0)
-    return;
-  time2gpst(time, &week);
-  utc[3] += week / 256 * 256;
-  if (utc[3] < week - 128)
-    utc[3] += 256.0;
-  else if (utc[3] > week + 128)
-    utc[3] -= 256.0;
-}
-/* adjust daily roll-over of time
- * ---------------------------------------------*/
-static gtime_t adjday(gtime_t time, double tod) {
-  double ep[6], tod_p;
-  time2epoch(time, ep);
-  tod_p = ep[3] * 3600.0 + ep[4] * 60.0 + ep[5];
-  if (tod < tod_p - 43200.0)
-    tod += 86400.0;
-  else if (tod > tod_p + 43200.0)
-    tod -= 86400.0;
-  ep[3] = ep[4] = ep[5] = 0.0;
-  return timeadd(epoch2time(ep), tod);
-}
 
 /* flush observation data buffer ---------------------------------------------*/
 static int flushobuf(raw_t *raw) {
@@ -353,8 +367,9 @@ static int decode_msgobs(raw_t *raw) {
   int16_t i, ii, sat, n, week;
   uint8_t *p = (raw->buff) + 6; /* jump to TOW location */
   uint8_t num_obs, lock_info;
-  uint32_t sys, prev_lockt = 0, curr_lockt = 0;
-  uint8_t flags, sat_id, band_code, cn0_int, code, freq, slip, half_cycle_amb;
+  uint32_t prev_lockt = 0, curr_lockt = 0;
+  uint8_t flags, sat_id, band_code, cn0_int, slip, half_cycle_amb;
+  uint32_t code=0, sys=0, freq=0;
   int iDidFlush = 0, iSatFound = 0;
 
   trace(4, "SBF decode_msgobs: len=%d\n", raw->len);
@@ -406,87 +421,10 @@ static int decode_msgobs(raw_t *raw) {
       carr_phase = -carr_phase;
     }
 
-    switch (band_code) {
-    case CODE_GPS_L1CA:
-      code = CODE_L1C;
-      sys = SYS_GPS;
-      freq = 0;
-      break;
-    case CODE_GPS_L2CM:
-      code = CODE_L2S;
-      sys = SYS_GPS;
-      freq = 1;
-      break;
-    case CODE_SBAS_L1CA:
-      code = CODE_L1C;
-      sys = SYS_SBS;
-      freq = 0;
-      break;
-    case CODE_GLO_L1OF:
-      code = CODE_L1C;
-      sys = SYS_GLO;
-      freq = 0;
-      break;
-    case CODE_GLO_L2OF:
-      code = CODE_L2C;
-      sys = SYS_GLO;
-      freq = 1;
-      break;
-    case CODE_GPS_L1P:
-      code = CODE_L1P;
-      sys = SYS_GPS;
-      freq = 0;
-      break;
-    case CODE_GPS_L2P:
-      code = CODE_L2P;
-      sys = SYS_GPS;
-      freq = 1;
-      break;
-    case CODE_BDS2_B1:
-      code = CODE_L1I;
-      sys = SYS_CMP;
-      freq = 0;
-      break;
-    case CODE_BDS2_B2:
-      code = CODE_L7I;
-      sys = SYS_CMP;
-      freq = 1;
-      break;
-    case CODE_GAL_E1B:
-      code = CODE_L1B;
-      sys = SYS_GAL;
-      freq = 0;
-      break;
-    case CODE_GAL_E1C:
-      code = CODE_L1C;
-      sys = SYS_GAL;
-      freq = 0;
-      break;
-    case CODE_GAL_E1X:
-      code = CODE_L1X;
-      sys = SYS_GAL;
-      freq = 0;
-      break;
-    case CODE_GAL_E7I:
-      code = CODE_L7I;
-      sys = SYS_GAL;
-      freq = 1;
-      break;
-    case CODE_GAL_E7Q:
-      code = CODE_L7Q;
-      sys = SYS_GAL;
-      freq = 1;
-      break;
-    case CODE_GAL_E7X:
-      code = CODE_L7X;
-      sys = SYS_GAL;
-      freq = 1;
-      break;
-    default:
-      code = CODE_NONE;
-      sys = SYS_GPS;
-      freq = 0;
-      break;
+    if ((CODE_INVALID != band_code) && (band_code < CODE_COUNT)) {
+      code = rtklib_bandcode_map[band_code].code;
+      sys = rtklib_bandcode_map[band_code].sys;
+      freq = rtklib_bandcode_map[band_code].freq;
     }
 
     /* store satellite number */
@@ -537,19 +475,6 @@ static int decode_msgobs(raw_t *raw) {
   raw->time = time;
   raw->obuf.n = n;
   return iDidFlush;
-}
-
-/* adjust weekly roll-over of gps time
- * ----------------------------------------*/
-static gtime_t adjweek(gtime_t time, double tow) {
-  double tow_p;
-  int week;
-  tow_p = time2gpst(time, &week);
-  if (tow < tow_p - 302400.0)
-    tow += 604800.0;
-  else if (tow > tow_p + 302400.0)
-    tow -= 604800.0;
-  return gpst2time(week, tow);
 }
 
 /* common part of GPS eph decoding (navigation data)
@@ -1125,8 +1050,6 @@ static int decode_glonav(raw_t *raw) {
 static int decode_gpsion(raw_t *raw) {
 
   uint8_t *puiTmp = (raw->buff) + 6;
-  uint32_t uTowMs;
-  uint16_t uWeek;
 
   trace(4, "SBP decode_gpsion: len=%d\n", raw->len);
 
@@ -1134,10 +1057,6 @@ static int decode_gpsion(raw_t *raw) {
     trace(2, "SBP decode_gpsion frame length error: len=%d\n", raw->len);
     return -1;
   }
-
-  /* Get time information */
-  uTowMs = U4(puiTmp + 0); /* TOW in ms */
-  uWeek = I4(puiTmp + 4);  /* Week number */
 
   raw->nav.ion_gps[0] = R8(puiTmp + 6);
   raw->nav.ion_gps[1] = R8(puiTmp + 14);
