@@ -69,5 +69,3 @@ test_script:
         echo ""
         diff (gc 2017-05-12-v1.1.26.sbp.obs | select -Skip 5 ) (gc 2017-05-12-v1.1.26-nospaces.sbp.json.obs | select -Skip 5 ) 
       }
-
-      

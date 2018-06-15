@@ -139,7 +139,7 @@ install:
 clean:
 	rm -f sbp2rinex sbp2rinex.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
 
-test : test1 test2 test3 test4 test5 testclean
+test : test1 test2 test3 test4 test5 test6 testclean
 
 test1: # binary sbp
 	@echo -e "\n\n****** Test1: sbp binary ********\n"
@@ -158,5 +158,12 @@ test4:
 test5: test1 test4  # make sure JSON with no spaces are bit exact minus first two lines
 	tail -n +5 ./2017-05-12-v1.1.26-json-nospaces.obs > 2017-05-12-v1.1.26-json-nospaces.trunc.obs
 	diff 2017-05-12-v1.1.26-json-nospaces.trunc.obs 2017-05-12-v1.1.26-bin.trunc.obs
+test6: # BDS + GAL + GLO + GPS
+	@echo -e "\n\n****** Test6: BDS + GAL + GLO + GPS ********\n"
+	./sbp2rinex $(DATDIR)$(SEP)2018-06-15-v1.4.0-develop-2018061321-3-g734bd4b9.sbp.json -o 2018-06-15-json.obs -n 2018-06-15-json.nav
+	tail -n +4 ./2018-06-15-json.obs > 2018-06-15-json.trunc.obs
+	diff --strip-trailing-cr ./2018-06-15-json.trunc.obs $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json.obs
+	tail -n +4 ./2018-06-15-json.nav > 2018-06-15-json.trunc.nav
+	diff --strip-trailing-cr ./2018-06-15-json.trunc.nav $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json.nav
 testclean:
 	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs
