@@ -870,7 +870,7 @@ static int decode_galnav(raw_t *raw) {
     return -1;
 
   eph.code = puiTmp[1];
-  if ((CODE_GAL_E1X != eph.code) && (CODE_GAL_E7X != eph.code)) {
+  if ((CODE_GAL_E1B != eph.code) && (CODE_GAL_E7I != eph.code)) {
     trace(2, "Unrecognised code %d for E%02d\n", eph.code, prn);
     return -1;
   }
