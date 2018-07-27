@@ -25,11 +25,12 @@ static const char rcsid[] = "$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
 #define ID_MSGEPHGPS 0x008A      /* GPS L1 C/A nav message */
 #define ID_MSGEPHBDS 0x0089      /* BDS B1/B2 D1 nav message */
 #define ID_MSGEPHGAL 0x0095      /* GAL E1 I/NAV message */
-#define ID_MSGEPHGLO_DEP1 0x0088 /* Glonass L1/L2 OF nav message (deprecated) \
-                                  */
-#define ID_MSGEPHGLO 0x008B      /* Glonass L1/L2 OF nav message */
-#define ID_MSGIONGPS 0x0090      /* GPS ionospheric parameters */
-#define ID_MSG_SBAS_RAW 0x7777   /* SBAS data */
+#define ID_MSGEPHGLO_DEP1                                                   \
+  0x0088                       /* Glonass L1/L2 OF nav message (deprecated) \
+                                */
+#define ID_MSGEPHGLO 0x008B    /* Glonass L1/L2 OF nav message */
+#define ID_MSGIONGPS 0x0090    /* GPS ionospheric parameters */
+#define ID_MSG_SBAS_RAW 0x7777 /* SBAS data */
 
 #define SEC_DAY 86400.0
 
@@ -360,6 +361,20 @@ static uint16_t sbp_checksum(uint8_t *buff, int len) {
   return crc;
 }
 
+static int aux_antenna(int8_t code) {
+  switch (code) {
+    case CODE_AUX_GPS:
+    case CODE_AUX_GAL:
+    case CODE_AUX_SBAS:
+    case CODE_AUX_BDS:
+    case CODE_AUX_QZS:
+      return 1;
+    default:
+      return 0;
+  }
+  return 0;
+}
+
 /* flush observation data buffer ---------------------------------------------*/
 static int flushobuf(raw_t *raw) {
   gtime_t time0 = {0};
@@ -432,7 +447,8 @@ static int decode_msgobs(raw_t *raw) {
   uint8_t *p = (raw->buff) + 6; /* jump to TOW location */
   uint8_t num_obs, lock_info;
   uint32_t prev_lockt = 0, curr_lockt = 0;
-  uint8_t flags, sat_id, band_code, cn0_int, slip, half_cycle_amb;
+  uint8_t flags, sat_id, cn0_int, slip, half_cycle_amb;
+  int8_t band_code;
   uint32_t code = 0, sys = 0, freq = 0;
   int iDidFlush = 0, iSatFound = 0;
 
@@ -477,6 +493,12 @@ static int decode_msgobs(raw_t *raw) {
     /* Check for RAIM exclusion */
     if ((flags & 0x80) && (NULL == strstr(raw->opt, "OBSALL"))) {
       continue;
+    }
+
+    if (strstr(raw->opt, "ANT_AUX")) {
+      if (!aux_antenna(band_code)) continue;
+    } else {
+      if (aux_antenna(band_code)) continue;
     }
 
     /* phase polarity flip option (INVCP) */
