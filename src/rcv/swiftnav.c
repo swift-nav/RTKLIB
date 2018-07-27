@@ -19,16 +19,14 @@ static const char rcsid[] = "$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
 
 #define SBP_SYNC1 0x55 /* SBP message header sync */
 
-#define ID_MEASEPOCH 0x004A      /* observation */
+#define ID_MSGOBS 0x004A      /* observation */
 #define ID_MSGEPHGPS_DEP1 0x0081 /* GPS L1 C/A nav message (deprecated) */
 #define ID_MSGEPHGPS_DEP2 0x0086 /* GPS L1 C/A nav message (deprecated) */
 #define ID_MSGEPHGPS 0x008A      /* GPS L1 C/A nav message */
 #define ID_MSGEPHBDS 0x0089      /* BDS B1/B2 D1 nav message */
 #define ID_MSGEPHGAL 0x0095      /* GAL E1 I/NAV message */
-#define ID_MSGEPHGLO_DEP1                                                   \
-  0x0088                       /* Glonass L1/L2 OF nav message (deprecated) \
-                                */
-#define ID_MSGEPHGLO 0x008B    /* Glonass L1/L2 OF nav message */
+#define ID_MSGEPHGLO_DEP1 0x0088 /* Glonass L1/L2 ephemeris (deprecated) */
+#define ID_MSGEPHGLO 0x008B    /* Glonass L1/L2 ephemeris */
 #define ID_MSGIONGPS 0x0090    /* GPS ionospheric parameters */
 #define ID_MSG_SBAS_RAW 0x7777 /* SBAS data */
 
@@ -168,6 +166,12 @@ static bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
     [CODE_GLO_L2P] = {CODE_L2P, SYS_GLO, 1},
     [CODE_BDS2_B1] = {CODE_L1I, SYS_CMP, 0},
     [CODE_BDS2_B2] = {CODE_L7I, SYS_CMP, 1},
+    [CODE_BDS3_B1CI] = {CODE_L1I, SYS_CMP, 0},
+    [CODE_BDS3_B1CQ] = {CODE_L1Q, SYS_CMP, 0},
+    [CODE_BDS3_B1CX] = {CODE_L7X, SYS_CMP, 0},
+    [CODE_BDS3_B5I] = {CODE_L5I, SYS_CMP, 2},
+    [CODE_BDS3_B5Q] = {CODE_L5Q, SYS_CMP, 2},
+    [CODE_BDS3_B5X] = {CODE_L5X, SYS_CMP, 2},
     [CODE_GAL_E1B] = {CODE_L1B, SYS_GAL, 0},
     [CODE_GAL_E1C] = {CODE_L1C, SYS_GAL, 0},
     [CODE_GAL_E1X] = {CODE_L1X, SYS_GAL, 0},
@@ -847,7 +851,10 @@ static int decode_gpsnav(raw_t *raw) {
   }
 
   sat = satno(SYS_GPS, prn);
-  if (sat == 0) return -1;
+  if (sat == 0) {
+    trace(2, "Can't work out GPS sat for PRN %02d\n", prn);
+    return -1;
+  }
 
   eph.code = puiTmp[1];
   if ((CODE_GPS_L1CA != eph.code)) {
@@ -894,7 +901,10 @@ static int decode_bdsnav(raw_t *raw) {
   }
 
   sat = satno(SYS_CMP, prn);
-  if (sat == 0) return -1;
+  if (sat == 0) {
+    trace(2, "Can't work out Beidou sat for PRN %02d\n", prn);
+    return -1;
+  }
 
   eph.code = puiTmp[1];
   if ((CODE_BDS2_B1 != eph.code) && (CODE_BDS2_B2 != eph.code)) {
@@ -941,7 +951,10 @@ static int decode_galnav(raw_t *raw) {
   }
 
   sat = satno(SYS_GAL, prn);
-  if (sat == 0) return -1;
+  if (sat == 0) {
+    trace(2, "Can't work out Galileo sat for PRN %02d\n", prn);
+    return -1;
+  }
 
   eph.code = puiTmp[1];
   if ((CODE_GAL_E1B != eph.code) && (CODE_GAL_E7I != eph.code)) {
@@ -1212,7 +1225,7 @@ static int decode_sbp(raw_t *raw) {
   }
 
   switch (type) {
-    case ID_MEASEPOCH:
+    case ID_MSGOBS:
       return decode_msgobs(raw);
     case ID_MSGEPHGPS_DEP1:
       return decode_gpsnav_dep1(raw);
@@ -1375,7 +1388,7 @@ extern int input_sbpjsonf(raw_t *raw, FILE *fp) {
 
   /* avoid parsing the payload if the message isn't supported in the first place
    */
-  if ((uMsgType != ID_MEASEPOCH) && (uMsgType != ID_MSGEPHGPS_DEP1) &&
+  if ((uMsgType != ID_MSGOBS) && (uMsgType != ID_MSGEPHGPS_DEP1) &&
       (uMsgType != ID_MSGEPHGPS_DEP2) && (uMsgType != ID_MSGEPHGPS) &&
       (uMsgType != ID_MSGEPHBDS) && (uMsgType != ID_MSGEPHGAL) &&
       (uMsgType != ID_MSGEPHGLO_DEP1) && (uMsgType != ID_MSGEPHGLO) &&
