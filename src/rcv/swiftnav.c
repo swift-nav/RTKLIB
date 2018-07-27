@@ -9,7 +9,7 @@
  * version : $Revision: 1.0 $ $Date: 2017/01/30 09:00:00 $
  *
  * history : 2017/01/30  1.0  begin writing
-  *-----------------------------------------------------------------------------*/
+ *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
 #include <math.h>
@@ -25,7 +25,8 @@ static const char rcsid[] = "$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
 #define ID_MSGEPHGPS 0x008A      /* GPS L1 C/A nav message */
 #define ID_MSGEPHBDS 0x0089      /* BDS B1/B2 D1 nav message */
 #define ID_MSGEPHGAL 0x0095      /* GAL E1 I/NAV message */
-#define ID_MSGEPHGLO_DEP1 0x0088 /* Glonass L1/L2 OF nav message (deprecated) */
+#define ID_MSGEPHGLO_DEP1 0x0088 /* Glonass L1/L2 OF nav message (deprecated) \
+                                  */
 #define ID_MSGEPHGLO 0x008B      /* Glonass L1/L2 OF nav message */
 #define ID_MSGIONGPS 0x0090      /* GPS ionospheric parameters */
 #define ID_MSG_SBAS_RAW 0x7777   /* SBAS data */
@@ -39,46 +40,39 @@ static const char rcsid[] = "$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
 /* get fields (little-endian) ------------------------------------------------*/
 #define U1(p) (*((uint8_t *)(p)))
 #define I1(p) (*((int8_t *)(p)))
-static uint16_t U2(uint8_t *p)
-{
+static uint16_t U2(uint8_t *p) {
   uint16_t u;
   memcpy(&u, p, 2);
   return u;
 }
-static uint32_t U4(uint8_t *p)
-{
+static uint32_t U4(uint8_t *p) {
   uint32_t u;
   memcpy(&u, p, 4);
   return u;
 }
-static float R4(uint8_t *p)
-{
+static float R4(uint8_t *p) {
   float r;
   memcpy(&r, p, 4);
   return r;
 }
-static double R8(uint8_t *p)
-{
+static double R8(uint8_t *p) {
   double r;
   memcpy(&r, p, 8);
   return r;
 }
-static int32_t I4(uint8_t *p)
-{
+static int32_t I4(uint8_t *p) {
   int32_t u;
   memcpy(&u, p, 4);
   return u;
 }
-static int16_t I2(uint8_t *p)
-{
+static int16_t I2(uint8_t *p) {
   int16_t i;
   memcpy(&i, p, 2);
   return i;
 }
 
 /** Code identifier. */
-typedef enum code_e
-{
+typedef enum code_e {
   CODE_INVALID = -1,
   CODE_GPS_L1CA = 0,
   CODE_GPS_L2CM = 1,
@@ -147,8 +141,7 @@ typedef enum code_e
   CODE_COUNT
 } code_t;
 
-typedef struct
-{
+typedef struct {
   uint32_t code;
   uint32_t sys;
   uint32_t freq;
@@ -161,6 +154,9 @@ static bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
     [CODE_GPS_L2CL] = {CODE_L2L, SYS_GPS, 1},
     [CODE_GPS_L2CX] = {CODE_L2X, SYS_GPS, 1},
     [CODE_GPS_L2P] = {CODE_L2P, SYS_GPS, 1},
+    [CODE_GPS_L5I] = {CODE_L5I, SYS_GPS, 2},
+    [CODE_GPS_L5Q] = {CODE_L5Q, SYS_GPS, 2},
+    [CODE_GPS_L5X] = {CODE_L5X, SYS_GPS, 2},
     [CODE_SBAS_L1CA] = {CODE_L1C, SYS_SBS, 0},
     [CODE_SBAS_L5I] = {CODE_L5I, SYS_SBS, 0},
     [CODE_SBAS_L5Q] = {CODE_L5Q, SYS_SBS, 0},
@@ -169,9 +165,6 @@ static bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
     [CODE_GLO_L1P] = {CODE_L1P, SYS_GLO, 0},
     [CODE_GLO_L2OF] = {CODE_L2C, SYS_GLO, 1},
     [CODE_GLO_L2P] = {CODE_L2P, SYS_GLO, 1},
-    [CODE_GPS_L5I] = {CODE_L5I, SYS_GPS, 2},
-    [CODE_GPS_L5Q] = {CODE_L5Q, SYS_GPS, 2},
-    [CODE_GPS_L5X] = {CODE_L5X, SYS_GPS, 2},
     [CODE_BDS2_B1] = {CODE_L1I, SYS_CMP, 0},
     [CODE_BDS2_B2] = {CODE_L7I, SYS_CMP, 1},
     [CODE_GAL_E1B] = {CODE_L1B, SYS_GAL, 0},
@@ -231,14 +224,40 @@ static const uint32_t CRC_16CCIT_LookUp[256] = {
 
 /* it's easy to derive a function for the values below, but I'd rather map the
  * table explicitly from the RTCM standard document */
-static const uint32_t rtcm_phase_lock_table[16] = {
-    0, 32, 64, 128, 256, 512, 1024, 2048,
-    4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288};
+static const uint32_t rtcm_phase_lock_table[16] = {0,
+                                                   32,
+                                                   64,
+                                                   128,
+                                                   256,
+                                                   512,
+                                                   1024,
+                                                   2048,
+                                                   4096,
+                                                   8192,
+                                                   16384,
+                                                   32768,
+                                                   65536,
+                                                   131072,
+                                                   262144,
+                                                   524288};
 
 static const double ura_eph[] = {/* ura values */
-                                 2.4, 3.4, 4.85, 6.85, 9.65, 13.65,
-                                 24.0, 48.0, 96.0, 192.0, 384.0, 768.0,
-                                 1536.0, 3072.0, 6144.0, 0.0};
+                                 2.4,
+                                 3.4,
+                                 4.85,
+                                 6.85,
+                                 9.65,
+                                 13.65,
+                                 24.0,
+                                 48.0,
+                                 96.0,
+                                 192.0,
+                                 384.0,
+                                 768.0,
+                                 1536.0,
+                                 3072.0,
+                                 6144.0,
+                                 0.0};
 
 static const uint8_t decoding_table[256] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -267,53 +286,46 @@ static const uint8_t decoding_table[256] = {
 static uint8_t puPayloadTmp[256];
 
 /* ura value (m) to ura index ------------------------------------------------*/
-static int uraindex(double value)
-{
+static int uraindex(double value) {
   int i;
   for (i = 0; i < 15; i++)
-    if (ura_eph[i] >= value)
-      break;
+    if (ura_eph[i] >= value) break;
   return i;
 }
 
-static int Base64_Decode(uint8_t *_pcData, uint32_t _uDataLen,
-                         uint8_t *_puDecodedData, uint32_t *_puDecodedDataLen)
-{
+static int Base64_Decode(uint8_t *_pcData,
+                         uint32_t _uDataLen,
+                         uint8_t *_puDecodedData,
+                         uint32_t *_puDecodedDataLen) {
   uint32_t i, j;
   uint32_t output_length;
   uint32_t a, b, c, d, t;
 
-  if (NULL == _puDecodedData)
-  {
+  if (NULL == _puDecodedData) {
     return -1;
   }
 
-  if (0 != (_uDataLen % 4))
-  {
+  if (0 != (_uDataLen % 4)) {
     return -1;
   }
 
   output_length = _uDataLen / 4 * 3;
 
-  if ('=' == _pcData[_uDataLen - 1])
-  {
+  if ('=' == _pcData[_uDataLen - 1]) {
     output_length--;
   }
-  if ('=' == _pcData[_uDataLen - 2])
-  {
+  if ('=' == _pcData[_uDataLen - 2]) {
     output_length--;
   }
 
-  if (output_length > (*_puDecodedDataLen))
-  {
+  if (output_length > (*_puDecodedDataLen)) {
     /* Not enough space in output buffer */
     return -1;
   }
 
   (*_puDecodedDataLen) = output_length;
 
-  for (i = 0, j = 0; i < _uDataLen;)
-  {
+  for (i = 0, j = 0; i < _uDataLen;) {
     a = ('=' == _pcData[i]) ? 0 : decoding_table[_pcData[i]];
     i++;
     b = ('=' == _pcData[i]) ? 0 : decoding_table[_pcData[i]];
@@ -325,16 +337,13 @@ static int Base64_Decode(uint8_t *_pcData, uint32_t _uDataLen,
 
     t = (a << 3 * 6) + (b << 2 * 6) + (c << 1 * 6) + (d << 0 * 6);
 
-    if (j < output_length)
-    {
+    if (j < output_length) {
       _puDecodedData[j++] = (t >> 2 * 8) & 0xFF;
     }
-    if (j < output_length)
-    {
+    if (j < output_length) {
       _puDecodedData[j++] = (t >> 1 * 8) & 0xFF;
     }
-    if (j < output_length)
-    {
+    if (j < output_length) {
       _puDecodedData[j++] = (t >> 0 * 8) & 0xFF;
     }
   } /* for() */
@@ -342,103 +351,81 @@ static int Base64_Decode(uint8_t *_pcData, uint32_t _uDataLen,
 } /* Base64_Decode() */
 
 /* SBP checksum calculation --------------------------------------------------*/
-static uint16_t sbp_checksum(uint8_t *buff, int len)
-{
+static uint16_t sbp_checksum(uint8_t *buff, int len) {
   int i;
   uint16_t crc = 0;
-  for (i = 0; i < len; i++)
-  {
+  for (i = 0; i < len; i++) {
     crc = (crc << 8) ^ CRC_16CCIT_LookUp[(crc >> 8) ^ buff[i]];
   }
   return crc;
 }
 
 /* flush observation data buffer ---------------------------------------------*/
-static int flushobuf(raw_t *raw)
-{
+static int flushobuf(raw_t *raw) {
   gtime_t time0 = {0};
   int i, j, n = 0;
 
   trace(3, "flushobuf: n=%d\n", raw->obuf.n);
 
   /* copy observation data buffer */
-  for (i = 0; i < raw->obuf.n && i < MAXOBS; i++)
-  {
-    if (!satsys(raw->obuf.data[i].sat, NULL))
-      continue;
-    if (raw->obuf.data[i].time.time == 0)
-      continue;
+  for (i = 0; i < raw->obuf.n && i < MAXOBS; i++) {
+    if (!satsys(raw->obuf.data[i].sat, NULL)) continue;
+    if (raw->obuf.data[i].time.time == 0) continue;
     raw->obs.data[n++] = raw->obuf.data[i];
   }
   raw->obs.n = n;
 
   /* clear observation data buffer */
-  for (i = 0; i < MAXOBS; i++)
-  {
+  for (i = 0; i < MAXOBS; i++) {
     raw->obuf.data[i].time = time0;
-    for (j = 0; j < NFREQ + NEXOBS; j++)
-    {
+    for (j = 0; j < NFREQ + NEXOBS; j++) {
       raw->obuf.data[i].L[j] = raw->obuf.data[i].P[j] = 0.0;
       raw->obuf.data[i].D[j] = 0.0;
       raw->obuf.data[i].SNR[j] = raw->obuf.data[i].LLI[j] = 0;
       raw->obuf.data[i].code[j] = CODE_NONE;
     }
   }
-  for (i = 0; i < MAXSAT; i++)
-    raw->prCA[i] = raw->dpCA[i] = 0.0;
+  for (i = 0; i < MAXSAT; i++) raw->prCA[i] = raw->dpCA[i] = 0.0;
   return n > 0 ? 1 : 0;
 }
 /* clear buffer --------------------------------------------------------------*/
-static void clearbuff(raw_t *raw)
-{
+static void clearbuff(raw_t *raw) {
   raw->buff[0] = 0;
   raw->len = raw->nbyte = 0;
 }
 
 /* appropriate calculation of LLI for SBP */
-static uint8_t calculate_loss_of_lock(double dt, uint32_t prev_lock_time,
-                                      uint32_t curr_lock_time)
-{
-  if (prev_lock_time > curr_lock_time)
-  {
+static uint8_t calculate_loss_of_lock(double dt,
+                                      uint32_t prev_lock_time,
+                                      uint32_t curr_lock_time) {
+  if (prev_lock_time > curr_lock_time) {
     /*    fprintf(stderr, "prev_lock_time %d curr_lock_time %d\n",
      * prev_lock_time, curr_lock_time);*/
     return 1;
-  }
-  else if ((prev_lock_time == curr_lock_time) && (dt >= prev_lock_time))
-  {
+  } else if ((prev_lock_time == curr_lock_time) && (dt >= prev_lock_time)) {
     /*fprintf(stderr, "2\n");*/
     return 1;
-  }
-  else if ((prev_lock_time == curr_lock_time) && (dt < prev_lock_time))
-  {
+  } else if ((prev_lock_time == curr_lock_time) && (dt < prev_lock_time)) {
     return 0;
-  }
-  else if ((prev_lock_time < curr_lock_time) &&
-           (dt >= (2 * curr_lock_time - prev_lock_time)))
-  {
+  } else if ((prev_lock_time < curr_lock_time) &&
+             (dt >= (2 * curr_lock_time - prev_lock_time))) {
     /*fprintf(stderr, "3\n");*/
     return 1;
-  }
-  else if ((prev_lock_time < curr_lock_time) &&
-           (curr_lock_time < dt &&
-            dt < (2 * curr_lock_time - prev_lock_time)))
-  {
+  } else if ((prev_lock_time < curr_lock_time) &&
+             (curr_lock_time < dt &&
+              dt < (2 * curr_lock_time - prev_lock_time))) {
     /*fprintf(stderr, "4\n");*/
     return 1;
-  }
-  else if ((prev_lock_time < curr_lock_time) && (dt <= curr_lock_time))
+  } else if ((prev_lock_time < curr_lock_time) && (dt <= curr_lock_time))
     return 0;
-  else
-  {
+  else {
     /*fprintf(stderr, "5\n");*/
     return 1;
   }
 }
 
 /* decode SBF measurements message (observables) -----------------------------*/
-static int decode_msgobs(raw_t *raw)
-{
+static int decode_msgobs(raw_t *raw) {
   gtime_t time;
   double tow, dResTow, pseudorange, carr_phase, freq_doppler, delta_time;
   int16_t i, ii, sat, n, week;
@@ -463,13 +450,10 @@ static int decode_msgobs(raw_t *raw)
   time = gpst2time(week, tow * 0.001 + dResTow * 1e-9);
   /* start new observation period */
   delta_time = fabs(timediff(time, raw->time));
-  if ((delta_time) > 1E-6)
-  {
+  if ((delta_time) > 1E-6) {
     n = 0;
     iDidFlush = flushobuf(raw);
-  }
-  else
-  {
+  } else {
     n = raw->obuf.n;
     iDidFlush = 0;
   }
@@ -478,9 +462,7 @@ static int decode_msgobs(raw_t *raw)
   p = p + 11;
 
   /* add observations */
-  for (i = 0; i < num_obs && i < MAXOBS; i++, p += 17)
-  {
-
+  for (i = 0; i < num_obs && i < MAXOBS; i++, p += 17) {
     pseudorange = U4(p) * 0.02;    /* pseudorange observation in 2cm units */
     carr_phase = I4(p + 4);        /* carrier phase integer cycles */
     carr_phase += p[8] / 256.0;    /* carrier phase fractional cycles */
@@ -493,19 +475,16 @@ static int decode_msgobs(raw_t *raw)
     band_code = p[16];
 
     /* Check for RAIM exclusion */
-    if ((flags & 0x80) && (NULL == strstr(raw->opt, "OBSALL")))
-    {
+    if ((flags & 0x80) && (NULL == strstr(raw->opt, "OBSALL"))) {
       continue;
     }
 
     /* phase polarity flip option (INVCP) */
-    if (strstr(raw->opt, "INVCP"))
-    {
+    if (strstr(raw->opt, "INVCP")) {
       carr_phase = -carr_phase;
     }
 
-    if ((CODE_INVALID != band_code) && (band_code < CODE_COUNT))
-    {
+    if ((CODE_INVALID != band_code) && (band_code < CODE_COUNT)) {
       code = rtklib_bandcode_map[band_code].code;
       sys = rtklib_bandcode_map[band_code].sys;
       freq = rtklib_bandcode_map[band_code].freq;
@@ -513,16 +492,13 @@ static int decode_msgobs(raw_t *raw)
 
     /* store satellite number */
     sat = satno(sys, sat_id);
-    if (sat == 0)
-    {
+    if (sat == 0) {
       continue;
     }
 
     iSatFound = 0;
-    for (ii = 0; ii < n; ii++)
-    {
-      if (raw->obuf.data[ii].sat == sat)
-      {
+    for (ii = 0; ii < n; ii++) {
+      if (raw->obuf.data[ii].sat == sat) {
         iSatFound = 1;
         break;
       }
@@ -532,23 +508,20 @@ static int decode_msgobs(raw_t *raw)
     raw->obuf.data[ii].sat = (unsigned char)sat;
 
     /* store signal info */
-    if (freq < NFREQ + NEXOBS)
-    {
+    if (freq < NFREQ + NEXOBS) {
       raw->obuf.data[ii].P[freq] = (flags & 0x1) ? pseudorange : 0.0;
       raw->obuf.data[ii].L[freq] = (flags & 0x2) ? carr_phase : 0.0;
       raw->obuf.data[ii].D[freq] = (flags & 0x8) ? (float)freq_doppler : 0.0f;
       raw->obuf.data[ii].SNR[freq] = cn0_int;
       raw->obuf.data[ii].code[freq] = code;
 
-      if (flags & 0x2)
-      {
+      if (flags & 0x2) {
         prev_lockt = rtcm_phase_lock_table[(raw->halfc[sat - 1][freq])];
         curr_lockt = rtcm_phase_lock_table[lock_info];
-        slip = calculate_loss_of_lock(delta_time * 1000.0, prev_lockt,
-                                      curr_lockt);
+        slip =
+            calculate_loss_of_lock(delta_time * 1000.0, prev_lockt, curr_lockt);
         half_cycle_amb = (flags & 0x4) ? 0 : 1;
-        if (half_cycle_amb)
-        {
+        if (half_cycle_amb) {
           slip |= 0x2; /* half-cycle ambiguity unresolved */
         }
 
@@ -559,8 +532,7 @@ static int decode_msgobs(raw_t *raw)
     }
 
     /* Receiver channel goes up */
-    if (!iSatFound)
-      n++;
+    if (!iSatFound) n++;
   }
   raw->time = time;
   raw->obuf.n = n;
@@ -569,8 +541,7 @@ static int decode_msgobs(raw_t *raw)
 
 /* common part of GPS eph decoding (navigation data)
  * --------------------------*/
-static void decode_gpsnav_common_dep1(uint8_t *_pBuff, eph_t *_pEph)
-{
+static void decode_gpsnav_common_dep1(uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
 
@@ -614,8 +585,7 @@ static void decode_gpsnav_common_dep1(uint8_t *_pBuff, eph_t *_pEph)
 
 /* common part of GPS eph decoding (navigation data)
  * --------------------------*/
-static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph)
-{
+static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
 
@@ -659,8 +629,7 @@ static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph)
 
 /* common part of BDS eph decoding (navigation data)
  * --------------------------*/
-static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph)
-{
+static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
 
@@ -705,8 +674,7 @@ static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph)
 
 /* common part of GAL eph decoding (navigation data)
  * --------------------------*/
-static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph)
-{
+static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
 
@@ -751,31 +719,26 @@ static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph)
 
 /* decode deprecated SBP nav message for GPS (navigation data)
  * ----------------*/
-static int decode_gpsnav_dep1(raw_t *raw)
-{
-
+static int decode_gpsnav_dep1(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
   uint8_t prn, sat;
 
   trace(4, "SBP decode_gpsnav_dep1: len=%d\n", raw->len);
 
-  if ((raw->len) < 193)
-  {
+  if ((raw->len) < 193) {
     trace(2, "SBP decode_gpsnav_dep1 frame length error: len=%d\n", raw->len);
     return -1;
   }
 
   prn = U2(puiTmp) + 1; /* GPS coded as PRN-1 */
-  if (!((prn >= 1) && (prn <= 37)))
-  {
+  if (!((prn >= 1) && (prn <= 37))) {
     trace(2, "SBP decode_gpsnav_dep1 prn error: sat=%d\n", prn);
     return -1;
   }
 
   sat = satno(SYS_GPS, prn);
-  if (sat == 0)
-    return -1;
+  if (sat == 0) return -1;
 
   eph.code = U1(puiTmp + 2);
 
@@ -783,8 +746,7 @@ static int decode_gpsnav_dep1(raw_t *raw)
 
   eph.ttr = raw->time;
 
-  if (!strstr(raw->opt, "EPHALL"))
-  {
+  if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
         (eph.iodc == raw->nav.eph[sat - 1].iodc))
       return 0;
@@ -797,35 +759,29 @@ static int decode_gpsnav_dep1(raw_t *raw)
 }
 
 /* decode SBP nav message for GPS (navigation data) --------------------------*/
-static int decode_gpsnav_dep2(raw_t *raw)
-{
-
+static int decode_gpsnav_dep2(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
   uint8_t prn, sat;
 
   trace(4, "SBP decode_gpsnav: len=%d\n", raw->len);
 
-  if ((raw->len) < 191)
-  {
+  if ((raw->len) < 191) {
     trace(2, "SBP decode_gpsnav frame length error: len=%d\n", raw->len);
     return -1;
   }
 
   prn = puiTmp[0];
-  if (!((prn >= 1) && (prn <= 37)))
-  {
+  if (!((prn >= 1) && (prn <= 37))) {
     trace(2, "SBP decode_gpsnav prn error: sat=%d\n", prn);
     return -1;
   }
 
   sat = satno(SYS_GPS, prn);
-  if (sat == 0)
-    return -1;
+  if (sat == 0) return -1;
 
   eph.code = puiTmp[1];
-  if ((CODE_GPS_L1CA != eph.code))
-  {
+  if ((CODE_GPS_L1CA != eph.code)) {
     trace(2, "Unrecognised code %d for G%02d\n", eph.code, prn);
     return -1;
   }
@@ -834,11 +790,9 @@ static int decode_gpsnav_dep2(raw_t *raw)
 
   eph.ttr = raw->time;
 
-  if (!strstr(raw->opt, "EPHALL"))
-  {
+  if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
-        (eph.iodc == raw->nav.eph[sat - 1].iodc))
-    {
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
       return 0;
     }
   }
@@ -852,35 +806,29 @@ static int decode_gpsnav_dep2(raw_t *raw)
 }
 
 /* decode SBP nav message for GPS (navigation data) --------------------------*/
-static int decode_gpsnav(raw_t *raw)
-{
-
+static int decode_gpsnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
   uint8_t prn, sat;
 
   trace(4, "SBP decode_gpsnav: len=%d\n", raw->len);
 
-  if ((raw->len) < 147)
-  {
+  if ((raw->len) < 147) {
     trace(2, "SBP decode_gpsnav frame length error: len=%d\n", raw->len);
     return -1;
   }
 
   prn = puiTmp[0];
-  if (!((prn >= 1) && (prn <= 37)))
-  {
+  if (!((prn >= 1) && (prn <= 37))) {
     trace(2, "SBP decode_gpsnav prn error: sat=%d\n", prn);
     return -1;
   }
 
   sat = satno(SYS_GPS, prn);
-  if (sat == 0)
-    return -1;
+  if (sat == 0) return -1;
 
   eph.code = puiTmp[1];
-  if ((CODE_GPS_L1CA != eph.code))
-  {
+  if ((CODE_GPS_L1CA != eph.code)) {
     trace(2, "Unrecognised code %d for G%02d\n", eph.code, prn);
     return -1;
   }
@@ -889,11 +837,9 @@ static int decode_gpsnav(raw_t *raw)
 
   eph.ttr = raw->time;
 
-  if (!strstr(raw->opt, "EPHALL"))
-  {
+  if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
-        (eph.iodc == raw->nav.eph[sat - 1].iodc))
-    {
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
       return 0;
     }
   }
@@ -907,35 +853,29 @@ static int decode_gpsnav(raw_t *raw)
 }
 
 /* decode SBP nav message for BDS (navigation data) --------------------------*/
-static int decode_bdsnav(raw_t *raw)
-{
-
+static int decode_bdsnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
   uint8_t prn, sat;
 
   trace(4, "SBP decode_bdsnav: len=%d\n", raw->len);
 
-  if ((raw->len) < 155)
-  {
+  if ((raw->len) < 155) {
     trace(2, "SBP decode_bdsnav frame length error: len=%d\n", raw->len);
     return -1;
   }
 
   prn = puiTmp[0];
-  if (!((prn >= 1) && (prn <= 37)))
-  {
+  if (!((prn >= 1) && (prn <= 37))) {
     trace(2, "SBP decode_bdsnav prn error: sat=%d\n", prn);
     return -1;
   }
 
   sat = satno(SYS_CMP, prn);
-  if (sat == 0)
-    return -1;
+  if (sat == 0) return -1;
 
   eph.code = puiTmp[1];
-  if ((CODE_BDS2_B1 != eph.code) && (CODE_BDS2_B2 != eph.code))
-  {
+  if ((CODE_BDS2_B1 != eph.code) && (CODE_BDS2_B2 != eph.code)) {
     trace(2, "Unrecognised code %d for C%02d\n", eph.code, prn);
     return -1;
   }
@@ -944,11 +884,9 @@ static int decode_bdsnav(raw_t *raw)
 
   eph.ttr = raw->time;
 
-  if (!strstr(raw->opt, "EPHALL"))
-  {
+  if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
-        (eph.iodc == raw->nav.eph[sat - 1].iodc))
-    {
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
       return 0;
     }
   }
@@ -962,35 +900,29 @@ static int decode_bdsnav(raw_t *raw)
 }
 
 /* decode SBP nav message for GAL (navigation data) --------------------------*/
-static int decode_galnav(raw_t *raw)
-{
-
+static int decode_galnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
   uint8_t prn, sat;
 
   trace(4, "SBP decode_galnav: len=%d\n", raw->len);
 
-  if ((raw->len) < 160)
-  {
+  if ((raw->len) < 160) {
     trace(2, "SBP decode_galnav frame length error: len=%d\n", raw->len);
     return -1;
   }
 
   prn = puiTmp[0];
-  if (!((prn >= 1) && (prn <= 50)))
-  {
+  if (!((prn >= 1) && (prn <= 50))) {
     trace(2, "SBP decode_galnav prn error: sat=%d\n", prn);
     return -1;
   }
 
   sat = satno(SYS_GAL, prn);
-  if (sat == 0)
-    return -1;
+  if (sat == 0) return -1;
 
   eph.code = puiTmp[1];
-  if ((CODE_GAL_E1B != eph.code) && (CODE_GAL_E7I != eph.code))
-  {
+  if ((CODE_GAL_E1B != eph.code) && (CODE_GAL_E7I != eph.code)) {
     trace(2, "Unrecognised code %d for E%02d\n", eph.code, prn);
     return -1;
   }
@@ -999,11 +931,9 @@ static int decode_galnav(raw_t *raw)
 
   eph.ttr = raw->time;
 
-  if (!strstr(raw->opt, "EPHALL"))
-  {
+  if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
-        (eph.iodc == raw->nav.eph[sat - 1].iodc))
-    {
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
       return 0;
     }
   }
@@ -1018,8 +948,7 @@ static int decode_galnav(raw_t *raw)
 
 /* decode SBP nav message for Glonass (navigation data)
  * --------------------------*/
-static int decode_glonav_dep1(raw_t *raw)
-{
+static int decode_glonav_dep1(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   geph_t geph = {0};
   uint8_t prn, sat, code;
@@ -1028,8 +957,7 @@ static int decode_glonav_dep1(raw_t *raw)
 
   trace(4, "SBP decode_glonav: len=%d\n", raw->len);
 
-  if ((raw->len) < 128)
-  {
+  if ((raw->len) < 128) {
     trace(2, "SBP decode_glonav frame length error: len=%d\n", raw->len);
     return -1;
   }
@@ -1037,11 +965,9 @@ static int decode_glonav_dep1(raw_t *raw)
   prn = puiTmp[0]; /* Glonass sid.sat */
   sat = satno(SYS_GLO, prn);
 
-  if (sat == 0)
-    return -1;
+  if (sat == 0) return -1;
 
-  if (!((prn >= 1) && (prn <= 28)))
-  {
+  if (!((prn >= 1) && (prn <= 28))) {
     trace(2, "SBP decode_glonav prn error: prn=%d\n", prn);
     return -1;
   }
@@ -1049,8 +975,7 @@ static int decode_glonav_dep1(raw_t *raw)
   geph.sat = sat;
   code = puiTmp[1];
 
-  if ((code != CODE_GLO_L1OF) && (code != CODE_GLO_L2OF))
-  {
+  if ((code != CODE_GLO_L1OF) && (code != CODE_GLO_L2OF)) {
     trace(2, "SBP decode_glonav code error: code=%d\n", code);
   }
 
@@ -1084,10 +1009,8 @@ static int decode_glonav_dep1(raw_t *raw)
 
   geph.frq = (int)puiTmp[118] - 8;
 
-  if (!strstr(raw->opt, "EPHALL"))
-  {
-    if (geph.iode == raw->nav.geph[prn - 1].iode)
-      return 0; /* unchanged */
+  if (!strstr(raw->opt, "EPHALL")) {
+    if (geph.iode == raw->nav.geph[prn - 1].iode) return 0; /* unchanged */
   }
 
   trace(2, "decoded eph for R%02d\n", prn);
@@ -1099,8 +1022,7 @@ static int decode_glonav_dep1(raw_t *raw)
 
 /* decode SBP nav message for Glonass (navigation data)
  * --------------------------*/
-static int decode_glonav(raw_t *raw)
-{
+static int decode_glonav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   geph_t geph = {0};
   uint8_t prn, sat, code;
@@ -1109,8 +1031,7 @@ static int decode_glonav(raw_t *raw)
 
   trace(4, "SBP decode_glonav: len=%d\n", raw->len);
 
-  if ((raw->len) < 100)
-  {
+  if ((raw->len) < 100) {
     trace(2, "SBP decode_glonav frame length error: len=%d\n", raw->len);
     return -1;
   }
@@ -1118,11 +1039,9 @@ static int decode_glonav(raw_t *raw)
   prn = puiTmp[0]; /* Glonass sid.sat */
   sat = satno(SYS_GLO, prn);
 
-  if (sat == 0)
-    return -1;
+  if (sat == 0) return -1;
 
-  if (!((prn >= 1) && (prn <= 28)))
-  {
+  if (!((prn >= 1) && (prn <= 28))) {
     trace(2, "SBP decode_glonav prn error: prn=%d\n", prn);
     return -1;
   }
@@ -1130,8 +1049,7 @@ static int decode_glonav(raw_t *raw)
   geph.sat = sat;
   code = puiTmp[1];
 
-  if ((code != CODE_GLO_L1OF) && (code != CODE_GLO_L2OF))
-  {
+  if ((code != CODE_GLO_L1OF) && (code != CODE_GLO_L2OF)) {
     trace(2, "SBP decode_glonav code error: code=%d\n", code);
   }
 
@@ -1165,10 +1083,8 @@ static int decode_glonav(raw_t *raw)
 
   geph.frq = (int)puiTmp[90] - 8;
 
-  if (!strstr(raw->opt, "EPHALL"))
-  {
-    if (geph.iode == raw->nav.geph[prn - 1].iode)
-      return 0; /* unchanged */
+  if (!strstr(raw->opt, "EPHALL")) {
+    if (geph.iode == raw->nav.geph[prn - 1].iode) return 0; /* unchanged */
   }
 
   trace(2, "decoded eph for R%02d\n", prn);
@@ -1179,15 +1095,12 @@ static int decode_glonav(raw_t *raw)
 }
 
 /* decode SBF gpsion --------------------------------------------------------*/
-static int decode_gpsion(raw_t *raw)
-{
-
+static int decode_gpsion(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
 
   trace(4, "SBP decode_gpsion: len=%d\n", raw->len);
 
-  if ((raw->len) < 72)
-  {
+  if ((raw->len) < 72) {
     trace(2, "SBP decode_gpsion frame length error: len=%d\n", raw->len);
     return -1;
   }
@@ -1205,8 +1118,7 @@ static int decode_gpsion(raw_t *raw)
 }
 
 /* decode sbas navigation data -----------------------------------------------*/
-static int decode_snav(raw_t *raw)
-{
+static int decode_snav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   uint8_t sat, code, sbas_msg;
   int32_t week;
@@ -1216,22 +1128,19 @@ static int decode_snav(raw_t *raw)
 
   trace(4, "MSG_SBAS_RAW: len=%d\n", raw->len);
 
-  if ((raw->len) < 42)
-  {
+  if ((raw->len) < 42) {
     trace(2, "MSG_SBAS_RAW frame length error: len=%d\n", raw->len);
     return -1;
   }
 
   sat = puiTmp[0];
-  if (!((sat >= 120) && (sat <= 138)))
-  {
+  if (!((sat >= 120) && (sat <= 138))) {
     trace(2, "MSG_SBAS_RAW PRN error: sat=%d\n", sat);
     return -1;
   }
 
   code = puiTmp[1];
-  if (CODE_SBAS_L1CA != code)
-  {
+  if (CODE_SBAS_L1CA != code) {
     trace(2, "MSG_SBAS_RAW PRN error: code=%d\n", code);
     return -1;
   }
@@ -1244,8 +1153,7 @@ static int decode_snav(raw_t *raw)
   raw->sbsmsg.msg[0] = uSbasPream[((raw->sbsmsg.tow) % 3)];
   sbas_msg = puiTmp[6];
 
-  for (k = 0; k < 27; k++)
-  {
+  for (k = 0; k < 27; k++) {
     raw->sbsmsg.msg[1 + k] = (sbas_msg << 2) | ((puiTmp[7 + k] >> 6) & 0x03);
     sbas_msg = puiTmp[7 + k];
   }
@@ -1255,18 +1163,15 @@ static int decode_snav(raw_t *raw)
 }
 
 /* decode SBF raw message --------------------------------------------------*/
-static int decode_sbp(raw_t *raw)
-{
+static int decode_sbp(raw_t *raw) {
   uint16_t crc, uCalcCrc;
 
   /* read the SBF block ID and revision */
   int type = U2(raw->buff + 1);
   int sender = U2(raw->buff + 3);
 
-  if ((sender == 0) && (NULL == strstr(raw->opt, "CONVBASE")))
-    return 0;
-  if ((sender != 0) && (NULL != strstr(raw->opt, "CONVBASE")))
-    return 0;
+  if ((sender == 0) && (NULL == strstr(raw->opt, "CONVBASE"))) return 0;
+  if ((sender != 0) && (NULL != strstr(raw->opt, "CONVBASE"))) return 0;
 
   trace(3, "decode_sbp: type=%04x len=%d\n", type, raw->len);
 
@@ -1275,50 +1180,46 @@ static int decode_sbp(raw_t *raw)
 
   /* checksum skipping first 4 bytes */
   uCalcCrc = sbp_checksum(raw->buff + 1, raw->len - 3);
-  if (uCalcCrc != crc)
-  {
+  if (uCalcCrc != crc) {
     trace(2, "SBP checksum error: type=%04x len=%d\n", type, raw->len);
     return -1;
   }
 
-  if (raw->outtype)
-  {
+  if (raw->outtype) {
     sprintf(raw->msgtype, "SBP 0x%04X (%4d):", type, raw->len);
   }
 
-  switch (type)
-  {
-  case ID_MEASEPOCH:
-    return decode_msgobs(raw);
-  case ID_MSGEPHGPS_DEP1:
-    return decode_gpsnav_dep1(raw);
-  case ID_MSGEPHGPS_DEP2:
-    return decode_gpsnav_dep2(raw);
-  case ID_MSGEPHGPS:
-    return decode_gpsnav(raw);
-  case ID_MSGEPHBDS:
-    return decode_bdsnav(raw);
-  case ID_MSGEPHGAL:
-    return decode_galnav(raw);
-  case ID_MSGEPHGLO_DEP1:
-    return decode_glonav_dep1(raw);
-  case ID_MSGEPHGLO:
-    return decode_glonav(raw);
-  case ID_MSGIONGPS:
-    return decode_gpsion(raw);
-  case ID_MSG_SBAS_RAW:
-    return decode_snav(raw);
+  switch (type) {
+    case ID_MEASEPOCH:
+      return decode_msgobs(raw);
+    case ID_MSGEPHGPS_DEP1:
+      return decode_gpsnav_dep1(raw);
+    case ID_MSGEPHGPS_DEP2:
+      return decode_gpsnav_dep2(raw);
+    case ID_MSGEPHGPS:
+      return decode_gpsnav(raw);
+    case ID_MSGEPHBDS:
+      return decode_bdsnav(raw);
+    case ID_MSGEPHGAL:
+      return decode_galnav(raw);
+    case ID_MSGEPHGLO_DEP1:
+      return decode_glonav_dep1(raw);
+    case ID_MSGEPHGLO:
+      return decode_glonav(raw);
+    case ID_MSGIONGPS:
+      return decode_gpsion(raw);
+    case ID_MSG_SBAS_RAW:
+      return decode_snav(raw);
 
-  default:
-    trace(3, "decode_sbp: unused frame type=%04x len=%d\n", type, raw->len);
-    /* there are many more SBF blocks to be extracted */
+    default:
+      trace(3, "decode_sbp: unused frame type=%04x len=%d\n", type, raw->len);
+      /* there are many more SBF blocks to be extracted */
   }
   return 0;
 }
 
 /* sync to the beginning of a block ------------------------------------------*/
-static int sync_sbp(uint8_t *buff, uint8_t data)
-{
+static int sync_sbp(uint8_t *buff, uint8_t data) {
   buff[0] = data;
   return buff[0] == SBP_SYNC1;
 }
@@ -1330,47 +1231,38 @@ static int sync_sbp(uint8_t *buff, uint8_t data)
  *                  2: input ephemeris, 3: input sbas message,
  *                  9: input ion/utc parameter)
  *-----------------------------------------------------------------------------*/
-extern int input_sbp(raw_t *raw, uint8_t data)
-{
+extern int input_sbp(raw_t *raw, uint8_t data) {
   trace(5, "input_sbp: data=%02x\n", data);
 
-  if (raw->nbyte == 0)
-  {
-    if (sync_sbp(raw->buff, data))
-      raw->nbyte = 1;
+  if (raw->nbyte == 0) {
+    if (sync_sbp(raw->buff, data)) raw->nbyte = 1;
     return 0;
   }
   raw->buff[raw->nbyte++] = data;
 
-  if (raw->nbyte < 6)
-    return 0;
+  if (raw->nbyte < 6) return 0;
 
-  if ((raw->len = (8 + raw->buff[5])) > MAXRAWLEN)
-  {
+  if ((raw->len = (8 + raw->buff[5])) > MAXRAWLEN) {
     trace(2, "sbp length error: len=%d\n", raw->len);
     raw->nbyte = 0;
     return -1;
   }
-  if (raw->nbyte < raw->len)
-    return 0;
+  if (raw->nbyte < raw->len) return 0;
   raw->nbyte = 0;
 
   return decode_sbp(raw);
 }
 
 /* start input file ----------------------------------------------------------*/
-static void startfile(raw_t *raw)
-{
+static void startfile(raw_t *raw) {
   raw->tod = -1;
   raw->obuf.n = 0;
   raw->buff[0] = 0;
 }
 /* end input file ------------------------------------------------------------*/
-static int endfile(raw_t *raw)
-{
+static int endfile(raw_t *raw) {
   /* flush observation data buffer */
-  if (!flushobuf(raw))
-    return -2;
+  if (!flushobuf(raw)) return -2;
   raw->obuf.n = 0;
   return 1;
 }
@@ -1381,41 +1273,32 @@ static int endfile(raw_t *raw)
  *          FILE   *fp    I      file pointer
  * return : status(-2: end of file, -1...9: same as above)
  *-----------------------------------------------------------------------------*/
-extern int input_sbpf(raw_t *raw, FILE *fp)
-{
+extern int input_sbpf(raw_t *raw, FILE *fp) {
   int i, data, stat;
 
   trace(4, "input_sbpf:\n");
 
-  if (raw->flag)
-  {
+  if (raw->flag) {
     startfile(raw);
     raw->flag = 0;
   }
 
   /* go to the beginning of the first block */
-  if (raw->nbyte == 0)
-  {
-    for (i = 0;; i++)
-    {
-      if ((data = fgetc(fp)) == EOF)
-        return endfile(raw);
-      if (sync_sbp(raw->buff, (uint8_t)data))
-        break;
-      if (i >= MAXRAWLEN)
-        return 0;
+  if (raw->nbyte == 0) {
+    for (i = 0;; i++) {
+      if ((data = fgetc(fp)) == EOF) return endfile(raw);
+      if (sync_sbp(raw->buff, (uint8_t)data)) break;
+      if (i >= MAXRAWLEN) return 0;
     }
   }
 
   /* load block header content (8 bytes) in raw->buff */
   /* since we already read the first byte, we just read the next 5 bytes */
-  if (fread(raw->buff + 1, 1, 5, fp) < 5)
-    return endfile(raw);
+  if (fread(raw->buff + 1, 1, 5, fp) < 5) return endfile(raw);
   raw->nbyte = 6;
 
   /* decode the length of the block and store it in len */
-  if ((raw->len = 8 + raw->buff[5]) > MAXRAWLEN)
-  {
+  if ((raw->len = 8 + raw->buff[5]) > MAXRAWLEN) {
     trace(2, "sbp length error: len=%d\n", raw->len);
     raw->nbyte = 0;
     return -1;
@@ -1440,8 +1323,7 @@ extern int input_sbpf(raw_t *raw, FILE *fp)
  *          FILE   *fp    I      file pointer
  * return : status(-2: end of file, -1...9: same as above)
  *-----------------------------------------------------------------------------*/
-extern int input_sbpjsonf(raw_t *raw, FILE *fp)
-{
+extern int input_sbpjsonf(raw_t *raw, FILE *fp) {
   const char JSON_MSGTYPE_FIELD[] = "\"msg_type\":";
   const char JSON_SENDER_FIELD[] = "\"sender\":";
   const char JSON_PAYLOAD_FIELD[] = "\"payload\":";
@@ -1453,25 +1335,21 @@ extern int input_sbpjsonf(raw_t *raw, FILE *fp)
 
   trace(4, "input_sbpjsonf:\n");
 
-  if (raw->flag)
-  {
+  if (raw->flag) {
     startfile(raw);
     raw->flag = 0;
   }
 
   memset(raw->buff, 0, MAXRAWLEN);
   pcTmp = fgets((char *)raw->buff, MAXRAWLEN, fp);
-  if (NULL == pcTmp)
-  {
+  if (NULL == pcTmp) {
     return endfile(raw);
   }
 
   pcTmp = strstr((char *)raw->buff, JSON_MSGTYPE_FIELD);
-  if (NULL == pcTmp)
-    return 0;
+  if (NULL == pcTmp) return 0;
   iRet = sscanf(pcTmp + strlen(JSON_MSGTYPE_FIELD), "%u", &uMsgType);
-  if (0 == iRet)
-    return 0;
+  if (0 == iRet) return 0;
 
   /* avoid parsing the payload if the message isn't supported in the first place
    */
@@ -1479,37 +1357,30 @@ extern int input_sbpjsonf(raw_t *raw, FILE *fp)
       (uMsgType != ID_MSGEPHGPS_DEP2) && (uMsgType != ID_MSGEPHGPS) &&
       (uMsgType != ID_MSGEPHBDS) && (uMsgType != ID_MSGEPHGAL) &&
       (uMsgType != ID_MSGEPHGLO_DEP1) && (uMsgType != ID_MSGEPHGLO) &&
-      (uMsgType != ID_MSGIONGPS) && (uMsgType != ID_MSG_SBAS_RAW))
-  {
+      (uMsgType != ID_MSGIONGPS) && (uMsgType != ID_MSG_SBAS_RAW)) {
     return 0;
   }
 
   /* sender in clear */
   pcTmp = strstr((char *)raw->buff, JSON_SENDER_FIELD);
-  if (NULL == pcTmp)
-    return 0;
+  if (NULL == pcTmp) return 0;
   iRet = sscanf(pcTmp + strlen(JSON_SENDER_FIELD), "%u", &uSender);
-  if (0 == iRet)
-    return 0;
+  if (0 == iRet) return 0;
 
   /* crc */
   pcTmp = strstr((char *)raw->buff, JSON_CRC_FIELD);
-  if (NULL == pcTmp)
-    return 0;
+  if (NULL == pcTmp) return 0;
   iRet = sscanf(pcTmp + strlen(JSON_CRC_FIELD), "%u", &uMsgCrc);
-  if (0 == iRet)
-    return 0;
+  if (0 == iRet) return 0;
 
   /* payload */
   pcTmp = strstr((char *)raw->buff, JSON_PAYLOAD_FIELD);
-  if (NULL == pcTmp)
-    return 0;
+  if (NULL == pcTmp) return 0;
   pcTmp += strlen(JSON_PAYLOAD_FIELD);
 
   pcPayloadBeg = (uint8_t *)strchr((char *)pcTmp, '\"') + 1;
   pcPayloadEnd = (uint8_t *)strchr((char *)pcPayloadBeg, '\"') - 1;
-  if ((NULL == pcPayloadBeg) || (NULL == pcPayloadEnd))
-    return 0;
+  if ((NULL == pcPayloadBeg) || (NULL == pcPayloadEnd)) return 0;
   uPayloadSize = pcPayloadEnd - pcPayloadBeg + 1;
   pcPayloadEnd[1] = 0;
   /* fprintf(stderr, "%4d: %s\n", uPayloadSize, pcPayloadBeg); */
