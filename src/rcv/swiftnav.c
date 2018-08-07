@@ -218,6 +218,8 @@ static const uint8_t decoding_table[256] = {
 
 static uint8_t puPayloadTmp[256];
 
+static const gtime_t time0 = {0};
+
 /* ura value (m) to ura index ------------------------------------------------*/
 static int uraindex(double value) {
   int i;
@@ -296,7 +298,6 @@ static uint16_t sbp_checksum(uint8_t *buff, int len) {
 
 /* flush observation data buffer ---------------------------------------------*/
 static int flushobuf(raw_t *raw) {
-  gtime_t time0 = {0};
   int i, j, n = 0;
 
   trace(3, "flushobuf: n=%d\n", raw->obuf.n);
@@ -321,8 +322,9 @@ static int flushobuf(raw_t *raw) {
       raw->obuf.data[i].code[j] = CODE_NONE;
     }
   }
-  for (i = 0; i < MAXSAT; i++)
+  for (i = 0; i < MAXSAT; i++) {
     raw->prCA[i] = raw->dpCA[i] = 0.0;
+  }
   return n > 0 ? 1 : 0;
 }
 /* clear buffer --------------------------------------------------------------*/
@@ -486,8 +488,9 @@ static void decode_gpsnav_common_dep1(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->toes = U4(_pBuff + 4);
   uWeekE = U2(_pBuff + 8);
   _pEph->sva = uraindex(R8(_pBuff + 10)); /* URA index */
-  _pEph->fit = U4(_pBuff + 14) ? 0 : 4;
-  _pEph->flag = U1(_pBuff + 15);
+  _pEph->fit = U4(_pBuff + 18) / 3600;
+  /* _pEph->flag = U1(_pBuff + 22); SBP payload does not have L2 flag */
+  _pEph->svh = U1(_pBuff + 23);
 
   _pEph->tgd[0] = R8(_pBuff + 24);
   _pEph->crs = R8(_pBuff + 32);
@@ -530,8 +533,9 @@ static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->toes = U4(_pBuff + 4);
   uWeekE = U2(_pBuff + 8);
   _pEph->sva = uraindex(R4(_pBuff + 10)); /* URA index */
-  _pEph->fit = U4(_pBuff + 14) ? 0 : 4;
-  _pEph->flag = U1(_pBuff + 18);
+  _pEph->fit = U4(_pBuff + 14) / 3600;
+  /* _pEph->flag = U1(_pBuff + 18); SBP payload does not have L2 flag */
+  _pEph->svh = U1(_pBuff + 19);
 
   _pEph->tgd[0] = R4(_pBuff + 20);
   _pEph->crs = R4(_pBuff + 24);
@@ -684,12 +688,19 @@ static int decode_gpsnav_dep1(raw_t *raw) {
 
   decode_gpsnav_common_dep1(puiTmp, &eph);
 
-  eph.ttr = raw->time;
+  if (0 == timediff(raw->time, time0)) {
+    eph.ttr = timeget();
+  } else {
+    eph.ttr = raw->time;
+  }
 
   if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
-        (eph.iodc == raw->nav.eph[sat - 1].iodc))
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
+      trace(3, "eph.iode %d raw->nav.eph[sat - 1].iode %d\n", eph.iode, raw->nav.eph[sat - 1].iode);
+      trace(3, "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n", eph.iode, raw->nav.eph[sat - 1].iode);
       return 0;
+    }
   }
 
   eph.sat = sat;
@@ -730,7 +741,11 @@ static int decode_gpsnav_dep2(raw_t *raw) {
 
   decode_gpsnav_common_dep1(puiTmp - 2, &eph);
 
-  eph.ttr = raw->time;
+  if (0 == timediff(raw->time, time0)) {
+    eph.ttr = timeget();
+  } else {
+    eph.ttr = raw->time;
+  }
 
   if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
@@ -779,11 +794,17 @@ static int decode_gpsnav(raw_t *raw) {
 
   decode_gpsnav_common(puiTmp - 2, &eph);
 
-  eph.ttr = raw->time;
+  if (0 == timediff(raw->time, time0)) {
+    eph.ttr = timeget();
+  } else {
+    eph.ttr = raw->time;
+  }
 
   if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
         (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
+      trace(3, "eph.iode %d raw->nav.eph[sat - 1].iode %d\n", eph.iode, raw->nav.eph[sat - 1].iode);
+      trace(3, "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n", eph.iode, raw->nav.eph[sat - 1].iode);
       return 0;
     }
   }
@@ -1220,8 +1241,7 @@ static void startfile(raw_t *raw) {
 /* end input file ------------------------------------------------------------*/
 static int endfile(raw_t *raw) {
   /* flush observation data buffer */
-  if (!flushobuf(raw))
-    return -2;
+  if (!flushobuf(raw)) return -2  ;
   raw->obuf.n = 0;
   return 1;
 }
