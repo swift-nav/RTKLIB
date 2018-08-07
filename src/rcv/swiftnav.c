@@ -25,7 +25,8 @@ static const char rcsid[] = "$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
 #define ID_MSGEPHGPS 0x008A      /* GPS L1 C/A nav message */
 #define ID_MSGEPHBDS 0x0089      /* BDS B1/B2 D1 nav message */
 #define ID_MSGEPHGAL 0x0095      /* GAL E1 I/NAV message */
-#define ID_MSGEPHGLO_DEP1 0x0088 /* Glonass L1/L2 OF nav message (deprecated) */
+#define ID_MSGEPHGLO_DEP1 0x0088 /* Glonass L1/L2 OF nav message (deprecated)  \
+                                    */
 #define ID_MSGEPHGLO 0x008B      /* Glonass L1/L2 OF nav message */
 #define ID_MSGIONGPS 0x0090      /* GPS ionospheric parameters */
 #define ID_MSG_SBAS_RAW 0x7777   /* SBAS data */
@@ -84,12 +85,12 @@ typedef enum code_e {
   CODE_GPS_L2CX = 8, /* combined L2C tracking */
   CODE_GPS_L5I = 9,
   CODE_GPS_L5Q = 10,
-  CODE_GPS_L5X = 11,  /* combined L5 tracking */
+  CODE_GPS_L5X = 11, /* combined L5 tracking */
   CODE_BDS2_B1 = 12, /* data channel at 1526 * 1.023 MHz */
-  CODE_BDS2_B2 = 13,  /* data channel at 1180 * 1.023 MHz */
-  CODE_GAL_E1B = 14,  /* data channel at E1 (1540 * 1.023 MHz) */
-  CODE_GAL_E1C = 15,  /* pilot channel at E1 */
-  CODE_GAL_E1X = 16,  /* combined tracking on E1 */
+  CODE_BDS2_B2 = 13, /* data channel at 1180 * 1.023 MHz */
+  CODE_GAL_E1B = 14, /* data channel at E1 (1540 * 1.023 MHz) */
+  CODE_GAL_E1C = 15, /* pilot channel at E1 */
+  CODE_GAL_E1X = 16, /* combined tracking on E1 */
   CODE_GAL_E6B = 17,
   CODE_GAL_E6C = 18,
   CODE_GAL_E6X = 19, /* combined tracking on E6 */
@@ -110,44 +111,47 @@ typedef enum code_e {
   CODE_COUNT
 } code_t;
 
-typedef struct {uint32_t code; uint32_t sys; uint32_t freq;} bandcode_t;
+typedef struct {
+  uint32_t code;
+  uint32_t sys;
+  uint32_t freq;
+} bandcode_t;
 
-static bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
-    [CODE_GPS_L1CA] = {CODE_L1C, SYS_GPS, 0},
-    [CODE_GPS_L2CM] = {CODE_L2S, SYS_GPS, 1},
-    [CODE_SBAS_L1CA] = {CODE_L1C, SYS_SBS, 0},
-    [CODE_GLO_L1OF] = {CODE_L1C, SYS_GLO, 0},
-    [CODE_GLO_L2OF] = {CODE_L2C, SYS_GLO, 1},
-    [CODE_GPS_L1P] = {CODE_L1P, SYS_GPS, 0},
-    [CODE_GPS_L2P] = {CODE_L2P, SYS_GPS, 1},
-    [CODE_GPS_L2CL] = {CODE_L2L, SYS_GPS, 1},
-    [CODE_GPS_L2CX] = {CODE_L2X, SYS_GPS, 1},
-    [CODE_GPS_L5I] = {CODE_L5I, SYS_GPS, 2},
-    [CODE_GPS_L5Q] = {CODE_L5Q, SYS_GPS, 2},
-    [CODE_GPS_L5X] = {CODE_L5X, SYS_GPS, 2},
-    [CODE_BDS2_B1] = {CODE_L1I, SYS_CMP, 0},
-    [CODE_BDS2_B2] = {CODE_L7I, SYS_CMP, 1},
-    [CODE_GAL_E1B] = {CODE_L1B, SYS_GAL, 0},
-    [CODE_GAL_E1C] = {CODE_L1C, SYS_GAL, 0},
-    [CODE_GAL_E1X] = {CODE_L1X, SYS_GAL, 0},
-    [CODE_GAL_E6B] = {CODE_L6B, SYS_GAL, 3},
-    [CODE_GAL_E6C] = {CODE_L6C, SYS_GAL, 3},
-    [CODE_GAL_E6X] = {CODE_L6X, SYS_GAL, 3},
-    [CODE_GAL_E7I] = {CODE_L7I, SYS_GAL, 1},
-    [CODE_GAL_E7Q] = {CODE_L7Q, SYS_GAL, 1},
-    [CODE_GAL_E7X] = {CODE_L7X, SYS_GAL, 1},
-    [CODE_GAL_E8] = {CODE_L8X, SYS_GAL, 4},
-    [CODE_GAL_E5I] = {CODE_L5I, SYS_GAL, 2},
-    [CODE_GAL_E5Q] = {CODE_L5Q, SYS_GAL, 2},
-    [CODE_GAL_E5X] = {CODE_L5X, SYS_GAL, 2},
-    [CODE_QZS_L1CA] = {CODE_L1C, SYS_QZS, 0},
-    [CODE_QZS_L2CM] = {CODE_L2S, SYS_QZS, 1},
-    [CODE_QZS_L2CL] = {CODE_L2L, SYS_QZS, 1},
-    [CODE_QZS_L2CX] = {CODE_L2X, SYS_QZS, 1},
-    [CODE_QZS_L5I] = {CODE_L5I, SYS_QZS, 2},
-    [CODE_QZS_L5Q] = {CODE_L5Q, SYS_QZS, 2},
-    [CODE_QZS_L5X] = {CODE_L5X, SYS_QZS, 2}
-};
+static bandcode_t rtklib_bandcode_map[CODE_COUNT] =
+    {[CODE_GPS_L1CA] = {CODE_L1C, SYS_GPS, 0},
+     [CODE_GPS_L2CM] = {CODE_L2S, SYS_GPS, 1},
+     [CODE_SBAS_L1CA] = {CODE_L1C, SYS_SBS, 0},
+     [CODE_GLO_L1OF] = {CODE_L1C, SYS_GLO, 0},
+     [CODE_GLO_L2OF] = {CODE_L2C, SYS_GLO, 1},
+     [CODE_GPS_L1P] = {CODE_L1P, SYS_GPS, 0},
+     [CODE_GPS_L2P] = {CODE_L2P, SYS_GPS, 1},
+     [CODE_GPS_L2CL] = {CODE_L2L, SYS_GPS, 1},
+     [CODE_GPS_L2CX] = {CODE_L2X, SYS_GPS, 1},
+     [CODE_GPS_L5I] = {CODE_L5I, SYS_GPS, 2},
+     [CODE_GPS_L5Q] = {CODE_L5Q, SYS_GPS, 2},
+     [CODE_GPS_L5X] = {CODE_L5X, SYS_GPS, 2},
+     [CODE_BDS2_B1] = {CODE_L1I, SYS_CMP, 0},
+     [CODE_BDS2_B2] = {CODE_L7I, SYS_CMP, 1},
+     [CODE_GAL_E1B] = {CODE_L1B, SYS_GAL, 0},
+     [CODE_GAL_E1C] = {CODE_L1C, SYS_GAL, 0},
+     [CODE_GAL_E1X] = {CODE_L1X, SYS_GAL, 0},
+     [CODE_GAL_E6B] = {CODE_L6B, SYS_GAL, 3},
+     [CODE_GAL_E6C] = {CODE_L6C, SYS_GAL, 3},
+     [CODE_GAL_E6X] = {CODE_L6X, SYS_GAL, 3},
+     [CODE_GAL_E7I] = {CODE_L7I, SYS_GAL, 1},
+     [CODE_GAL_E7Q] = {CODE_L7Q, SYS_GAL, 1},
+     [CODE_GAL_E7X] = {CODE_L7X, SYS_GAL, 1},
+     [CODE_GAL_E8] = {CODE_L8X, SYS_GAL, 4},
+     [CODE_GAL_E5I] = {CODE_L5I, SYS_GAL, 2},
+     [CODE_GAL_E5Q] = {CODE_L5Q, SYS_GAL, 2},
+     [CODE_GAL_E5X] = {CODE_L5X, SYS_GAL, 2},
+     [CODE_QZS_L1CA] = {CODE_L1C, SYS_QZS, 0},
+     [CODE_QZS_L2CM] = {CODE_L2S, SYS_QZS, 1},
+     [CODE_QZS_L2CL] = {CODE_L2L, SYS_QZS, 1},
+     [CODE_QZS_L2CX] = {CODE_L2X, SYS_QZS, 1},
+     [CODE_QZS_L5I] = {CODE_L5I, SYS_QZS, 2},
+     [CODE_QZS_L5Q] = {CODE_L5Q, SYS_QZS, 2},
+     [CODE_QZS_L5X] = {CODE_L5X, SYS_QZS, 2}};
 
 /* checksum lookup table -----------------------------------------------------*/
 static const uint32_t CRC_16CCIT_LookUp[256] = {
@@ -294,8 +298,6 @@ static uint16_t sbp_checksum(uint8_t *buff, int len) {
   return crc;
 }
 
-
-
 /* flush observation data buffer ---------------------------------------------*/
 static int flushobuf(raw_t *raw) {
   int i, j, n = 0;
@@ -371,7 +373,7 @@ static int decode_msgobs(raw_t *raw) {
   uint8_t num_obs, lock_info;
   uint32_t prev_lockt = 0, curr_lockt = 0;
   uint8_t flags, sat_id, band_code, cn0_int, slip, half_cycle_amb;
-  uint32_t code=0, sys=0, freq=0;
+  uint32_t code = 0, sys = 0, freq = 0;
   int iDidFlush = 0, iSatFound = 0;
 
   trace(4, "SBF decode_msgobs: len=%d\n", raw->len);
@@ -380,7 +382,7 @@ static int decode_msgobs(raw_t *raw) {
   tow = U4(p);         /* TOW in ms */
   dResTow = I4(p + 4); /* residual Time Of Week */
   week = U2(p + 8);    /* GPS week */
-  num_obs = p[10];       /* number of observations in message */
+  num_obs = p[10];     /* number of observations in message */
   /*  uSeqSize = num_obs>>4; */
   /*  uSeqIdx  = num_obs&0xf; */
   num_obs = ((raw->len) - 19) / 17;
@@ -402,14 +404,14 @@ static int decode_msgobs(raw_t *raw) {
   /* add observations */
   for (i = 0; i < num_obs && i < MAXOBS; i++, p += 17) {
 
-    pseudorange = U4(p) * 0.02;  /* pseudorange observation in 2cm units */
-    carr_phase = I4(p + 4);     /* carrier phase integer cycles */
-    carr_phase += p[8] / 256.0; /* carrier phase fractional cycles */
-    freq_doppler = I2(p + 9);       /* Doppler shift in integer Hz */
-    freq_doppler += p[11] / 256.0;  /* fractional part of Doppler shift */
+    pseudorange = U4(p) * 0.02;    /* pseudorange observation in 2cm units */
+    carr_phase = I4(p + 4);        /* carrier phase integer cycles */
+    carr_phase += p[8] / 256.0;    /* carrier phase fractional cycles */
+    freq_doppler = I2(p + 9);      /* Doppler shift in integer Hz */
+    freq_doppler += p[11] / 256.0; /* fractional part of Doppler shift */
     cn0_int = p[12];               /* C/N0 */
-    lock_info = p[13] & 0xf;    /* lock time */
-    flags = p[14];             /* observation flags */
+    lock_info = p[13] & 0xf;       /* lock time */
+    flags = p[14];                 /* observation flags */
     sat_id = p[15];
     band_code = p[16];
 
@@ -457,8 +459,8 @@ static int decode_msgobs(raw_t *raw) {
       if (flags & 0x2) {
         prev_lockt = rtcm_phase_lock_table[(raw->halfc[sat - 1][freq])];
         curr_lockt = rtcm_phase_lock_table[lock_info];
-        slip = calculate_loss_of_lock(delta_time * 1000.0, prev_lockt,
-                                       curr_lockt);
+        slip =
+            calculate_loss_of_lock(delta_time * 1000.0, prev_lockt, curr_lockt);
         half_cycle_amb = (flags & 0x4) ? 0 : 1;
         if (half_cycle_amb) {
           slip |= 0x2; /* half-cycle ambiguity unresolved */
@@ -697,8 +699,10 @@ static int decode_gpsnav_dep1(raw_t *raw) {
   if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
         (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
-      trace(3, "eph.iode %d raw->nav.eph[sat - 1].iode %d\n", eph.iode, raw->nav.eph[sat - 1].iode);
-      trace(3, "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n", eph.iode, raw->nav.eph[sat - 1].iode);
+      trace(3, "eph.iode %d raw->nav.eph[sat - 1].iode %d\n", eph.iode,
+            raw->nav.eph[sat - 1].iode);
+      trace(3, "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n", eph.iode,
+            raw->nav.eph[sat - 1].iode);
       return 0;
     }
   }
@@ -803,8 +807,10 @@ static int decode_gpsnav(raw_t *raw) {
   if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
         (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
-      trace(3, "eph.iode %d raw->nav.eph[sat - 1].iode %d\n", eph.iode, raw->nav.eph[sat - 1].iode);
-      trace(3, "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n", eph.iode, raw->nav.eph[sat - 1].iode);
+      trace(3, "eph.iode %d raw->nav.eph[sat - 1].iode %d\n", eph.iode,
+            raw->nav.eph[sat - 1].iode);
+      trace(3, "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n", eph.iode,
+            raw->nav.eph[sat - 1].iode);
       return 0;
     }
   }
@@ -1241,7 +1247,8 @@ static void startfile(raw_t *raw) {
 /* end input file ------------------------------------------------------------*/
 static int endfile(raw_t *raw) {
   /* flush observation data buffer */
-  if (!flushobuf(raw)) return -2  ;
+  if (!flushobuf(raw))
+    return -2;
   raw->obuf.n = 0;
   return 1;
 }
