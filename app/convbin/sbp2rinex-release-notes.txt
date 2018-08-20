@@ -6,6 +6,18 @@ Executables Download:   support.swiftnav.com
 Source Code Location:   github.com/swift-nav/RTKLIB
 ===============================================================================
 
+-------------------------------------------------------------------------------
+Release 1.2                                                          2018-08-21
+-------------------------------------------------------------------------------
+CHANGES:
+* Improve handling of sbp observation flags
+* BeiDou BDS2 Support
+* Galileo Support
+* Conversion of SBAS raw messages
+* Updated to RTKLIB v2.4.3 b29
+
+KNOWN ISSUES:
+none
 
 -------------------------------------------------------------------------------
 Release 1.1                                                          2017-10-25
