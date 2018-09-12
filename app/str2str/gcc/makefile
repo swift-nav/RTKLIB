@@ -19,7 +19,7 @@ CTARGET=
 
 #OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=3 -DNEXOBS=3
 OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=7 -DNEXOBS=3 -DSVR_REUSEADDR
-CFLAGS = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) $(OPTION) $(CTARGET)
+CFLAGS = -Wall -O3 -ansi -std=c99 -Wno-unused-but-set-variable -I$(SRC) $(OPTION) $(CTARGET)
 
 ifeq ($(UNAME),Windows)
 OPTIONS += -DWIN32
@@ -38,7 +38,7 @@ all : str2str-swiftnav
 str2str-swiftnav    : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
 str2str-swiftnav    : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o gw10.o javad.o
 str2str-swiftnav    : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
-str2str-swiftnav    : septentrio.o cmr.o
+str2str-swiftnav    : septentrio.o cmr.o tersus.o
 
 str2str-swiftnav  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
@@ -91,31 +91,34 @@ septentrio.o: $(SRC)/rcv/septentrio.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/septentrio.c
 cmr.o      : $(SRC)/rcv/cmr.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/cmr.c
+tersus.o   : $(SRC)/rcv/tersus.c
+	$(CC) -c $(CFLAGS) $(SRC)/rcv/tersus.c
 
-str2str.o  : $(SRC)/rtklib.h Makefile
-stream.o   : $(SRC)/rtklib.h Makefile
-streamsvr.o: $(SRC)/rtklib.h Makefile
-rtkcmn.o   : $(SRC)/rtklib.h Makefile
-solution.o : $(SRC)/rtklib.h Makefile
-sbas.o     : $(SRC)/rtklib.h Makefile
-geoid.o    : $(SRC)/rtklib.h Makefile
-rcvraw.o   : $(SRC)/rtklib.h Makefile
-novatel.o  : $(SRC)/rtklib.h Makefile
-ublox.o    : $(SRC)/rtklib.h Makefile
-swiftnav.o : $(SRC)/rtklib.h Makefile
-skytraq.o  : $(SRC)/rtklib.h Makefile
-gw10.o     : $(SRC)/rtklib.h Makefile
-javad.o    : $(SRC)/rtklib.h Makefile
-nvs.o      : $(SRC)/rtklib.h Makefile
-binex.o    : $(SRC)/rtklib.h Makefile
-rt17.o     : $(SRC)/rtklib.h Makefile
-rtcm.o     : $(SRC)/rtklib.h Makefile
-rtcm2.o    : $(SRC)/rtklib.h Makefile
-rtcm3.o    : $(SRC)/rtklib.h Makefile
-rtcm3e.o   : $(SRC)/rtklib.h Makefile
-preceph.o  : $(SRC)/rtklib.h Makefile
-septentrio.o: $(SRC)/rtklib.h Makefile
-cmr.o      : $(SRC)/rtklib.h Makefile
+str2str.o  : $(SRC)/rtklib.h makefile
+stream.o   : $(SRC)/rtklib.h makefile
+streamsvr.o: $(SRC)/rtklib.h makefile
+rtkcmn.o   : $(SRC)/rtklib.h makefile
+solution.o : $(SRC)/rtklib.h makefile
+sbas.o     : $(SRC)/rtklib.h makefile
+geoid.o    : $(SRC)/rtklib.h makefile
+rcvraw.o   : $(SRC)/rtklib.h makefile
+novatel.o  : $(SRC)/rtklib.h makefile
+ublox.o    : $(SRC)/rtklib.h makefile
+swiftnav.o : $(SRC)/rtklib.h makefile
+skytraq.o  : $(SRC)/rtklib.h makefile
+gw10.o     : $(SRC)/rtklib.h makefile
+javad.o    : $(SRC)/rtklib.h makefile
+nvs.o      : $(SRC)/rtklib.h makefile
+binex.o    : $(SRC)/rtklib.h makefile
+rt17.o     : $(SRC)/rtklib.h makefile
+rtcm.o     : $(SRC)/rtklib.h makefile
+rtcm2.o    : $(SRC)/rtklib.h makefile
+rtcm3.o    : $(SRC)/rtklib.h makefile
+rtcm3e.o   : $(SRC)/rtklib.h makefile
+preceph.o  : $(SRC)/rtklib.h makefile
+septentrio.o: $(SRC)/rtklib.h makefile
+cmr.o      : $(SRC)/rtklib.h makefile
+tersus.o   : $(SRC)/rtklib.h makefile
 
 install:
 	cp str2str $(BINDIR)
