@@ -1,6 +1,17 @@
 #
-# makefile for convbin
+# makefile for sbp2rinex
 #
+
+SHELL := /bin/bash#
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
 
 BINDIR = /usr/local/bin
 
@@ -9,16 +20,34 @@ SRC    = ../../../src
 INCLUDE= -I$(SRC)
 OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS=3
 
-CFLAGS = -O3 -ansi -pedantic -Wall -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS) -g
+CC=gcc
+CFLAGS=-O2 -ansi -std=c99 -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
+DATDIR=../../../test/data/rcvraw
+SEP="/"
 
-LDLIBS = -lm -lrt
+ifeq ($(UNAME),Windows)
+OPTIONS += -DWIN32
+DATDIR=..\\..\\..\\test\\data\\rcvraw
+SEP="\\"
+endif
 
-all  : convbin
+LDLIBS= -lm
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
 
-convbin    : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
-convbin    : rtcm.o rtcm2.o rtcm3.o rtcm3e.o pntpos.o ephemeris.o ionex.o
-convbin    : novatel.o ss2.o ublox.o crescent.o skytraq.o gw10.o javad.o nvs.o
-convbin    : binex.o rt17.o qzslex.o septentrio.o cmr.o tersus.o
+all  : sbp2rinex
+
+sbp2rinex  : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
+sbp2rinex  : rtcm.o rtcm2.o rtcm3.o rtcm3e.o pntpos.o ephemeris.o ionex.o
+sbp2rinex  : novatel.o swiftnav.o ublox.o skytraq.o gw10.o javad.o nvs.o
+sbp2rinex  : binex.o rt17.o qzslex.o septentrio.o cmr.o tersus.o
+
+sbp2rinex  :
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 convbin.o  : ../convbin.c
 	$(CC) -c $(CFLAGS) ../convbin.c
@@ -50,12 +79,10 @@ ephemeris.o: $(SRC)/ephemeris.c
 	$(CC) -c $(CFLAGS) $(SRC)/ephemeris.c
 novatel.o  : $(SRC)/rcv/novatel.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/novatel.c
-ss2.o      : $(SRC)/rcv/ss2.c
-	$(CC) -c $(CFLAGS) $(SRC)/rcv/ss2.c
+swiftnav.o : $(SRC)/rcv/swiftnav.c
+	$(CC) -c $(CFLAGS) $(SRC)/rcv/swiftnav.c
 ublox.o    : $(SRC)/rcv/ublox.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/ublox.c
-crescent.o : $(SRC)/rcv/crescent.c
-	$(CC) -c $(CFLAGS) $(SRC)/rcv/crescent.c
 skytraq.o  : $(SRC)/rcv/skytraq.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/skytraq.c
 gw10.o     : $(SRC)/rcv/gw10.c
@@ -74,85 +101,69 @@ septentrio.o: $(SRC)/rcv/septentrio.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/septentrio.c
 cmr.o      : $(SRC)/rcv/cmr.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/cmr.c
-tersus.o   : $(SRC)/rcv/tersus.c
+tersus.o      : $(SRC)/rcv/tersus.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/tersus.c
 
-convbin.o  : $(SRC)/rtklib.h
-rtkcmn.o   : $(SRC)/rtklib.h
-rinex.o    : $(SRC)/rtklib.h
-sbas.o     : $(SRC)/rtklib.h
-preceph.o  : $(SRC)/rtklib.h
-rcvraw.o   : $(SRC)/rtklib.h
-convrnx.o  : $(SRC)/rtklib.h
-rtcm.o     : $(SRC)/rtklib.h
-rtcm2.o    : $(SRC)/rtklib.h
-rtcm3.o    : $(SRC)/rtklib.h
-rtcm3e.o   : $(SRC)/rtklib.h
-pntpos.o   : $(SRC)/rtklib.h
-ephemeris.o: $(SRC)/rtklib.h
-ionex.o    : $(SRC)/rtklib.h
-novatel.o  : $(SRC)/rtklib.h
-ss2.o      : $(SRC)/rtklib.h
-ublox.o    : $(SRC)/rtklib.h
-crescent.o : $(SRC)/rtklib.h
-skytraq.o  : $(SRC)/rtklib.h
-gw10.o     : $(SRC)/rtklib.h
-javad.o    : $(SRC)/rtklib.h
-nvs.o      : $(SRC)/rtklib.h
-binex.o    : $(SRC)/rtklib.h
-rt17.o     : $(SRC)/rtklib.h
-qzslex.o   : $(SRC)/rtklib.h
-septentrio.o: $(SRC)/rtklib.h
-cmr.o      : $(SRC)/rtklib.h
-tersus.o   : $(SRC)/rtklib.h
+convbin.o  : $(SRC)/rtklib.h makefile
+rtkcmn.o   : $(SRC)/rtklib.h makefile
+rinex.o    : $(SRC)/rtklib.h makefile
+sbas.o     : $(SRC)/rtklib.h makefile
+preceph.o  : $(SRC)/rtklib.h makefile
+rcvraw.o   : $(SRC)/rtklib.h makefile
+convrnx.o  : $(SRC)/rtklib.h makefile
+rtcm.o     : $(SRC)/rtklib.h makefile
+rtcm2.o    : $(SRC)/rtklib.h makefile
+rtcm3.o    : $(SRC)/rtklib.h makefile
+rtcm3e.o   : $(SRC)/rtklib.h makefile
+pntpos.o   : $(SRC)/rtklib.h makefile
+ephemeris.o: $(SRC)/rtklib.h makefile
+ionex.o    : $(SRC)/rtklib.h makefile
+novatel.o  : $(SRC)/rtklib.h makefile
+swiftnav.o : $(SRC)/rtklib.h makefile
+ublox.o    : $(SRC)/rtklib.h makefile
+skytraq.o  : $(SRC)/rtklib.h makefile
+gw10.o     : $(SRC)/rtklib.h makefile
+javad.o    : $(SRC)/rtklib.h makefile
+nvs.o      : $(SRC)/rtklib.h makefile
+binex.o    : $(SRC)/rtklib.h makefile
+rt17.o     : $(SRC)/rtklib.h makefile
+qzslex.o   : $(SRC)/rtklib.h makefile
+septentrio.o: $(SRC)/rtklib.h makefile
+cmr.o      : $(SRC)/rtklib.h makefile
+tersus.o      : $(SRC)/rtklib.h makefile
 
-DATDIR = ../../../test/data/rcvraw
 
 install:
-	cp convbin $(BINDIR)
+	cp sbp2rinex $(BINDIR)
 
 clean:
-	rm -f convbin convbin.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
+	rm -f sbp2rinex sbp2rinex.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
 
-test : test1 test2 test3 test4 test5 test7 test8 test9 test10 test11 test12 test13
-test : test14 test15
+test : test1 test2 test3 test4 test5 test6 testclean
 
-test1:
-	./convbin -r nov $(DATDIR)/oemv_200911218.gps -ti 10 -d . -os
-test2:
-	./convbin -r hemis $(DATDIR)/cres_20080526.bin -ti 10 -d . -f 1 -od -os
-test3:
-	./convbin $(DATDIR)/ubx_20080526.ubx -o ubx_test.obs -d . -f 1 -ts 2008/5/26 6:00 -te 2008/5/26 6:10
+test1: # binary sbp
+	@echo -e "\n\n****** Test1: sbp binary ********\n"
+	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26.sbp -o 2017-05-12-v1.1.26-bin.obs
+test2: # sbp json with spaces
+	@echo -e "\n\n****** Test2: sbp json ********\n"
+	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26.sbp.json -o 2017-05-12-v1.1.26-json.obs -n 2017-05-12-v1.1.26-json.nav
+test3: test1 test2 # ensure outputs from test1 and test2 are bit exact minus first two lines
+	@echo -e "\n\n****** Test3: compare json and binary output ********\n"
+	tail -n +5 ./2017-05-12-v1.1.26-json.obs > 2017-05-12-v1.1.26-json.trunc.obs
+	tail -n +5 ./2017-05-12-v1.1.26-bin.obs > 2017-05-12-v1.1.26-bin.trunc.obs
+	diff -q 2017-05-12-v1.1.26-json.trunc.obs 2017-05-12-v1.1.26-bin.trunc.obs
 test4:
-	./convbin $(DATDIR)/ubx_20080526.ubx -n ubx_test.nav -d .
-test5:
-	./convbin $(DATDIR)/ubx_20080526.ubx -h ubx_test.hnav -s ubx_test.sbs -d . -x 129
-test7:
-	./convbin $(DATDIR)/testglo.rtcm2 -tr 2009/12/18 23:20 -d .
-test8:
-	./convbin $(DATDIR)/testglo.rtcm3 -os -tr 2009/12/18 23:20 -d .
-test9:
-	./convbin -v 3 -f 6 -r nov $(DATDIR)/oemv_200911218.gps -od -os -o rnx3_test.obs -n rnx3_test.nav -d .
-test10:
-	./convbin $(DATDIR)/testglo.rtcm3 -os -tr 2009/12/18 23:20 -d .
-test11:
-	./convbin $(DATDIR)/javad_20110115.jps -d out -c JAV1
-test12:
-	./convbin $(DATDIR)/javad_20110115.jps -d out -v 3.00 -f 3 -od -os
-test13:
-	./convbin $(DATDIR)/javad_20110115.jps -d out -o test13.obs -v 3 -hc test1 -hc test2 -hm MARKER -hn MARKERNO -ht MARKKERTYPE -ho OBSERVER/AGENCY -hr 1234/RECEIVER/V.0.1.2 -ha ANTNO/ANTENNA -hp 1234.567/8901.234/5678.901 -hd 0.123/0.234/0.567
-test14:
-	./convbin $(DATDIR)/javad_20110115.jps -d out -o test14.obs -v 3 -y S -y J -x 2 -x R19 -x R21
-test15:
-	./convbin $(DATDIR)/javad_20110115.jps -d out -o test15.obs -v 3 -ro "-GL1P -GL2C"
-test16:
-	./convbin $(DATDIR)/javad_20110115.jps -d out -o test15.obs -v 3 -ro "-GL1P -GL2C"
-test17:
-	./convbin $(DATDIR)/GMSD7_20121014.rtcm3 -tr 2012/10/14 0:00:00
-test18:
-	./convbin $(DATDIR)/GMSD7_20121014.rtcm3 -scan -v 3.01 -f 6 -od -os -tr 2012/10/14 0:00:00
-test21:
-	stty raw < /dev/ttyACM0
-	./convbin -r ubx -o ubx.obs -n ubx.nav -s ubx.sbs -h ubx.hnav /dev/ttyACM0
-
-
+	@echo -e "\n\n***** Test: json without spaces********\n"
+	./sbp2rinex $(DATDIR)$(SEP)2017-05-12-v1.1.26-nospaces.sbp.json -o 2017-05-12-v1.1.26-json-nospaces.obs -n 2017-05-12-v1.1.26-json.nav
+test5: test1 test4  # make sure JSON with no spaces are bit exact minus first two lines
+	tail -n +5 ./2017-05-12-v1.1.26-json-nospaces.obs > 2017-05-12-v1.1.26-json-nospaces.trunc.obs
+	diff 2017-05-12-v1.1.26-json-nospaces.trunc.obs 2017-05-12-v1.1.26-bin.trunc.obs
+test6: # BDS + GAL + GLO + GPS
+	@echo -e "\n\n****** Test6: BDS + GAL + GLO + GPS ********\n"
+	./sbp2rinex $(DATDIR)$(SEP)2018-06-15-v1.4.0-develop-2018061321-3-g734bd4b9.sbp.json -o 2018-06-15-json.obs -n 2018-06-15-json.nav
+	tail -n +4 ./2018-06-15-json.obs > 2018-06-15-json.trunc.obs
+	diff --strip-trailing-cr ./2018-06-15-json.trunc.obs $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json.obs
+	tail -n +4 ./2018-06-15-json.nav > 2018-06-15-json.trunc.nav
+	diff --strip-trailing-cr ./2018-06-15-json.trunc.nav $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json.nav
+testclean:
+	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs

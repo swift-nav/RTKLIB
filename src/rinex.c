@@ -607,7 +607,7 @@ static int readrnxh(FILE *fp, double *ver, char *type, int *sys, int *tsys,
     
     trace(3,"readrnxh:\n");
     
-    *ver=2.10; *type=' '; *sys=SYS_GPS;
+    *ver=2.10; *type=' '; *sys=SYS_GPS; *tsys=TSYS_GPS;
     
     while (fgets(buff,MAXRNXLEN,fp)) {
         
@@ -2084,7 +2084,7 @@ static int obsindex(double ver, int sys, const unsigned char *code,
 * return : status (1:ok, 0:output error)
 *-----------------------------------------------------------------------------*/
 extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
-                      int flag)
+                      int flag, double _dClockBias)
 {
     const char *mask;
     double ep[6];
@@ -2120,8 +2120,8 @@ extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
         }
     }
     else { /* ver.3 */
-        fprintf(fp,"> %04.0f %2.0f %2.0f %2.0f %2.0f%11.7f  %d%3d%21s\n",
-                ep[0],ep[1],ep[2],ep[3],ep[4],ep[5],flag,ns,"");
+        fprintf(fp,"> %04.0f %2.0f %2.0f %2.0f %2.0f%11.7f  %d%3d%6s%15.12f\n",
+                ep[0],ep[1],ep[2],ep[3],ep[4],ep[5],0,ns,"",_dClockBias);
     }
     for (i=0;i<ns;i++) {
         sys=satsys(obs[ind[i]].sat,NULL);

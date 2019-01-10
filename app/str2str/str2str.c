@@ -79,8 +79,8 @@ static const char *help[]={
 "    nov          : NovAtel OEMV/4/6,OEMStar (only in)",
 "    oem3         : NovAtel OEM3 (only in)",
 "    ubx          : ublox LEA-4T/5T/6T (only in)",
-"    ss2          : NovAtel Superstar II (only in)",
-"    hemis        : Hemisphere Eclipse/Crescent (only in)",
+"    sbp          : Swift Navigation SBP",
+"    json         : Swift Navigation SBP-JSON",
 "    stq          : SkyTraq S1315F (only in)",
 "    gw10         : Furuno GW10 (only in)",
 "    javad        : Javad (only in)",
@@ -139,17 +139,17 @@ static void reload_srctbl(int sig)
 static void decodefmt(char *path, int *fmt)
 {
     char *p;
-    
+
     *fmt=-1;
-    
+
     if ((p=strrchr(path,'#'))) {
         if      (!strcmp(p,"#rtcm2")) *fmt=STRFMT_RTCM2;
         else if (!strcmp(p,"#rtcm3")) *fmt=STRFMT_RTCM3;
         else if (!strcmp(p,"#nov"  )) *fmt=STRFMT_OEM4;
         else if (!strcmp(p,"#oem3" )) *fmt=STRFMT_OEM3;
         else if (!strcmp(p,"#ubx"  )) *fmt=STRFMT_UBX;
-        else if (!strcmp(p,"#ss2"  )) *fmt=STRFMT_SS2;
-        else if (!strcmp(p,"#hemis")) *fmt=STRFMT_CRES;
+        else if (!strcmp(p,"#sbp"  )) *fmt=STRFMT_SBP;
+        else if (!strcmp(p,"#json"))  *fmt=STRFMT_SBPJSON;
         else if (!strcmp(p,"#stq"  )) *fmt=STRFMT_STQ;
         else if (!strcmp(p,"#gw10" )) *fmt=STRFMT_GW10;
         else if (!strcmp(p,"#javad")) *fmt=STRFMT_JAVAD;
@@ -167,12 +167,12 @@ static void decodefmt(char *path, int *fmt)
 static int decodepath(const char *path, int *type, char *strpath, int *fmt)
 {
     char buff[1024],*p;
-    
+
     strcpy(buff,path);
-    
+
     /* decode format */
     decodefmt(buff,fmt);
-    
+
     /* decode type */
     if (!(p=strstr(buff,"://"))) {
         strcpy(strpath,buff);
@@ -200,11 +200,11 @@ static void readcmd(const char *file, char *cmd, int type)
     FILE *fp;
     char buff[MAXSTR],*p=cmd;
     int i=0;
-    
+
     *p='\0';
-    
+
     if (!(fp=fopen(file,"r"))) return;
-    
+
     while (fgets(buff,sizeof(buff),fp)) {
         if (*buff=='@') i++;
         else if (i==type&&p+strlen(buff)+1<cmd+MAXRCVCMD) {
@@ -229,7 +229,7 @@ int main(int argc, char **argv)
     int i,j,n=0,dispint=5000,trlevel=0,opts[]={10000,10000,2000,32768,10,0,30,0};
     int types[MAXSTR]={STR_FILE,STR_FILE},stat[MAXSTR]={0},byte[MAXSTR]={0};
     int bps[MAXSTR]={0},fmts[MAXSTR]={0},sta=0;
-    
+
     for (i=0;i<MAXSTR;i++) {
         paths[i]=s[i];
         cmds[i]=cmd_strs[i];
@@ -283,7 +283,7 @@ int main(int argc, char **argv)
         else if (*argv[i]=='-') printhelp();
     }
     if (n<=0) n=1; /* stdout */
-    
+
     for (i=0;i<n;i++) {
         if (fmts[i+1]<=0) continue;
         if (fmts[i+1]!=STRFMT_RTCM3) {
@@ -315,18 +315,18 @@ int main(int argc, char **argv)
     signal(SIGINT ,sigfunc);
     signal(SIGHUP ,SIG_IGN);
     signal(SIGPIPE,SIG_IGN);
-    
+
     strsvrinit(&strsvr,n+1);
-    
+
     if (trlevel>0) {
         traceopen(*logfile?logfile:TRFILE);
         tracelevel(trlevel);
     }
     fprintf(stderr,"stream server start\n");
-    
+
     strsetdir(local);
     strsetproxy(proxy);
-    
+
     for (i=0;i<MAXSTR;i++) {
         if (*cmdfile[i]) readcmd(cmdfile[i],cmds[i],0);
         if (*cmdfile[i]) readcmd(cmdfile[i],cmds_periodic[i],2);
@@ -342,16 +342,16 @@ int main(int argc, char **argv)
         signal(SIGUSR2,reload_srctbl);
     }
     for (intrflg=0;!intrflg;) {
-        
+
         /* get stream server status */
         strsvrstat(&strsvr,stat,byte,bps,strmsg);
-        
+
         /* show stream server status */
         for (i=0,p=buff;i<MAXSTR;i++) p+=sprintf(p,"%c",ss[stat[i]+1]);
-        
+
         fprintf(stderr,"%s [%s] %10d B %7d bps %s\n",
                 time_str(utc2gpst(timeget()),0),buff,byte[0],bps[0],strmsg);
-        
+
         sleepms(dispint);
     }
     for (i=0;i<MAXSTR;i++) {
@@ -359,7 +359,7 @@ int main(int argc, char **argv)
     }
     /* stop stream server */
     strsvrstop(&strsvr,cmds);
-    
+
     for (i=0;i<n;i++) {
         strconvfree(conv[i]);
     }

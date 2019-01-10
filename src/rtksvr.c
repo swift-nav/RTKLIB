@@ -803,9 +803,9 @@ extern void rtksvrunlock(rtksvr_t *svr) {unlock(&svr->lock);}
 *-----------------------------------------------------------------------------*/
 extern int rtksvrstart(rtksvr_t *svr, int cycle, int buffsize, int *strs,
                        char **paths, int *formats, int navsel, char **cmds,
-                       char **cmds_periodic, char **rcvopts, int nmeacycle,
-                       int nmeareq, const double *nmeapos, prcopt_t *prcopt,
-                       solopt_t *solopt, stream_t *moni, char *errmsg)
+                       char **cmds_periodic, char **rcvopts, int nmeacycle, int nmeareq,
+                       const double *nmeapos, prcopt_t *prcopt, solopt_t *solopt, stream_t *moni,
+                       char *errmsg)
 {
     gtime_t time,time0={0};
     int i,j,rw;

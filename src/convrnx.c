@@ -552,9 +552,13 @@ static void dump_halfc(halfc_t *halfc)
     halfd_t *p;
     char s0[32],s1[32],s2[32];
     int i,j;
+<<<<<<< HEAD
     
     trace(TL_HALFC,"HALF-CYC AMBIGUITY STATUS\n");
     
+=======
+
+>>>>>>> d666127... swift navigation changes
     for (i=0;i<MAXSAT;i++) for (j=0;j<NFREQ+NEXOBS;j++) {
         for (p=halfc->data[i][j];p;p=p->next) {
             satno2id(i+1,s0);
@@ -644,7 +648,7 @@ static int scan_obstype(int format, char **files, int nf, rnxopt_t *opt,
             }
             if (opt->te.time&&timediff(str->obs->data[0].time,opt->te)>10.0) break;
             
-            if (++c%11) continue;
+            if (++c%256) continue;
             
             sprintf(msg,"scanning: %s %s%s%s%s%s%s%s",time_str(str->time,0),
                     n[0]?"G":"",n[1]?"R":"",n[2]?"E":"",n[3]?"J":"",
@@ -718,15 +722,6 @@ static void set_obstype(int format, rnxopt_t *opt)
         {CODE_L1I,CODE_L7I},
         {0}
     };
-    static const unsigned char codes_cres[NSATSYS][8]={ /* hemisphere */
-        {CODE_L1C,CODE_L2P},
-        {CODE_L1C,CODE_L2P},
-        {0},
-        {0},
-        {CODE_L1C},
-        {0},
-        {0}
-    };
     static const unsigned char codes_javad[NSATSYS][8]={ /* javad */
         {CODE_L1C,CODE_L1W,CODE_L1X,CODE_L2X,CODE_L2W,CODE_L5X},
         {CODE_L1C,CODE_L1P,CODE_L2C,CODE_L2P},
@@ -789,7 +784,6 @@ static void set_obstype(int format, rnxopt_t *opt)
             case STRFMT_RTCM3: codes=codes_rtcm3[i]; break;
             case STRFMT_OEM4 : codes=codes_oem4 [i]; break;
             case STRFMT_OEM3 : codes=codes_oem3 [i]; break;
-            case STRFMT_CRES : codes=codes_cres [i]; break;
             case STRFMT_JAVAD: codes=codes_javad[i]; break;
             case STRFMT_BINEX: codes=codes_rinex[i]; break;
             case STRFMT_RT17 : codes=codes_rt17 [i]; break;
@@ -890,7 +884,7 @@ static void closefile(FILE **ofp, const rnxopt_t *opt, nav_t *nav)
 static void outrnxevent(FILE *fp, rnxopt_t *opt, int staid, stas_t *stas)
 {
     stas_t *p;
-    double pos[3],enu[3],del[3];
+    double pos[3]={0},enu[3]={0},del[3]={0};
     
     trace(2,"outrnxevent: staid=%d\n",staid);
     
@@ -982,7 +976,7 @@ static void convobs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *staid,
         }
     }
     /* output rinex obs */
-    outrnxobsb(ofp[0],opt,str->obs->data,str->obs->n,0);
+    outrnxobsb(ofp[0],opt,str->obs->data,str->obs->n,0,0.0);
     
     if (opt->tstart.time==0) opt->tstart=time;
     opt->tend=time;
@@ -1292,7 +1286,7 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
         /* input message */
         for (j=0;(type=input_strfile(str))>=-1;j++) {
             
-            if (j%11==1&&(abort=showstat(sess,te,te,n))) break;
+            if (j%256==1&&(abort=showstat(sess,te,te,n))) break;
             
             /* avioid duplicated if overlapped data */
             if (type==1&&tend.time&&timediff(str->time,tend)<=0.0) continue;
