@@ -302,6 +302,20 @@ static int uraindex(double value) {
     if (ura_eph[i] >= value) break;
   return i;
 }
+/* sisa value (m) to raw GAL sisa --------------------------------------------*/
+static int sisa_m_to_raw(float value) {
+  if (value < 0.5) {
+    return rintf(value / 0.01);
+  } else if (value < 1.0) {
+    return 50 + rintf((value - 0.5) / 0.02);
+  } else if (value < 2.0) {
+    return 75 + rintf((value - 1.0) / 0.04);
+  } else if (value < 6.0) {
+    return 100 + rintf((value - 2.0) / 0.16);
+  } else {
+    return 255;
+  }
+}
 
 static int Base64_Decode(uint8_t *_pcData,
                          uint32_t _uDataLen,
@@ -715,7 +729,7 @@ static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
 
   _pEph->toes = U4(_pBuff + 4);
   uWeekE = U2(_pBuff + 8);
-  _pEph->sva = uraindex(R4(_pBuff + 10)); /* URA index */
+  _pEph->sva = sisa_m_to_raw(R4(_pBuff + 10)); /* SISA */
   _pEph->fit = U4(_pBuff + 14) ? 0 : 4;
   _pEph->flag = U1(_pBuff + 18);
 
