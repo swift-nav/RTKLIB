@@ -286,7 +286,6 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
 {
     double eps[]={1980,1,1,0,0,0},epe[]={2037,12,31,0,0,0};
     double epr[]={2010,1,1,0,0,0},span=0.0;
-    int i,j,k,sat,nf=3,nc=2,format=-1;
     int i,j,k,sat,nf=7,nc=2,format=-1;
     char *p,*sys,*fmt="",*paths[1],path[1024],buff[256];
 

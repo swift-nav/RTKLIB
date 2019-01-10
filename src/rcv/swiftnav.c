@@ -15,8 +15,6 @@
 #include <math.h>
 #include <stdint.h>
 
-static const char rcsid[] = "$Id: Swiftnav SBP,v 1.0 2017/02/01 FT $";
-
 #define SBP_SYNC1 0x55 /* SBP message header sync */
 
 #define ID_MSGOBS 0x004A      /* observation */
