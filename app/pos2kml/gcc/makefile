@@ -1,9 +1,33 @@
 # makefile for pos2kml
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
 
 BINDIR = /usr/local/bin
 SRC    = ../../../src
-CFLAGS = -Wall -O3 -ansi -pedantic -I$(SRC) -DTRACE
-LDLIBS  = -lm -lrt
+
+CC=gcc
+
+OPTIONS =
+ifeq ($(UNAME),Windows)
+OPTIONS += -DWIN32
+endif
+
+CFLAGS = -Wall -O2 -ansi -std=c99 -pedantic -I$(SRC) $(OPTIONS) -DTRACE
+
+LDLIBS= -lm -lpthread
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
 
 pos2kml    : pos2kml.o convkml.o convgpx.o solution.o geoid.o rtkcmn.o preceph.o
 
@@ -22,13 +46,13 @@ rtkcmn.o   : $(SRC)/rtkcmn.c
 preceph.o  : $(SRC)/preceph.c
 	$(CC) -c $(CFLAGS) $(SRC)/preceph.c
 
-pos2kml.o  : $(SRC)/rtklib.h
-convkml.o  : $(SRC)/rtklib.h
-convgpx.o  : $(SRC)/rtklib.h
-solution.o : $(SRC)/rtklib.h
-geoid.o    : $(SRC)/rtklib.h
-rtkcmn.o   : $(SRC)/rtklib.h
-preceph.o  : $(SRC)/rtklib.h
+pos2kml.o  : $(SRC)/rtklib.h makefile
+convkml.o  : $(SRC)/rtklib.h makefile
+convgpx.o  : $(SRC)/rtklib.h makefile
+solution.o : $(SRC)/rtklib.h makefile
+geoid.o    : $(SRC)/rtklib.h makefile
+rtkcmn.o   : $(SRC)/rtklib.h makefile
+preceph.o  : $(SRC)/rtklib.h makefile
 
 install:
 	cp pos2kml $(BINDIR)

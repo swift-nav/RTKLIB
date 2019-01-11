@@ -23,13 +23,13 @@
 
 /* constants -----------------------------------------------------------------*/
 
-#define SIZP     0.2            /* mark size of rover positions */
+#define SIZP     0.8            /* mark size of rover positions */
 #define SIZR     0.3            /* mark size of reference position */
 #define TINT     60.0           /* time label interval (sec) */
 
 static const char *head1="<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 static const char *head2="<kml xmlns=\"http://earth.google.com/kml/2.1\">";
-static const char *mark="http://maps.google.com/mapfiles/kml/pal2/icon18.png";
+static const char *mark="http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png";
 
 /* output track --------------------------------------------------------------*/
 static void outtrack(FILE *f, const solbuf_t *solbuf, const char *color,
@@ -37,7 +37,7 @@ static void outtrack(FILE *f, const solbuf_t *solbuf, const char *color,
 {
     double pos[3];
     int i;
-    
+
     fprintf(f,"<Placemark>\n");
     fprintf(f,"<name>Rover Track</name>\n");
     fprintf(f,"<Style>\n");
@@ -64,7 +64,7 @@ static void outpoint(FILE *fp, gtime_t time, const double *pos,
 {
     double ep[6],alt=0.0;
     char str[256]="";
-    
+
     fprintf(fp,"<Placemark>\n");
     if (*label) fprintf(fp,"<name>%s</name>\n",label);
     fprintf(fp,"<styleUrl>#P%d</styleUrl>\n",style);
@@ -98,8 +98,14 @@ static int savekml(const char *file, const solbuf_t *solbuf, int tcolor,
     FILE *fp;
     double pos[3];
     int i,qcolor[]={0,1,2,5,4,3,0};
+    /* colors are in aabbggrr */
     char *color[]={
-        "ffffffff","ff008800","ff00aaff","ff0000ff","ff00ffff","ffff00ff"
+        "ffffffff", /* 0 - white */
+        "ff00aa00", /* 1 - green */
+        "ff00aaff", /* 2 - orange */
+        "ffaaaaaa", /* 3 - grey */
+        "ff00ffff", /* 4 - yellow */
+        "ffff00ff"  /* 5 - magenta */
     };
     if (!(fp=fopen(file,"w"))) {
         fprintf(stderr,"file open error : %s\n",file);
@@ -163,9 +169,9 @@ extern int convkml(const char *infile, const char *outfile, gtime_t ts,
     double rr[3]={0},pos[3],dr[3];
     int i,j,nfile,stat;
     char *p,file[1024],*files[MAXEXFILE]={0};
-    
+
     trace(3,"convkml : infile=%s outfile=%s\n",infile,outfile);
-    
+
     /* expand wild-card of infile */
     for (i=0;i<MAXEXFILE;i++) {
         if (!(files[i]=(char *)malloc(1024))) {
@@ -185,12 +191,12 @@ extern int convkml(const char *infile, const char *outfile, gtime_t ts,
         else sprintf(file,"%s.kml",infile);
     }
     else strcpy(file,outfile);
-    
+
     /* read solution file */
     stat=readsolt(files,nfile,ts,te,tint,qflg,&solbuf);
-    
+
     for (i=0;i<MAXEXFILE;i++) free(files[i]);
-    
+
     if (!stat) {
         return -1;
     }
