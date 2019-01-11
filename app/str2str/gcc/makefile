@@ -1,4 +1,4 @@
-# makefile for str2str-swiftnav
+# makefile for str2str
 ifeq ($(OS),Windows_NT)
     UNAME := Windows
 else
@@ -19,7 +19,7 @@ CTARGET=
 
 #OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=3 -DNEXOBS=3
 OPTION = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=7 -DNEXOBS=3 -DSVR_REUSEADDR
-CFLAGS = -Wall -O3 -ansi -std=c99 -Wno-unused-but-set-variable -I$(SRC) $(OPTION) $(CTARGET)
+CFLAGS = -Wall -g -ansi -std=c99 -Wno-unused-but-set-variable -I$(SRC) $(OPTION) $(CTARGET)
 
 ifeq ($(UNAME),Windows)
 OPTIONS += -DWIN32
@@ -34,13 +34,13 @@ LDLIBS+= -lwinmm
 endif
 
 
-all : str2str-swiftnav
-str2str-swiftnav    : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
-str2str-swiftnav    : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o gw10.o javad.o
-str2str-swiftnav    : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
-str2str-swiftnav    : septentrio.o cmr.o tersus.o
+all : str2str
+str2str : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
+str2str : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o gw10.o javad.o
+str2str : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
+str2str : septentrio.o cmr.o tersus.o
 
-str2str-swiftnav  :
+str2str  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 str2str.o  : ../str2str.c
@@ -128,23 +128,23 @@ DEVICE=ttyS1:115200:8:n:1:off
 #DEVICE=ttyUSB0:115200:8:n:1:off
 
 test1:
-	./str2str-swiftnav -in serial://$(DEVICE) -out file://test1.out -t 2
+	./str2str -in serial://$(DEVICE) -out file://test1.out -t 2
 
 test2:
-	./str2str-swiftnav -in serial://$(DEVICE) -out tcpsvr://:2102 -c ../../../data/oem4_raw_10hz.cmd -t 5
+	./str2str -in serial://$(DEVICE) -out tcpsvr://:2102 -c ../../../data/oem4_raw_10hz.cmd -t 5
 
 test3:
-	./str2str-swiftnav -in serial://$(DEVICE) -out ntrips://:sesam@localhost:8000/BUCU0 -c ../../../data/oem4_raw_10hz.cmd -t 5
+	./str2str -in serial://$(DEVICE) -out ntrips://:sesam@localhost:8000/BUCU0 -c ../../../data/oem4_raw_10hz.cmd -t 5
 
 test4:
-	./str2str-swiftnav -in ../oem6_20121107.gps#nov -out oem6_20121107.rtcm3#rtcm3 -sta 123 -msg "1077(10),1087(10),1097(10),1107(10),1117(10),1019,1020"
+	./str2str -in ../oem6_20121107.gps#nov -out oem6_20121107.rtcm3#rtcm3 -sta 123 -msg "1077(10),1087(10),1097(10),1107(10),1117(10),1019,1020"
 
 test5:
-	./str2str-swiftnav -in ../oem6_20121107.gps#nov -out oem6_20121107_gal.rtcm3#rtcm3 -msg "1097(10)"
+	./str2str -in ../oem6_20121107.gps#nov -out oem6_20121107_gal.rtcm3#rtcm3 -msg "1097(10)"
 
 test6:
-	./str2str-swiftnav -in serial://ttyS54:115200#nov -out tcpsvr://:2103#rtcm3 -c ../../../data/oem4_raw_10hz.cmd
+	./str2str -in serial://ttyS54:115200#nov -out tcpsvr://:2103#rtcm3 -c ../../../data/oem4_raw_10hz.cmd
 
 clean:
-	rm -f str2str-swiftnav str2str-swiftnav.exe *.o *.out *.trace
+	rm -f str2str str2str.exe *.o *.out *.trace
 
