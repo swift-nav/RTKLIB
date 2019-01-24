@@ -404,6 +404,7 @@ static int decode_solxyz(char *buff, const solopt_t *opt, sol_t *sol)
             P[2]=P[6]=SQR(val[i]); i++; /* sdzx */
         }
         covtosol(P,sol);
+
     }
     if (i<n) sol->age  =(float)val[i++];
     if (i<n) sol->ratio=(float)val[i++];
@@ -457,18 +458,7 @@ static int decode_solllh(char *buff, const solopt_t *opt, sol_t *sol)
     pos2ecef(pos,sol->rr);
     if (i<n) sol->stat=(unsigned char)val[i++];
     if (i<n) sol->ns  =(unsigned char)val[i++];
-    if (i+3<=n) {
-        Q[4]=val[i]*val[i]; i++; /* sdn */
-        Q[0]=val[i]*val[i]; i++; /* sde */
-        Q[8]=val[i]*val[i]; i++; /* sdu */
-        if (i+3<n) {
-            Q[1]=Q[3]=SQR(val[i]); i++; /* sdne */
-            Q[2]=Q[6]=SQR(val[i]); i++; /* sdeu */
-            Q[5]=Q[7]=SQR(val[i]); i++; /* sdun */
-        }
-        covecef(pos,Q,P);
-        covtosol(P,sol);
-    }
+    if (i<n) sol->qr[0] = 3.0 * val[i++] / 1000.0;
     if (i<n) sol->age  =(float)val[i++];
     if (i<n) sol->ratio=(float)val[i++];
 

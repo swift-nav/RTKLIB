@@ -23,8 +23,8 @@
 
 /* constants -----------------------------------------------------------------*/
 
-#define SIZP     0.8            /* mark size of rover positions */
-#define SIZR     0.3            /* mark size of reference position */
+#define SIZP     0.6            /* mark size of rover positions */
+#define SIZR     1.0            /* mark size of reference position */
 #define TINT     60.0           /* time label interval (sec) */
 
 static const char *head1="<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -91,6 +91,48 @@ static void outpoint(FILE *fp, gtime_t time, const double *pos,
     fprintf(fp,"</Point>\n");
     fprintf(fp,"</Placemark>\n");
 }
+/* output circle --------------------------------------------------------------*/
+static void outcircle(FILE *fp,
+                      const double *pos_ecef_m,
+                      double radius_m,
+                      int style) {
+  int num_points = (6 * radius_m); /* roughly proportional to circumference */
+  if (num_points < 6) num_points = 6;
+  if (num_points > 120) num_points = 120;
+  if (radius_m < 0.25) radius_m = 0.25;
+  if (radius_m > 25.0) radius_m = 25.0;
+
+  fprintf(fp,"<Placemark>\n");
+  fprintf(fp,"<styleUrl>#C%d</styleUrl>\n",style);
+  fprintf(fp,"  <Polygon>\n");
+  fprintf(fp,"    <outerBoundaryIs>\n");
+  fprintf(fp,"      <LinearRing>\n");
+  fprintf(fp,"        <coordinates>\n");
+  double enu[3], xyz[3], llh[3];
+  for (int k=0; k<num_points; k++) {
+    float theta = 2.0 * PI * k / num_points;
+    enu[0] = radius_m * cosf(theta);
+    enu[1] = radius_m * sinf(theta);
+    enu[2] = 0.0;
+    ecef2pos(pos_ecef_m, llh);
+    enu2ecef(llh, enu, xyz);
+    xyz[0] += pos_ecef_m[0];
+    xyz[1] += pos_ecef_m[1];
+    xyz[2] += pos_ecef_m[2];
+    ecef2pos(xyz, llh);
+    fprintf(
+      fp,
+      "%13.9f,%12.9f,%5.3f\n",
+      llh[1]*R2D,
+      llh[0]*R2D,
+      0.0);
+  }
+  fprintf(fp,"        </coordinates>\n");
+  fprintf(fp,"      </LinearRing>\n");
+  fprintf(fp,"    </outerBoundaryIs>\n");
+  fprintf(fp,"  </Polygon>\n");
+  fprintf(fp,"</Placemark>\n");
+}
 /* save kml file -------------------------------------------------------------*/
 static int savekml(const char *file, const solbuf_t *solbuf, int tcolor,
                    int pcolor, int outalt, int outtime)
@@ -107,6 +149,14 @@ static int savekml(const char *file, const solbuf_t *solbuf, int tcolor,
         "ff00ffff", /* 4 - yellow */
         "ffff00ff"  /* 5 - magenta */
     };
+    char *circle_color[]={
+        "aaffffff", /* 0 - white */
+        "aa00aa00", /* 1 - green */
+        "aa00aaff", /* 2 - orange */
+        "aaaaaaaa", /* 3 - grey */
+        "aa00ffff", /* 4 - yellow */
+        "aaff00ff"  /* 5 - magenta */
+    };
     if (!(fp=fopen(file,"w"))) {
         fprintf(stderr,"file open error : %s\n",file);
         return 0;
@@ -122,6 +172,16 @@ static int savekml(const char *file, const solbuf_t *solbuf, int tcolor,
         fprintf(fp,"  </IconStyle>\n");
         fprintf(fp,"</Style>\n");
     }
+    for (i=0;i<6;i++) {
+        fprintf(fp,"<Style id=\"C%d\">\n",i);
+        fprintf(fp,"    <PolyStyle>\n");
+        fprintf(fp,"        <color>%s</color>\n", circle_color[i]);
+        fprintf(fp,"        <colorMode>normal</colorMode>\n");
+        fprintf(fp,"        <fill>1</fill>\n");
+        fprintf(fp,"        <outline>1</outline>\n");
+        fprintf(fp,"    </PolyStyle>\n");
+        fprintf(fp,"</Style>\n");
+    }
     if (tcolor>0) {
         outtrack(fp,solbuf,color[tcolor-1],outalt,outtime);
     }
@@ -132,6 +192,25 @@ static int savekml(const char *file, const solbuf_t *solbuf, int tcolor,
             ecef2pos(solbuf->data[i].rr,pos);
             outpoint(fp,solbuf->data[i].time,pos,"",
                      pcolor==5?qcolor[solbuf->data[i].stat]:pcolor-1,outalt,outtime);
+        }
+        fprintf(fp,"</Folder>\n");
+        fprintf(fp,"<Folder>\n");
+        fprintf(fp,"  <name>Horizontal accuracy</name>\n");
+
+        for (i=0;i<solbuf->n;i++) {
+          double radius_m = solbuf->data[i].qr[0];
+          if (radius_m < 1e-6) {
+            continue;
+          }
+          //~ printf("solbuf->data[i].qr %.1f %.1f %.1f  %.1f %.1f %.1f radius_m %.3f\n",
+             //~ solbuf->data[i].qr[0], solbuf->data[i].qr[1], solbuf->data[i].qr[2],
+             //~ solbuf->data[i].qr[3], solbuf->data[i].qr[4], solbuf->data[i].qr[5],
+             //~ radius_m);
+          outcircle(
+            fp,
+            solbuf->data[i].rr,
+            radius_m,
+            pcolor==5?qcolor[solbuf->data[i].stat]:pcolor-1);
         }
         fprintf(fp,"</Folder>\n");
     }
