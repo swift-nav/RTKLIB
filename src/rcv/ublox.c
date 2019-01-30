@@ -123,7 +123,7 @@ static int checksum(unsigned char *buff, int len)
 {
     unsigned char cka=0,ckb=0;
     int i;
-    
+
     for (i=2;i<len-2;i++) {
         cka+=buff[i]; ckb+=cka;
     }
@@ -133,7 +133,7 @@ static void setcs(unsigned char *buff, int len)
 {
     unsigned char cka=0,ckb=0;
     int i;
-    
+
     for (i=2;i<len-2;i++) {
         cka+=buff[i]; ckb+=cka;
     }
@@ -223,7 +223,7 @@ static double sig_freq(int sys, int f, int fcn)
     static const double freq_glo[8]={FREQ1_GLO,FREQ2_GLO,FREQ3_GLO};
     static const double dfrq_glo[8]={DFRQ1_GLO,DFRQ2_GLO};
     static const double freq_bds[8]={FREQ1_CMP,0,0,FREQ3_CMP,FREQ2_CMP};
-    
+
     if (sys == SYS_GLO) {
         return freq_glo[f-1]+dfrq_glo[f-1]*fcn;
     }
@@ -236,7 +236,7 @@ static double sig_freq(int sys, int f, int fcn)
 static void adj_utcweek(gtime_t time, double *utc)
 {
     int week;
-    
+
     if (utc[3]>=256.0) return;
     time2gpst(time,&week);
     utc[3]+=week/256*256;
@@ -251,9 +251,9 @@ static int decode_rxmraw(raw_t *raw)
     int i,j,prn,sat,n=0,nsat,week;
     unsigned char *p=raw->buff+6;
     char *q;
-    
+
     trace(4,"decode_rxmraw: len=%d\n",raw->len);
-    
+
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX RXM-RAW   (%4d): nsat=%d",raw->len,U1(p+6));
     }
@@ -269,7 +269,7 @@ static int decode_rxmraw(raw_t *raw)
     tow =U4(p  );
     week=U2(p+4);
     time=gpst2time(week,tow*0.001);
-    
+
     if (week==0) {
         trace(3,"ubx rxmraw week=0 error: len=%d nsat=%d\n",raw->len,nsat);
         return 0;
@@ -281,7 +281,7 @@ static int decode_rxmraw(raw_t *raw)
         time=timeadd(time,-toff);
     }
     tt=timediff(time,raw->time);
-    
+
     for (i=0,p+=8;i<nsat&&i<MAXOBS;i++,p+=24) {
         raw->obs.data[n].time=time;
         raw->obs.data[n].L[0]  =R8(p   )-toff*FREQ1;
@@ -291,7 +291,7 @@ static int decode_rxmraw(raw_t *raw)
         raw->obs.data[n].SNR[0]=(unsigned char)(I1(p+22)*4.0+0.5);
         raw->obs.data[n].LLI[0]=U1(p+23);
         raw->obs.data[n].code[0]=CODE_L1C;
-        
+
         /* phase polarity flip option (-INVCP) */
         if (strstr(raw->opt,"-INVCP")) {
             raw->obs.data[n].L[0]=-raw->obs.data[n].L[0];
@@ -301,11 +301,11 @@ static int decode_rxmraw(raw_t *raw)
             continue;
         }
         raw->obs.data[n].sat=sat;
-        
+
         if (raw->obs.data[n].LLI[0]&1) raw->lockt[sat-1][0]=0.0;
         else if (tt<1.0||10.0<tt) raw->lockt[sat-1][0]=0.0;
         else raw->lockt[sat-1][0]+=tt;
-        
+
         for (j=1;j<NFREQ+NEXOBS;j++) {
             raw->obs.data[n].L[j]=raw->obs.data[n].P[j]=0.0;
             raw->obs.data[n].D[j]=0.0;
@@ -327,9 +327,9 @@ static int decode_rxmrawx(raw_t *raw)
     double tow,P,L,D,tn,tadj=0.0,toff=0.0;
     int i,j,k,f,sys,prn,sat,code,slip,halfv,halfc,LLI,n=0,std_slip=0;
     int week,nmeas,ver,gnss,svid,sigid,frqid,lockt,cn0,cpstd,tstat;
-    
+
     trace(4,"decode_rxmrawx: len=%d\n",raw->len);
-    
+
     if (raw->len<24) {
         trace(2,"ubx rxmrawx length error: len=%d\n",raw->len);
         return -1;
@@ -338,7 +338,7 @@ static int decode_rxmrawx(raw_t *raw)
     week =U2(p+ 8); /* week */
     nmeas=U1(p+11); /* numMeas */
     ver  =U1(p+13); /* version ([5] 5.15.3.1) */
-    
+
     if (raw->len<24+32*nmeas) {
         trace(2,"ubx rxmrawx length error: len=%d nmeas=%d\n",raw->len,nmeas);
         return -1;
@@ -348,7 +348,7 @@ static int decode_rxmrawx(raw_t *raw)
         return 0;
     }
     time=gpst2time(week,tow);
-    
+
     if (raw->outtype) {
         time2str(time,tstr,2);
         sprintf(raw->msgtype,"UBX RXM-RAWX  (%4d): time=%s nmeas=%d ver=%d",
@@ -382,7 +382,7 @@ static int decode_rxmrawx(raw_t *raw)
         tstat=U1(p+30);    /* trkStat */
         if (!(tstat&1)) P=0.0;
         if (!(tstat&2)||L==-0.5||cpstd>CPSTD_VALID) L=0.0;
-        
+
         if (!(sys=ubx_sys(gnss))) {
             trace(2,"ubx rxmrawx: system error gnss=%d\n", gnss);
             continue;
@@ -403,15 +403,15 @@ static int decode_rxmrawx(raw_t *raw)
         }
         /* signal index in obs data */
         f=sig_idx(sys,code);
-        
+
         if (f==0||f>NFREQ+NEXOBS) {
             trace(2,"ubx rxmrawx signal error: sat=%2d sigid=%d\n",sat,sigid);
             continue;
         }
         /* offset by time tag adjustment */
         if (toff!=0.0) {
-            P-=toff*CLIGHT;
-            L-=toff*sig_freq(sys,f,frqid-7);
+            if (P > 0.0) P-=toff*CLIGHT;
+            if (L > 0.0) L-=toff*sig_freq(sys,f,frqid-7);
         }
         halfv=tstat&4?1:0; /* half cycle valid */
         halfc=tstat&8?1:0; /* half cycle subtracted from phase */
@@ -420,7 +420,7 @@ static int decode_rxmrawx(raw_t *raw)
         raw->lockt[sat-1][f-1]=lockt*1E-3;
         raw->halfc[sat-1][f-1]=halfc;
         LLI=(slip?LLI_SLIP:0)|(halfc?LLI_HALFS:0)|(!halfv?LLI_HALFC:0);
-        
+
         for (j=0;j<n;j++) {
             if (raw->obs.data[j].sat==sat) break;
         }
@@ -452,13 +452,13 @@ static int save_subfrm(int sat, raw_t *raw)
 {
     unsigned char *p=raw->buff+6,*q;
     int i,j,n,id=(U4(p+6)>>2)&0x7;
-    
+
     trace(4,"save_subfrm: sat=%2d id=%d\n",sat,id);
-    
+
     if (id<1||5<id) return 0;
-    
+
     q=raw->subfrm[sat-1]+(id-1)*30;
-    
+
     for (i=n=0,p+=2;i<10;i++,p+=4) {
         for (j=23;j>=0;j--) {
             *q=(*q<<1)+((U4(p)>>j)&1); if (++n%8==0) q++;
@@ -470,13 +470,13 @@ static int save_subfrm(int sat, raw_t *raw)
 static int decode_ephem(int sat, raw_t *raw)
 {
     eph_t eph={0};
-    
+
     trace(4,"decode_ephem: sat=%2d\n",sat);
-    
+
     if (decode_frame(raw->subfrm[sat-1]   ,&eph,NULL,NULL,NULL,NULL)!=1||
         decode_frame(raw->subfrm[sat-1]+30,&eph,NULL,NULL,NULL,NULL)!=2||
         decode_frame(raw->subfrm[sat-1]+60,&eph,NULL,NULL,NULL,NULL)!=3) return 0;
-    
+
     if (!strstr(raw->opt,"-EPHALL")) {
         if (eph.iode==raw->nav.eph[sat-1].iode&&
             eph.iodc==raw->nav.eph[sat-1].iodc) return 0; /* unchanged */
@@ -490,9 +490,9 @@ static int decode_ephem(int sat, raw_t *raw)
 static int decode_alm1(int sat, raw_t *raw)
 {
     int sys=satsys(sat,NULL);
-    
+
     trace(4,"decode_alm1 : sat=%2d\n",sat);
-    
+
     if (sys==SYS_GPS) {
         decode_frame(raw->subfrm[sat-1]+90,NULL,raw->nav.alm,raw->nav.ion_gps,
                      raw->nav.utc_gps,&raw->nav.leaps);
@@ -509,9 +509,9 @@ static int decode_alm1(int sat, raw_t *raw)
 static int decode_alm2(int sat, raw_t *raw)
 {
     int sys=satsys(sat,NULL);
-    
+
     trace(4,"decode_alm2 : sat=%2d\n",sat);
-    
+
     if (sys==SYS_GPS) {
         decode_frame(raw->subfrm[sat-1]+120,NULL,raw->nav.alm,NULL,NULL,NULL);
     }
@@ -528,9 +528,9 @@ static int decode_rxmsfrb(raw_t *raw)
     unsigned int words[10];
     int i,prn,sat,sys,id;
     unsigned char *p=raw->buff+6;
-    
+
     trace(4,"decode_rxmsfrb: len=%d\n",raw->len);
-    
+
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX RXM-SFRB  (%4d): prn=%2d",raw->len,U1(p+1));
     }
@@ -544,7 +544,7 @@ static int decode_rxmsfrb(raw_t *raw)
         return -1;
     }
     sys=satsys(sat,&prn);
-    
+
     if (sys==SYS_GPS) {
         id=save_subfrm(sat,raw);
         if (id==3) return decode_ephem(sat,raw);
@@ -563,9 +563,9 @@ static int decode_navsol(raw_t *raw)
 {
     int itow,ftow,week;
     unsigned char *p=raw->buff+6;
-    
+
     trace(4,"decode_navsol: len=%d\n",raw->len);
-    
+
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX NAV-SOL   (%4d):",raw->len);
     }
@@ -582,9 +582,9 @@ static int decode_navtime(raw_t *raw)
 {
     int itow,ftow,week;
     unsigned char *p=raw->buff+6;
-    
+
     trace(4,"decode_navtime: len=%d\n",raw->len);
-    
+
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX NAV-TIME  (%4d):",raw->len);
     }
@@ -604,17 +604,17 @@ static int decode_trkmeas(raw_t *raw)
     double ts,tr=-1.0,t,tau,utc_gpst,snr,adr,dop;
     int i,j,n=0,nch,sys,prn,sat,qi,frq,flag,lock1,lock2,week;
     unsigned char *p=raw->buff+6;
-    
+
     trace(4,"decode_trkmeas: len=%d\n",raw->len);
-    
+
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX TRK-MEAS  (%4d):",raw->len);
     }
     if (!raw->time.time) return 0;
-    
+
     /* number of channels */
     nch=U1(p+2);
-    
+
     if (raw->len<112+nch*56) {
         trace(2,"decode_trkmeas: length error len=%d nch=%2d\n",raw->len,nch);
         return -1;
@@ -625,24 +625,24 @@ static int decode_trkmeas(raw_t *raw)
         if ((t=I8(p+24)*P2_32/1000.0)>tr) tr=t;
     }
     if (tr<0.0) return 0;
-    
+
     tr=ROUND((tr+0.08)/0.1)*0.1;
-    
+
     /* adjust week handover */
     t=time2gpst(raw->time,&week);
     if      (tr<t-302400.0) week++;
     else if (tr>t+302400.0) week--;
     time=gpst2time(week,tr);
-    
+
     utc_gpst=timediff(gpst2utc(time),time);
-    
+
     for (i=0,p=raw->buff+110;i<nch;i++,p+=56) {
-        
+
         /* quality indicator (0:idle,1:search,2:aquired,3:unusable, */
         /*                    4:code lock,5,6,7:code/carrier lock) */
         qi=U1(p+1);
         if (qi<4||7<qi) continue;
-        
+
         /* system and satellite number */
         if (!(sys=ubx_sys(U1(p+4)))) {
             trace(2,"ubx trkmeas: system error\n");
@@ -657,12 +657,12 @@ static int decode_trkmeas(raw_t *raw)
         ts=I8(p+24)*P2_32/1000.0;
         if      (sys==SYS_CMP) ts+=14.0;             /* bdt  -> gpst */
         else if (sys==SYS_GLO) ts-=10800.0+utc_gpst; /* glot -> gpst */
-        
+
         /* signal travel time */
         tau=tr-ts;
         if      (tau<-302400.0) tau+=604800.0;
         else if (tau> 302400.0) tau-=604800.0;
-        
+
         frq  =U1(p+ 7)-7; /* frequency */
         flag =U1(p+ 8);   /* tracking status */
         lock1=U1(p+16);   /* code lock count */
@@ -670,11 +670,11 @@ static int decode_trkmeas(raw_t *raw)
         snr  =U2(p+20)/256.0;
         adr  =I8(p+32)*P2_32+(flag&0x40?0.5:0.0);
         dop  =I4(p+40)*P2_10*10.0;
-        
+
         /* set slip flag */
         if (lock2==0||lock2<raw->lockt[sat-1][0]) raw->lockt[sat-1][1]=1.0;
         raw->lockt[sat-1][0]=lock2;
-        
+
 #if 0 /* for debug */
         trace(2,"[%2d] qi=%d sys=%d prn=%3d frq=%2d flag=%02X ?=%02X %02X "
               "%02X %02X %02X %02X %02X lock=%3d %3d ts=%10.3f snr=%4.1f "
@@ -684,10 +684,10 @@ static int decode_trkmeas(raw_t *raw)
               adrs[sat-1]==0.0||dop==0.0?0.0:(adr-adrs[sat-1])-dop);
 #endif
         adrs[sat-1]=adr;
-        
+
         /* check phase lock */
         if (!(flag&0x20)) continue;
-        
+
         raw->obs.data[n].time=time;
         raw->obs.data[n].sat=sat;
         raw->obs.data[n].P[0]=tau*CLIGHT;
@@ -703,7 +703,7 @@ static int decode_trkmeas(raw_t *raw)
             raw->obs.data[n].LLI[0]|=flag&0x80?0:2;
         }
         raw->lockt[sat-1][1]=0.0;
-        
+
         for (j=1;j<NFREQ+NEXOBS;j++) {
             raw->obs.data[n].L[j]=raw->obs.data[n].P[j]=0.0;
             raw->obs.data[n].D[j]=0.0;
@@ -725,16 +725,16 @@ static int decode_trkd5(raw_t *raw)
     double ts,tr=-1.0,t,tau,adr,dop,snr,utc_gpst;
     int i,j,n=0,type,off,len,sys,prn,sat,qi,frq,flag,week;
     unsigned char *p=raw->buff+6;
-    
+
     trace(4,"decode_trkd5: len=%d\n",raw->len);
-    
+
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX TRK-D5    (%4d):",raw->len);
     }
     if (!raw->time.time) return 0;
-    
+
     utc_gpst=timediff(gpst2utc(raw->time),raw->time);
-    
+
     switch ((type=U1(p))) {
         case 3 : off=86; len=56; break;
         case 6 : off=86; len=64; break; /* u-blox 7 */
@@ -747,23 +747,23 @@ static int decode_trkd5(raw_t *raw)
         if (t>tr) tr=t;
     }
     if (tr<0.0) return 0;
-    
+
     tr=ROUND((tr+0.08)/0.1)*0.1;
-    
+
     /* adjust week handover */
     t=time2gpst(raw->time,&week);
     if      (tr<t-302400.0) week++;
     else if (tr>t+302400.0) week--;
     time=gpst2time(week,tr);
-    
+
     trace(4,"time=%s\n",time_str(time,0));
-    
+
     for (i=0,p=raw->buff+off;p-raw->buff<raw->len-2;i++,p+=len) {
-        
+
         /* quality indicator */
         qi =U1(p+41)&7;
         if (qi<4||7<qi) continue;
-        
+
         if (type==6) {
             if (!(sys=ubx_sys(U1(p+56)))) {
                 trace(2,"ubx trkd5: system error\n");
@@ -783,19 +783,19 @@ static int decode_trkd5(raw_t *raw)
         /* transmission time */
         ts=I8(p)*P2_32/1000.0;
         if (sys==SYS_GLO) ts-=10800.0+utc_gpst; /* glot -> gpst */
-        
+
         /* signal travel time */
         tau=tr-ts;
         if      (tau<-302400.0) tau+=604800.0;
         else if (tau> 302400.0) tau-=604800.0;
-        
+
         flag=U1(p+54);   /* tracking status */
         adr=qi<6?0.0:I8(p+8)*P2_32+(flag&0x01?0.5:0.0);
         dop=I4(p+16)*P2_10/4.0;
         snr=U2(p+32)/256.0;
-        
+
         if (snr<=10.0) raw->lockt[sat-1][1]=1.0;
-        
+
 #if 0 /* for debug */
         trace(2,"[%2d] qi=%d sys=%d prn=%3d frq=%2d flag=%02X ts=%1.3f "
               "snr=%4.1f dop=%9.3f adr=%13.3f %6.3f\n",U1(p+35),qi,U1(p+56),
@@ -803,10 +803,10 @@ static int decode_trkd5(raw_t *raw)
               adrs[sat-1]==0.0||dop==0.0?0.0:(adr-adrs[sat-1])-dop);
 #endif
         adrs[sat-1]=adr;
-        
+
         /* check phase lock */
         if (!(flag&0x08)) continue;
-        
+
         raw->obs.data[n].time=time;
         raw->obs.data[n].sat=sat;
         raw->obs.data[n].P[0]=tau*CLIGHT;
@@ -816,7 +816,7 @@ static int decode_trkd5(raw_t *raw)
         raw->obs.data[n].code[0]=sys==SYS_CMP?CODE_L1I:CODE_L1C;
         raw->obs.data[n].LLI[0]=raw->lockt[sat-1][1]>0.0?1:0;
         raw->lockt[sat-1][1]=0.0;
-        
+
         for (j=1;j<NFREQ+NEXOBS;j++) {
             raw->obs.data[n].L[j]=raw->obs.data[n].P[j]=0.0;
             raw->obs.data[n].D[j]=0.0;
@@ -836,7 +836,7 @@ static int decode_nav(raw_t *raw, int sat, int off)
     unsigned int words[10];
     int i,id;
     unsigned char *p=raw->buff+6+off;
-    
+
     if (raw->len<48+off) {
         trace(2,"ubx rawsfrbx length error: sat=%d len=%d\n",sat,raw->len);
         return -1;
@@ -847,7 +847,7 @@ static int decode_nav(raw_t *raw, int sat, int off)
         return 0;
     }
     for (i=0;i<10;i++,p+=4) words[i]=U4(p)>>6; /* 24 bits without parity */
-    
+
     id=(words[1]>>2)&7;
     if (id<1||5<id) {
         trace(2,"ubx rawsfrbx subfrm id error: sat=%2d id=%d len=%d\n",sat,id,
@@ -868,7 +868,7 @@ static int decode_enav(raw_t *raw, int sat, int off)
     eph_t eph={0};
     unsigned char *p=raw->buff+6+off,buff[32],crc_buff[26]={0};
     int i,j,k,part1,page1,part2,page2,type;
-    
+
     if (raw->len<44+off) {
         trace(2,"ubx rawsfrbx length error: sat=%d len=%d\n",sat,raw->len);
         return -1;
@@ -880,10 +880,10 @@ static int decode_enav(raw_t *raw, int sat, int off)
     page1=getbitu(buff   ,1,1);
     part2=getbitu(buff+16,0,1);
     page2=getbitu(buff+16,1,1);
-    
+
     /* skip alert page */
     if (page1==1||page2==1) return 0;
-    
+
     /* test even-odd parts */
     if (part1!=0||part2!=1) {
         trace(2,"ubx rawsfrbx gal page even/odd error: sat=%2d\n",sat);
@@ -897,22 +897,22 @@ static int decode_enav(raw_t *raw, int sat, int off)
         return -1;
     }
     type=getbitu(buff,2,6); /* word type */
-    
+
     /* skip word except for ephemeris, iono, utc parameters */
     if (type>6) return 0;
-    
+
     /* clear word 0-6 flags */
     if (type==2) raw->subfrm[sat-1][112]=0;
-    
+
     /* save page data (112 + 16 bits) to frame buffer */
     k=type*16;
     for (i=0,j=2;i<14;i++,j+=8) raw->subfrm[sat-1][k++]=getbitu(buff   ,j,8);
     for (i=0,j=2;i< 2;i++,j+=8) raw->subfrm[sat-1][k++]=getbitu(buff+16,j,8);
-    
+
     /* test word 0-6 flags */
     raw->subfrm[sat-1][112]|=(1<<type);
     if (raw->subfrm[sat-1][112]!=0x7F) return 0;
-    
+
     if (strstr(raw->opt,"-GALFNAV")) {
         return 0;
     }
@@ -942,13 +942,13 @@ static int decode_cnav(raw_t *raw, int sat, int off)
     unsigned int words[10];
     int i,id,pgn,prn;
     unsigned char *p=raw->buff+6+off;
-    
+
     if (raw->len<48+off) {
         trace(2,"ubx rawsfrbx length error: sat=%d len=%d\n",sat,raw->len);
         return -1;
     }
     for (i=0;i<10;i++,p+=4) words[i]=U4(p)&0x3FFFFFFF; /* 30 bits */
-    
+
     satsys(sat,&prn);
     id=(words[0]>>12)&0x07; /* subframe id (3bit) */
     if (id<1||5<id) {
@@ -956,18 +956,18 @@ static int decode_cnav(raw_t *raw, int sat, int off)
         return -1;
     }
     if (prn>5&&prn!=17) { /* IGSO/MEO */
-        
+
         for (i=0;i<10;i++) {
             setbitu(raw->subfrm[sat-1]+(id-1)*38,i*30,30,words[i]);
         }
         if (id!=3) return 0;
-        
+
         /* decode beidou D1 ephemeris */
         if (!decode_bds_d1(raw->subfrm[sat-1],&eph)) return 0;
     }
     else { /* GEO (C01-05,C17) */
         if (id!=1) return 0;
-        
+
         /* subframe 1 */
         pgn=(words[1]>>14)&0x0F; /* page number (4bit) */
         if (pgn<1||10<pgn) {
@@ -978,7 +978,7 @@ static int decode_cnav(raw_t *raw, int sat, int off)
             setbitu(raw->subfrm[sat-1]+(pgn-1)*38,i*30,30,words[i]);
         }
         if (pgn!=10) return 0;
-        
+
         /* decode beidou D2 ephemeris */
         if (!decode_bds_d2(raw->subfrm[sat-1],&eph)) return 0;
     }
@@ -998,9 +998,9 @@ static int decode_gnav(raw_t *raw, int sat, int off, int frq)
     geph_t geph={0};
     int i,j,k,m,prn;
     unsigned char *p=raw->buff+6+off,buff[64],*fid;
-    
+
     satsys(sat,&prn);
-    
+
     if (raw->len<24+off) {
         trace(2,"ubx rawsfrbx gnav length error: len=%d\n",raw->len);
         return -1;
@@ -1025,14 +1025,14 @@ static int decode_gnav(raw_t *raw, int sat, int off, int frq)
         memcpy(fid,buff+12,2); /* save frame-id */
     }
     memcpy(raw->subfrm[sat-1]+(m-1)*10,buff,10);
-    
+
     if (m!=4) return 0;
-    
+
     /* decode glonass ephemeris strings */
     geph.tof=raw->time;
     if (!decode_glostr(raw->subfrm[sat-1],&geph)||geph.sat!=sat) return 0;
     geph.frq=frq-7;
-    
+
     if (!strstr(raw->opt,"-EPHALL")) {
         if (geph.iode==raw->nav.geph[prn-1].iode) return 0; /* unchanged */
     }
@@ -1045,7 +1045,7 @@ static int decode_snav(raw_t *raw, int sat, int off)
 {
     int i,j,k,prn,tow,week;
     unsigned char *p=raw->buff+6+off,buff[64];
-    
+
     if (raw->len<40+off) {
         trace(2,"ubx rawsfrbx snav length error: len=%d\n",raw->len);
         return -1;
@@ -1067,9 +1067,9 @@ static int decode_rxmsfrbx(raw_t *raw)
 {
     int prn,sat,sys;
     unsigned char *p=raw->buff+6;
-    
+
     trace(4,"decode_rxmsfrbx: len=%d\n",raw->len);
-    
+
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX RXM-SFRBX (%4d): sys=%d prn=%3d",raw->len,
                 U1(p),U1(p+1));
@@ -1101,9 +1101,9 @@ static int decode_trksfrbx(raw_t *raw)
 {
     int prn,sat,sys;
     unsigned char *p=raw->buff+6;
-    
+
     trace(4,"decode_trksfrbx: len=%d\n",raw->len);
-    
+
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX TRK-SFRBX (%4d): sys=%d prn=%3d",raw->len,
                 U1(p+1),U1(p+2));
@@ -1131,9 +1131,9 @@ static int decode_trksfrbx(raw_t *raw)
 static int decode_ubx(raw_t *raw)
 {
     int type=(U1(raw->buff+2)<<8)+U1(raw->buff+3);
-    
+
     trace(3,"decode_ubx: type=%04x len=%d\n",type,raw->len);
-    
+
     /* checksum */
     if (!checksum(raw->buff,raw->len)) {
         trace(2,"ubx checksum error: type=%04x len=%d\n",type,raw->len);
@@ -1194,7 +1194,7 @@ static int sync_ubx(unsigned char *buff, unsigned char data)
 extern int input_ubx(raw_t *raw, unsigned char data)
 {
     trace(5,"input_ubx: data=%02x\n",data);
-    
+
     /* synchronize frame */
     if (raw->nbyte==0) {
         if (!sync_ubx(raw->buff,data)) return 0;
@@ -1202,7 +1202,7 @@ extern int input_ubx(raw_t *raw, unsigned char data)
         return 0;
     }
     raw->buff[raw->nbyte++]=data;
-    
+
     if (raw->nbyte==6) {
         if ((raw->len=U2(raw->buff+4)+8)>MAXRAWLEN) {
             trace(2,"ubx length error: len=%d\n",raw->len);
@@ -1212,7 +1212,7 @@ extern int input_ubx(raw_t *raw, unsigned char data)
     }
     if (raw->nbyte<6||raw->nbyte<raw->len) return 0;
     raw->nbyte=0;
-    
+
     /* decode ublox raw message */
     return decode_ubx(raw);
 }
@@ -1225,9 +1225,9 @@ extern int input_ubx(raw_t *raw, unsigned char data)
 extern int input_ubxf(raw_t *raw, FILE *fp)
 {
     int i,data;
-    
+
     trace(4,"input_ubxf:\n");
-    
+
     /* synchronize frame */
     if (raw->nbyte==0) {
         for (i=0;;i++) {
@@ -1238,7 +1238,7 @@ extern int input_ubxf(raw_t *raw, FILE *fp)
     }
     if (fread(raw->buff+2,1,4,fp)<4) return -2;
     raw->nbyte=6;
-    
+
     if ((raw->len=U2(raw->buff+4)+8)>MAXRAWLEN) {
         trace(2,"ubx length error: len=%d\n",raw->len);
         raw->nbyte=0;
@@ -1246,13 +1246,13 @@ extern int input_ubxf(raw_t *raw, FILE *fp)
     }
     if (fread(raw->buff+6,1,raw->len-6,fp)<(size_t)(raw->len-6)) return -2;
     raw->nbyte=0;
-    
+
     /* decode ubx raw message */
     return decode_ubx(raw);
 }
 /* generate ublox binary message -----------------------------------------------
 * generate ublox binary message from message string
-* args   : char  *msg   IO     message string 
+* args   : char  *msg   IO     message string
 *            "CFG-PRT   portid res0 res1 mode baudrate inmask outmask flags"
 *            "CFG-USB   vendid prodid res1 res2 power flags vstr pstr serino"
 *            "CFG-MSG   msgid rate0 rate1 rate2 rate3 rate4 rate5 rate6"
@@ -1349,20 +1349,20 @@ extern int gen_ubx(const char *msg, unsigned char *buff)
     unsigned char *q=buff;
     char mbuff[1024],*args[32],*p;
     int i,j,n,narg=0;
-    
+
     trace(4,"gen_ubxf: msg=%s\n",msg);
-    
+
     strcpy(mbuff,msg);
     for (p=strtok(mbuff," ");p&&narg<32;p=strtok(NULL," ")) {
         args[narg++]=p;
     }
     if (narg<1||strncmp(args[0],"CFG-",4)) return 0;
-    
+
     for (i=0;*cmd[i];i++) {
         if (!strcmp(args[0]+4,cmd[i])) break;
     }
     if (!*cmd[i]) return 0;
-    
+
     *q++=UBXSYNC1;
     *q++=UBXSYNC2;
     *q++=UBXCFG;
@@ -1385,7 +1385,7 @@ extern int gen_ubx(const char *msg, unsigned char *buff)
     n=(int)(q-buff)+2;
     setU2(buff+4,(unsigned short)(n-8));
     setcs(buff,n);
-    
+
     trace(5,"gen_ubx: buff=\n"); traceb(5,buff,n);
     return n;
 }
