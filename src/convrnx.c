@@ -79,6 +79,26 @@ typedef struct {                /* stream file type */
 static const int navsys[]={     /* system codes */
     SYS_GPS,SYS_GLO,SYS_GAL,SYS_QZS,SYS_SBS,SYS_CMP,SYS_IRN,0
 };
+/* compute PVT position -------------------------------------------------------*/
+static int compute_pvt(strfile_t *str, sol_t *sol_o)
+{
+    prcopt_t prcopt=prcopt_default;
+    char msg[128];
+
+    if (NULL == str) return 0;
+    if (NULL == sol_o) return 0;
+
+    memset(sol_o, 0, sizeof(sol_t));
+    /* point positioning with last obs data */
+    return pntpos(
+        str->obs->data,
+        str->obs->n,
+        str->nav,
+        &prcopt,
+        sol_o,
+        NULL, NULL,
+        msg);
+}
 /* convert rinex obs type ver.3 -> ver.2 -------------------------------------*/
 static void convcode(double ver, int sys, char *type)
 {
@@ -971,8 +991,14 @@ static void convobs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *staid,
             resolve_halfc(halfc,str->obs->data+i);
         }
     }
+    /* compute_pvt if possible */
+    sol_t sol;
+    double clock_bias = 0.0;
+    if (compute_pvt(str, &sol) ) {
+      clock_bias = sol.dtr[0];
+    }
     /* output rinex obs */
-    outrnxobsb(ofp[0],opt,str->obs->data,str->obs->n,0,0.0);
+    outrnxobsb(ofp[0],opt,str->obs->data,str->obs->n,0,clock_bias);
 
     if (opt->tstart.time==0) opt->tstart=time;
     opt->tend=time;
@@ -1166,19 +1192,10 @@ static void convlex(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n)
 /* set approx position -------------------------------------------------------*/
 static void setapppos(strfile_t *str, rnxopt_t *opt)
 {
-    prcopt_t prcopt=prcopt_default;
-    sol_t sol={{0}};
-    char msg[128];
-
-    prcopt.navsys=opt->navsys;
-
-    /* point positioning with last obs data */
-    if (!pntpos(str->obs->data,str->obs->n,str->nav,&prcopt,&sol,NULL,NULL,
-                msg)) {
-        trace(2,"point position error (%s)\n",msg);
-        return;
-    }
-    matcpy(opt->apppos,sol.rr,3,1);
+  sol_t sol;
+  if (compute_pvt(str, &sol)) {
+    matcpy(opt->apppos, sol.rr, 3, 1);
+  }
 }
 /* show status message -------------------------------------------------------*/
 static int showstat(int sess, gtime_t ts, gtime_t te, int *n)
