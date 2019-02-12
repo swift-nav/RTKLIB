@@ -240,14 +240,18 @@ static void readcmd(const char *file, char *cmd, int type) {
 
 /* str2str -------------------------------------------------------------------*/
 int main(int argc, char **argv) {
+
   static char paths_strs[MAX_STREAMS][MAXSTRPATH] = {[0 ... (MAX_STREAMS-1)] = ""};
   char *paths[MAX_STREAMS] = {NULL};
+
   static char cmd_strs[MAX_STREAMS][MAXRCVCMD] = {[0 ... (MAX_STREAMS-1)] = ""};
   char *cmds[MAX_STREAMS] ={NULL};
+
   static char cmd_periodic_strs[MAX_STREAMS][MAXRCVCMD] = {[0 ... (MAX_STREAMS-1)] = ""};
   char *cmds_periodic[MAX_STREAMS] = {NULL};
+
   const char ss[] = {'E', '-', 'W', 'C', 'C'};
-  char *cmdfile[MAX_STREAMS] = {[0 ... (MAX_STREAMS-1)] = ""};
+  char *cmdfile[MAX_STREAMS] = {NULL};
   strconv_t *conv[MAX_STREAMS] = {NULL};
   double pos[3] = {0}, stapos[3] = {0}, stadel[3] = {0};
   char *local = "", *proxy = "", *msg = "1004,1019", *opt = "", buff[256], *p;
@@ -338,7 +342,10 @@ int main(int argc, char **argv) {
       printhelp();
   }
   if (nout == 0) {
-    nout = 1; /* stdout */
+    /* use stdout as only output */
+    fprintf(stderr, "using stdout as output\n");
+    nout = 1;
+    decodepath("/dev/stdout", types + nout, paths[nout], fmts + nout);
   }
 
   for (i = 0; i < nout; i++) {
@@ -390,10 +397,10 @@ int main(int argc, char **argv) {
   strsetproxy(proxy);
 
   for (i = 0; i < MAX_STREAMS; i++) {
-    if (*cmdfile[i]) {
+    if (cmdfile[i]) {
       readcmd(cmdfile[i], cmds[i], 0);
     }
-    if (*cmdfile[i]) {
+    if (cmdfile[i]) {
       readcmd(cmdfile[i], cmds_periodic[i], 2);
     }
   }
@@ -423,7 +430,7 @@ int main(int argc, char **argv) {
     sleepms(dispint);
   }
   for (i = 0; i < MAX_STREAMS; i++) {
-    if (*cmdfile[i])
+    if (cmdfile[i])
       readcmd(cmdfile[i], cmds[i], 1);
   }
   /* stop stream server */
