@@ -8,7 +8,8 @@ OPTS    = -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=3 -DIERS_
 #OPTS    = -DENAGLO -DENAQZS -DENAGAL -DENACMP -DNFREQ=2
 
 # for no lapack
-CFLAGS  = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) $(OPTS) -g
+CC=gcc
+CFLAGS=-Wall -O2 -g -Wno-unused-but-set-variable -I$(SRC) $(OPTS) 
 #LDLIBS  = -lm -lrt
 LDLIBS  = ../../../lib/iers/gcc/iers.a -lgfortran -lm -lrt
 
@@ -77,28 +78,28 @@ tides.o    : $(SRC)/tides.c
 qzslex.o   : $(SRC)/qzslex.c
 	$(CC) -c $(CFLAGS) $(SRC)/qzslex.c
 
-rnx2rtkp.o : $(SRC)/rtklib.h
-rtkcmn.o   : $(SRC)/rtklib.h
-rinex.o    : $(SRC)/rtklib.h
-rtkpos.o   : $(SRC)/rtklib.h
-postpos.o  : $(SRC)/rtklib.h
-solution.o : $(SRC)/rtklib.h
-lambda.o   : $(SRC)/rtklib.h
-geoid.o    : $(SRC)/rtklib.h
-sbas.o     : $(SRC)/rtklib.h
-preceph.o  : $(SRC)/rtklib.h
-pntpos.o   : $(SRC)/rtklib.h
-ephemeris.o: $(SRC)/rtklib.h
-options.o  : $(SRC)/rtklib.h
-ppp.o      : $(SRC)/rtklib.h
-ppp_ar.o   : $(SRC)/rtklib.h
-rtcm.o     : $(SRC)/rtklib.h
-rtcm2.o    : $(SRC)/rtklib.h
-rtcm3.o    : $(SRC)/rtklib.h
-rtcm3e.o   : $(SRC)/rtklib.h
-ionex.o    : $(SRC)/rtklib.h
-tides.o    : $(SRC)/rtklib.h
-qzslex.o   : $(SRC)/rtklib.h
+rnx2rtkp.o : $(SRC)/rtklib.h makefile
+rtkcmn.o   : $(SRC)/rtklib.h makefile
+rinex.o    : $(SRC)/rtklib.h makefile
+rtkpos.o   : $(SRC)/rtklib.h makefile
+postpos.o  : $(SRC)/rtklib.h makefile
+solution.o : $(SRC)/rtklib.h makefile
+lambda.o   : $(SRC)/rtklib.h makefile
+geoid.o    : $(SRC)/rtklib.h makefile
+sbas.o     : $(SRC)/rtklib.h makefile
+preceph.o  : $(SRC)/rtklib.h makefile
+pntpos.o   : $(SRC)/rtklib.h makefile
+ephemeris.o: $(SRC)/rtklib.h makefile
+options.o  : $(SRC)/rtklib.h makefile
+ppp.o      : $(SRC)/rtklib.h makefile
+ppp_ar.o   : $(SRC)/rtklib.h makefile
+rtcm.o     : $(SRC)/rtklib.h makefile
+rtcm2.o    : $(SRC)/rtklib.h makefile
+rtcm3.o    : $(SRC)/rtklib.h makefile
+rtcm3e.o   : $(SRC)/rtklib.h makefile
+ionex.o    : $(SRC)/rtklib.h makefile
+tides.o    : $(SRC)/rtklib.h makefile
+qzslex.o   : $(SRC)/rtklib.h makefile
 
 CMD1    = ./rnx2rtkp
 INPUT11 = ../../../test/data/rinex/07590920.05o ../../../test/data/rinex/30400920.05n
