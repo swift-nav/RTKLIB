@@ -99,16 +99,18 @@ int main(int argc, char **argv)
     gtime_t ts={0},te={0};
     double tint=0.0,es[]={2000,1,1,0,0,0},ee[]={2000,12,31,23,59,59},pos[3];
     int i,j,n,ret;
-    char *infile[MAXFILE],*outfile="",*p;
-    
-    prcopt.mode  =PMODE_KINEMA;
+    char *infile[MAXFILE] = {[0 ... (MAXFILE-1)] = ""};
+    char *outfile = "";
+    char *p = NULL;
+
+    prcopt.mode = PMODE_KINEMA;
     prcopt.navsys=0;
     prcopt.refpos=1;
     prcopt.glomodear=1;
     solopt.timef=0;
     sprintf(solopt.prog ,"%s ver.%s %s",PROGNAME,VER_RTKLIB,PATCH_LEVEL);
     sprintf(filopt.trace,"%s.trace",PROGNAME);
-    
+
     /* load options from configuration file */
     for (i=1;i<argc;i++) {
         if (!strcmp(argv[i],"-k")&&i+1<argc) {
@@ -136,12 +138,12 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-sys")&&i+1<argc) {
             for (p=argv[++i];*p;p++) {
                 switch (*p) {
-                    case 'G': prcopt.navsys|=SYS_GPS;
-                    case 'R': prcopt.navsys|=SYS_GLO;
-                    case 'E': prcopt.navsys|=SYS_GAL;
-                    case 'J': prcopt.navsys|=SYS_QZS;
-                    case 'C': prcopt.navsys|=SYS_CMP;
-                    case 'I': prcopt.navsys|=SYS_IRN;
+                    case 'G': prcopt.navsys|=SYS_GPS; break;
+                    case 'R': prcopt.navsys|=SYS_GLO; break;
+                    case 'E': prcopt.navsys|=SYS_GAL; break;
+                    case 'J': prcopt.navsys|=SYS_QZS; break;
+                    case 'C': prcopt.navsys|=SYS_CMP; break;
+                    case 'I': prcopt.navsys|=SYS_IRN; break;
                 }
                 if (!(p=strchr(p,','))) break;
             }
@@ -185,7 +187,7 @@ int main(int argc, char **argv)
         return -2;
     }
     ret=postpos(ts,te,tint,0.0,&prcopt,&solopt,&filopt,infile,n,outfile,"","");
-    
+
     if (!ret) fprintf(stderr,"%40s\r","");
     return ret;
 }
