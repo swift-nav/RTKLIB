@@ -458,7 +458,7 @@ static int decode_solllh(char *buff, const solopt_t *opt, sol_t *sol)
     pos2ecef(pos,sol->rr);
     if (i<n) sol->stat=(unsigned char)val[i++];
     if (i<n) sol->ns  =(unsigned char)val[i++];
-    if (i<n) sol->qr[0] = 3.0 * val[i++] / 1000.0;
+    if (i<n) sol->qr[0] = val[i++];
     if (i<n) sol->age  =(float)val[i++];
     if (i<n) sol->ratio=(float)val[i++];
 
