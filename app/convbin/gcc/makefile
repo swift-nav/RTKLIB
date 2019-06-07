@@ -21,7 +21,7 @@ INCLUDE= -I$(SRC)
 OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=7 -DNEXOBS=3
 
 CC=gcc
-CFLAGS=-O2 -ansi -std=c99 -pedantic -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
+CFLAGS=-O2 -ansi -std=c99 -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
 DATDIR=../../../test/data/rcvraw
 SEP="/"
 
@@ -33,7 +33,7 @@ endif
 
 LDLIBS= -lm
 ifeq ($(UNAME),Linux)
-LDLIBS+= -lrt
+LDLIBS+=
 endif
 ifeq ($(UNAME),Windows)
 LDLIBS+= -lwinmm
@@ -130,7 +130,7 @@ rt17.o     : $(SRC)/rtklib.h makefile
 qzslex.o   : $(SRC)/rtklib.h makefile
 septentrio.o: $(SRC)/rtklib.h makefile
 cmr.o      : $(SRC)/rtklib.h makefile
-tersus.o      : $(SRC)/rtklib.h makefile
+tersus.o   : $(SRC)/rtklib.h makefile
 
 
 install:
