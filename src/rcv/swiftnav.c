@@ -17,14 +17,25 @@
 
 #define SBP_SYNC1 0x55 /* SBP message header sync */
 
-#define ID_MSGOBS 0x004A      /* observation */
-#define ID_MSGEPHGPS_DEP1 0x0081 /* GPS L1 C/A nav message (deprecated) */
-#define ID_MSGEPHGPS_DEP2 0x0086 /* GPS L1 C/A nav message (deprecated) */
-#define ID_MSGEPHGPS 0x008A      /* GPS L1 C/A nav message */
-#define ID_MSGEPHBDS 0x0089      /* BDS B1/B2 D1 nav message */
-#define ID_MSGEPHGAL 0x0095      /* GAL E1 I/NAV message */
-#define ID_MSGEPHGLO_DEP1 0x0088 /* Glonass L1/L2 ephemeris (deprecated) */
-#define ID_MSGEPHGLO 0x008B    /* Glonass L1/L2 ephemeris */
+#define ID_MSGOBS 0x004A /* observation */
+
+#define ID_MSGEPHGPS_DEP_E 0x0081 /* GPS L1 C/A nav message (deprecated) */
+#define ID_MSGEPHGPS_DEP_F 0x0086 /* GPS L1 C/A nav message (deprecated) */
+#define ID_MSGEPHGPS 0x008A       /* GPS L1 C/A nav message */
+
+#define ID_MSGEPHBDS 0x0089 /* BDS B1/B2 D1 nav message */
+
+#define ID_MSGEPHQZSS 0x008E /* QZSS nav message */
+
+#define ID_MSGEPHGAL_DEP_A 0x0095 /* GAL E1 I/NAV message */
+#define ID_MSGEPHGAL 0x008D       /* GAL E1 message */
+
+#define ID_MSGEPHGLO_DEP_A 0x0083 /* Glonass ephemeris (deprecated) */
+#define ID_MSGEPHGLO_DEP_B 0x0085 /* Glonass ephemeris (deprecated) */
+#define ID_MSGEPHGLO_DEP_C 0x0087 /* Glonass ephemeris (deprecated) */
+#define ID_MSGEPHGLO_DEP_D 0x0088 /* Glonass ephemeris (deprecated) */
+#define ID_MSGEPHGLO 0x008B       /* Glonass L1/L2 ephemeris */
+
 #define ID_MSGIONGPS 0x0090    /* GPS ionospheric parameters */
 #define ID_MSG_SBAS_RAW 0x7777 /* SBAS data */
 
@@ -144,10 +155,13 @@ typedef struct {
   uint32_t freq;
 } bandcode_t;
 
-static bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
+static const bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
     [CODE_GPS_L1CA] = {CODE_L1C, SYS_GPS, 0},
     [CODE_AUX_GPS] = {CODE_L1C, SYS_GPS, 0},
     [CODE_GPS_L1P] = {CODE_L1P, SYS_GPS, 0},
+    [CODE_GPS_L1CI] = {CODE_L1C, SYS_GPS, 0},
+    [CODE_GPS_L1CQ] = {CODE_L1C, SYS_GPS, 0},
+    [CODE_GPS_L1CX] = {CODE_L1C, SYS_GPS, 0},
     [CODE_GPS_L2CM] = {CODE_L2S, SYS_GPS, 1},
     [CODE_GPS_L2CL] = {CODE_L2L, SYS_GPS, 1},
     [CODE_GPS_L2CX] = {CODE_L2X, SYS_GPS, 1},
@@ -169,10 +183,16 @@ static bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
     [CODE_BDS2_B2] = {CODE_L7I, SYS_CMP, 1},
     [CODE_BDS3_B1CI] = {CODE_L1I, SYS_CMP, 0},
     [CODE_BDS3_B1CQ] = {CODE_L1Q, SYS_CMP, 0},
-    [CODE_BDS3_B1CX] = {CODE_L7X, SYS_CMP, 0},
+    [CODE_BDS3_B1CX] = {CODE_L1X, SYS_CMP, 0},
+    [CODE_BDS3_B3I] = {CODE_L6I, SYS_CMP, 2},
+    [CODE_BDS3_B3Q] = {CODE_L6Q, SYS_CMP, 2},
+    [CODE_BDS3_B3X] = {CODE_L6X, SYS_CMP, 2},
     [CODE_BDS3_B5I] = {CODE_L5I, SYS_CMP, 2},
     [CODE_BDS3_B5Q] = {CODE_L5Q, SYS_CMP, 2},
     [CODE_BDS3_B5X] = {CODE_L5X, SYS_CMP, 2},
+    [CODE_BDS3_B7I] = {CODE_L7I, SYS_CMP, 1},
+    [CODE_BDS3_B7Q] = {CODE_L7Q, SYS_CMP, 1},
+    [CODE_BDS3_B7X] = {CODE_L7X, SYS_CMP, 1},
     [CODE_GAL_E1B] = {CODE_L1B, SYS_GAL, 0},
     [CODE_GAL_E1C] = {CODE_L1C, SYS_GAL, 0},
     [CODE_GAL_E1X] = {CODE_L1X, SYS_GAL, 0},
@@ -191,12 +211,22 @@ static bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
     [CODE_GAL_E5X] = {CODE_L5X, SYS_GAL, 2},
     [CODE_QZS_L1CA] = {CODE_L1C, SYS_QZS, 0},
     [CODE_AUX_QZS] = {CODE_L1C, SYS_QZS, 0},
+    [CODE_QZS_L1CI] = {CODE_L1I, SYS_QZS, 0},
+    [CODE_QZS_L1CQ] = {CODE_L1Q, SYS_QZS, 0},
+    [CODE_QZS_L1CX] = {CODE_L1X, SYS_QZS, 0},
     [CODE_QZS_L2CM] = {CODE_L2S, SYS_QZS, 1},
     [CODE_QZS_L2CL] = {CODE_L2L, SYS_QZS, 1},
     [CODE_QZS_L2CX] = {CODE_L2X, SYS_QZS, 1},
     [CODE_QZS_L5I] = {CODE_L5I, SYS_QZS, 2},
     [CODE_QZS_L5Q] = {CODE_L5Q, SYS_QZS, 2},
     [CODE_QZS_L5X] = {CODE_L5X, SYS_QZS, 2}};
+
+#define IS_GPS(c) (SYS_GPS == rtklib_bandcode_map[(c)].sys)
+#define IS_QZSS(c) (SYS_QZS == rtklib_bandcode_map[(c)].sys)
+#define IS_BDS(c) (SYS_CMP == rtklib_bandcode_map[(c)].sys)
+#define IS_GLO(c) (SYS_GLO == rtklib_bandcode_map[(c)].sys)
+#define IS_GAL(c) (SYS_GAL == rtklib_bandcode_map[(c)].sys)
+#define IS_SBAS(c) (SYS_SBS == rtklib_bandcode_map[(c)].sys)
 
 /* checksum lookup table -----------------------------------------------------*/
 static const uint32_t CRC_16CCIT_LookUp[256] = {
@@ -249,8 +279,8 @@ static const uint32_t rtcm_phase_lock_table[16] = {0,
                                                    262144,
                                                    524288};
 
-static const double ura_eph[] = {/* ura values */
-                                 2.4,
+/* ura values */
+static const double ura_eph[] = {2.4,
                                  3.4,
                                  4.85,
                                  6.85,
@@ -476,7 +506,7 @@ static int decode_msgobs(raw_t *raw) {
   uint32_t code = 0, sys = 0, freq = 0;
   int iDidFlush = 0, iSatFound = 0;
 
-  trace(4, "SBF decode_msgobs: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   /* Get time information */
   tow = U4(p);         /* TOW in ms */
@@ -503,7 +533,6 @@ static int decode_msgobs(raw_t *raw) {
 
   /* add observations */
   for (i = 0; i < num_obs && i < MAXOBS; i++, p += 17) {
-
     pseudorange = U4(p) * 0.02;    /* pseudorange observation in 2cm units */
     carr_phase = I4(p + 4);        /* carrier phase integer cycles */
     carr_phase += p[8] / 256.0;    /* carrier phase fractional cycles */
@@ -524,11 +553,6 @@ static int decode_msgobs(raw_t *raw) {
       if (!aux_antenna(band_code)) continue;
     } else {
       if (aux_antenna(band_code)) continue;
-    }
-
-    /* phase polarity flip option (INVCP) */
-    if (strstr(raw->opt, "INVCP")) {
-      carr_phase = -carr_phase;
     }
 
     if ((CODE_INVALID != band_code) && (band_code < CODE_COUNT)) {
@@ -641,7 +665,7 @@ static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   uWeekE = U2(_pBuff + 8);
   _pEph->sva = uraindex(R4(_pBuff + 10)); /* URA index */
   _pEph->fit = U4(_pBuff + 14) / 3600;
-  /* _pEph->flag = U1(_pBuff + 18); SBP payload does not have L2 flag */
+  _pEph->flag = 1; /* U1(_pBuff + 18); SBP payload does not have L2 flag */
   _pEph->svh = U1(_pBuff + 19);
 
   _pEph->tgd[0] = R4(_pBuff + 20);
@@ -672,6 +696,7 @@ static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iodc = U2(_pBuff + 139);
 
   _pEph->week = adjgpsweek(uWeekE);
+  _pEph->code = 2; /* SBP payload does not have the "code on L2" flag */
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
 }
@@ -768,25 +793,24 @@ static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
 
 /* decode deprecated SBP nav message for GPS (navigation data)
  * ----------------*/
-static int decode_gpsnav_dep1(raw_t *raw) {
+static int decode_gpsnav_dep_e(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
-  uint8_t prn, sat;
 
-  trace(4, "SBP decode_gpsnav_dep1: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 193) {
-    trace(2, "SBP decode_gpsnav_dep1 frame length error: len=%d\n", raw->len);
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
     return -1;
   }
 
-  prn = U2(puiTmp) + 1; /* GPS coded as PRN-1 */
-  if (!((prn >= 1) && (prn <= 37))) {
-    trace(2, "SBP decode_gpsnav_dep1 prn error: sat=%d\n", prn);
+  const uint8_t prn = U2(puiTmp) + 1; /* GPS coded as PRN-1 */
+  if ((prn < MINPRNGPS) || (prn > MAXPRNGPS)) {
+    trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  sat = satno(SYS_GPS, prn);
+  const uint8_t sat = satno(SYS_GPS, prn);
   if (sat == 0) return -1;
 
   eph.code = U1(puiTmp + 2);
@@ -802,9 +826,15 @@ static int decode_gpsnav_dep1(raw_t *raw) {
   if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
         (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
-      trace(3, "eph.iode %d raw->nav.eph[sat - 1].iode %d\n", eph.iode,
+      trace(3,
+            "%s: eph.iode %d raw->nav.eph[sat - 1].iode %d\n",
+            __FUNCTION__,
+            eph.iode,
             raw->nav.eph[sat - 1].iode);
-      trace(3, "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n", eph.iode,
+      trace(3,
+            "%s: eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n",
+            __FUNCTION__,
+            eph.iode,
             raw->nav.eph[sat - 1].iode);
       return 0;
     }
@@ -817,30 +847,32 @@ static int decode_gpsnav_dep1(raw_t *raw) {
 }
 
 /* decode SBP nav message for GPS (navigation data) --------------------------*/
-static int decode_gpsnav_dep2(raw_t *raw) {
+static int decode_gpsnav_dep_f(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
-  uint8_t prn, sat;
 
-  trace(4, "SBP decode_gpsnav: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 191) {
-    trace(2, "SBP decode_gpsnav frame length error: len=%d\n", raw->len);
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
     return -1;
   }
 
-  prn = puiTmp[0];
-  if (!((prn >= 1) && (prn <= 37))) {
-    trace(2, "SBP decode_gpsnav prn error: sat=%d\n", prn);
+  const uint8_t prn = puiTmp[0];
+  if ((prn < MINPRNGPS) || (prn > MAXPRNGPS)) {
+    trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  sat = satno(SYS_GPS, prn);
-  if (sat == 0) return -1;
+  const uint8_t sat = satno(SYS_GPS, prn);
+  if (sat == 0) {
+    return -1;
+  }
 
   eph.code = puiTmp[1];
-  if ((CODE_GPS_L1CA != eph.code)) {
-    trace(2, "Unrecognised code %d for G%02d\n", eph.code, prn);
+  if (!IS_GPS(eph.code)) {
+    trace(
+        2, "%s: unrecognised code %d for G%02d\n", __FUNCTION__, eph.code, prn);
     return -1;
   }
 
@@ -859,7 +891,7 @@ static int decode_gpsnav_dep2(raw_t *raw) {
     }
   }
 
-  trace(2, "decoded eph for G%02d\n", prn);
+  trace(3, "%s: decoded eph for G%02d\n", __FUNCTION__, prn);
 
   eph.sat = sat;
   raw->nav.eph[sat - 1] = eph;
@@ -871,30 +903,30 @@ static int decode_gpsnav_dep2(raw_t *raw) {
 static int decode_gpsnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
-  uint8_t prn, sat;
 
-  trace(4, "SBP decode_gpsnav: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 147) {
-    trace(2, "SBP decode_gpsnav frame length error: len=%d\n", raw->len);
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
     return -1;
   }
 
-  prn = puiTmp[0];
-  if (!((prn >= 1) && (prn <= 37))) {
-    trace(2, "SBP decode_gpsnav prn error: sat=%d\n", prn);
+  const uint8_t prn = puiTmp[0];
+  if ((prn < MINPRNGPS) || (prn > MAXPRNGPS)) {
+    trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  sat = satno(SYS_GPS, prn);
+  const uint8_t sat = satno(SYS_GPS, prn);
   if (sat == 0) {
-    trace(2, "Can't work out GPS sat for PRN %02d\n", prn);
+    trace(2, "%s: can't work out GPS sat for PRN %02d\n", __FUNCTION__, prn);
     return -1;
   }
 
   eph.code = puiTmp[1];
-  if ((CODE_GPS_L1CA != eph.code)) {
-    trace(2, "Unrecognised code %d for G%02d\n", eph.code, prn);
+  if (!IS_GPS(eph.code)) {
+    trace(
+        2, "%s: unrecognised code %d for G%02d\n", __FUNCTION__, eph.code, prn);
     return -1;
   }
 
@@ -909,15 +941,81 @@ static int decode_gpsnav(raw_t *raw) {
   if (!strstr(raw->opt, "EPHALL")) {
     if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
         (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
-      trace(3, "eph.iode %d raw->nav.eph[sat - 1].iode %d\n", eph.iode,
+      trace(3,
+            "eph.iode %d raw->nav.eph[sat - 1].iode %d\n",
+            eph.iode,
             raw->nav.eph[sat - 1].iode);
-      trace(3, "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n", eph.iode,
+      trace(3,
+            "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n",
+            eph.iode,
             raw->nav.eph[sat - 1].iode);
       return 0;
     }
   }
 
-  trace(2, "decoded eph for G%02d\n", prn);
+  trace(3, "%s: decoded eph for G%02d\n", __FUNCTION__, prn);
+
+  eph.sat = sat;
+  raw->nav.eph[sat - 1] = eph;
+  raw->ephsat = sat;
+  return 2;
+}
+
+/* decode SBP nav message for QZSS (navigation data) -------------------------*/
+static int decode_qzssnav(raw_t *raw) {
+  uint8_t *puiTmp = (raw->buff) + 6;
+  eph_t eph = {0};
+
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
+
+  if ((raw->len) < 147) {
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
+    return -1;
+  }
+
+  const uint8_t prn = puiTmp[0];
+  if ((prn < MINPRNQZS) || (prn > MAXPRNQZS)) {
+    trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
+    return -1;
+  }
+
+  const uint8_t sat = satno(SYS_QZS, prn);
+  if (sat == 0) {
+    trace(2, "%s: can't work out QZSS sat for PRN %02d\n", __FUNCTION__, prn);
+    return -1;
+  }
+
+  eph.code = puiTmp[1];
+  if (!IS_QZSS(eph.code)) {
+    trace(
+        2, "%s: unrecognised code %d for G%02d\n", __FUNCTION__, eph.code, prn);
+    return -1;
+  }
+
+  decode_gpsnav_common(puiTmp - 2, &eph);
+
+  if (0 == timediff(raw->time, time0)) {
+    eph.ttr = timeget();
+  } else {
+    eph.ttr = raw->time;
+  }
+
+  if (!strstr(raw->opt, "EPHALL")) {
+    if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
+      trace(3,
+            "eph.iode %d raw->nav.eph[sat - 1].iode %d\n",
+            eph.iode,
+            raw->nav.eph[sat - 1].iode);
+      trace(3,
+            "eph.iodc %d raw->nav.eph[sat - 1].iodc %d\n",
+            eph.iode,
+            raw->nav.eph[sat - 1].iode);
+      return 0;
+    }
+  }
+
+  trace(3, "%s: decoded eph for J%02d\n", __FUNCTION__, prn);
 
   eph.sat = sat;
   raw->nav.eph[sat - 1] = eph;
@@ -929,30 +1027,30 @@ static int decode_gpsnav(raw_t *raw) {
 static int decode_bdsnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
-  uint8_t prn, sat;
 
-  trace(4, "SBP decode_bdsnav: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 155) {
-    trace(2, "SBP decode_bdsnav frame length error: len=%d\n", raw->len);
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
     return -1;
   }
 
-  prn = puiTmp[0];
-  if (!((prn >= 1) && (prn <= 37))) {
-    trace(2, "SBP decode_bdsnav prn error: sat=%d\n", prn);
+  const uint8_t prn = puiTmp[0];
+  if ((prn < MINPRNCMP) || (prn > MAXPRNCMP)) {
+    trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  sat = satno(SYS_CMP, prn);
+  const uint8_t sat = satno(SYS_CMP, prn);
   if (sat == 0) {
-    trace(2, "Can't work out Beidou sat for PRN %02d\n", prn);
+    trace(2, "%s: can't work out Beidou sat for PRN %02d\n", __FUNCTION__, prn);
     return -1;
   }
 
   eph.code = puiTmp[1];
-  if ((CODE_BDS2_B1 != eph.code) && (CODE_BDS2_B2 != eph.code)) {
-    trace(2, "Unrecognised code %d for C%02d\n", eph.code, prn);
+  if (!IS_BDS(eph.code)) {
+    trace(
+        2, "%s: unrecognised code %d for C%02d\n", eph.code, __FUNCTION__, prn);
     return -1;
   }
 
@@ -967,7 +1065,7 @@ static int decode_bdsnav(raw_t *raw) {
     }
   }
 
-  trace(2, "decoded eph for C%02d\n", prn);
+  trace(3, "%s: decoded eph for C%02d\n", __FUNCTION__, prn);
 
   eph.sat = sat;
   raw->nav.eph[sat - 1] = eph;
@@ -976,33 +1074,34 @@ static int decode_bdsnav(raw_t *raw) {
 }
 
 /* decode SBP nav message for GAL (navigation data) --------------------------*/
-static int decode_galnav(raw_t *raw) {
+static int decode_galnav_dep_a(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
-  uint8_t prn, sat;
 
-  trace(4, "SBP decode_galnav: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
-  if ((raw->len) < 160) {
-    trace(2, "SBP decode_galnav frame length error: len=%d\n", raw->len);
+  if ((raw->len) != 160) {
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
     return -1;
   }
 
-  prn = puiTmp[0];
-  if (!((prn >= 1) && (prn <= 50))) {
-    trace(2, "SBP decode_galnav prn error: sat=%d\n", prn);
+  const uint8_t prn = puiTmp[0];
+  if ((prn < MINPRNGAL) || (prn > MAXPRNGAL)) {
+    trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  sat = satno(SYS_GAL, prn);
+  const uint8_t sat = satno(SYS_GAL, prn);
   if (sat == 0) {
-    trace(2, "Can't work out Galileo sat for PRN %02d\n", prn);
+    trace(
+        2, "%s: can't work out Galileo sat for PRN %02d\n", __FUNCTION__, prn);
     return -1;
   }
 
   eph.code = puiTmp[1];
-  if ((CODE_GAL_E1B != eph.code) && (CODE_GAL_E7I != eph.code)) {
-    trace(2, "Unrecognised code %d for E%02d\n", eph.code, prn);
+  if (!IS_GAL(eph.code)) {
+    trace(
+        2, "%s: unrecognised code %d for E%02d\n", __FUNCTION__, eph.code, prn);
     return -1;
   }
 
@@ -1017,7 +1116,61 @@ static int decode_galnav(raw_t *raw) {
     }
   }
 
-  trace(2, "decoded eph for E%02d\n", prn);
+  trace(3, "%s: decoded eph for E%02d\n", __FUNCTION__, prn);
+
+  eph.sat = sat;
+  raw->nav.eph[sat - 1] = eph;
+  raw->ephsat = sat;
+  return 2;
+}
+
+/* decode SBP nav message for GAL (navigation data) --------------------------*/
+static int decode_galnav(raw_t *raw) {
+  uint8_t *puiTmp = (raw->buff) + 6;
+  eph_t eph = {0};
+
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
+
+  if ((raw->len) != 161) {
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
+    return -1;
+  }
+
+  const uint8_t prn = puiTmp[0];
+  if ((prn < MINPRNGAL) || (prn > MAXPRNGAL)) {
+    trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
+    return -1;
+  }
+
+  const uint8_t sat = satno(SYS_GAL, prn);
+  if (sat == 0) {
+    trace(
+        2, "%s: can't work out Galileo sat for PRN %02d\n", __FUNCTION__, prn);
+    return -1;
+  }
+
+  eph.code = puiTmp[1];
+  if (!IS_GAL(eph.code)) {
+    trace(
+        2, "%s: unrecognised code %d for E%02d\n", __FUNCTION__, eph.code, prn);
+    return -1;
+  }
+
+  decode_galnav_common(puiTmp - 2, &eph);
+
+  eph.ttr = raw->time;
+
+  if (!strstr(raw->opt, "EPHALL")) {
+    if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
+        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
+      return 0;
+    }
+  }
+
+  const uint8_t source = puiTmp[156];
+  eph.code = (1 == source) ? 0x2 : 0x5;
+
+  trace(3, "%s: decoded eph for E%02d\n", __FUNCTION__, prn);
 
   eph.sat = sat;
   raw->nav.eph[sat - 1] = eph;
@@ -1027,35 +1180,32 @@ static int decode_galnav(raw_t *raw) {
 
 /* decode SBP nav message for Glonass (navigation data)
  * --------------------------*/
-static int decode_glonav_dep1(raw_t *raw) {
+static int decode_glonav_dep_d(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   geph_t geph = {0};
-  uint8_t prn, sat, code;
   uint16_t uWeekE;
   double dSeconds;
 
-  trace(4, "SBP decode_glonav: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 128) {
-    trace(2, "SBP decode_glonav frame length error: len=%d\n", raw->len);
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
     return -1;
   }
 
-  prn = puiTmp[0]; /* Glonass sid.sat */
-  sat = satno(SYS_GLO, prn);
+  const uint8_t prn = puiTmp[0]; /* Glonass sid.sat */
+  if ((prn < MINPRNGLO) || (prn > MAXPRNGLO)) {
+    trace(2, "%s: prn error: prn=%d\n", __FUNCTION__, prn);
+    return -1;
+  }
 
+  const uint8_t sat = satno(SYS_GLO, prn);
   if (sat == 0) return -1;
 
-  if (!((prn >= 1) && (prn <= 28))) {
-    trace(2, "SBP decode_glonav prn error: prn=%d\n", prn);
-    return -1;
-  }
-
   geph.sat = sat;
-  code = puiTmp[1];
-
-  if ((code != CODE_GLO_L1OF) && (code != CODE_GLO_L2OF)) {
-    trace(2, "SBP decode_glonav code error: code=%d\n", code);
+  const uint8_t code = puiTmp[1];
+  if (!IS_GLO(code)) {
+    trace(2, "%s: code error: code=%d\n", __FUNCTION__, code);
   }
 
   dSeconds = (double)U4(puiTmp + 2);
@@ -1092,7 +1242,7 @@ static int decode_glonav_dep1(raw_t *raw) {
     if (geph.iode == raw->nav.geph[prn - 1].iode) return 0; /* unchanged */
   }
 
-  trace(2, "decoded eph for R%02d\n", prn);
+  trace(3, "%s: decoded eph for R%02d\n", __FUNCTION__, prn);
 
   raw->nav.geph[prn - 1] = geph;
   raw->ephsat = sat;
@@ -1104,32 +1254,31 @@ static int decode_glonav_dep1(raw_t *raw) {
 static int decode_glonav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   geph_t geph = {0};
-  uint8_t prn, sat, code;
   uint16_t uWeekE;
   double dSeconds;
 
-  trace(4, "SBP decode_glonav: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 100) {
-    trace(2, "SBP decode_glonav frame length error: len=%d\n", raw->len);
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
     return -1;
   }
 
-  prn = puiTmp[0]; /* Glonass sid.sat */
-  sat = satno(SYS_GLO, prn);
+  const uint8_t prn = puiTmp[0]; /* Glonass sid.sat */
+  if ((prn < MINPRNGLO) || (prn > MAXPRNGLO)) {
+    trace(2, "%s: prn error: prn=%d\n", __FUNCTION__, prn);
+    return -1;
+  }
 
-  if (sat == 0) return -1;
-
-  if (!((prn >= 1) && (prn <= 28))) {
-    trace(2, "SBP decode_glonav prn error: prn=%d\n", prn);
+  const uint8_t sat = satno(SYS_GLO, prn);
+  if (sat == 0) {
     return -1;
   }
 
   geph.sat = sat;
-  code = puiTmp[1];
-
-  if ((code != CODE_GLO_L1OF) && (code != CODE_GLO_L2OF)) {
-    trace(2, "SBP decode_glonav code error: code=%d\n", code);
+  const uint8_t code = puiTmp[1];
+  if (!IS_GLO(code)) {
+    trace(2, "%s: code error: code=%d\n", __FUNCTION__, code);
   }
 
   dSeconds = (double)U4(puiTmp + 2);
@@ -1166,7 +1315,7 @@ static int decode_glonav(raw_t *raw) {
     if (geph.iode == raw->nav.geph[prn - 1].iode) return 0; /* unchanged */
   }
 
-  trace(2, "decoded eph for R%02d\n", prn);
+  trace(3, "%s: decoded eph for R%02d\n", __FUNCTION__, prn);
 
   raw->nav.geph[prn - 1] = geph;
   raw->ephsat = sat;
@@ -1177,10 +1326,10 @@ static int decode_glonav(raw_t *raw) {
 static int decode_gpsion(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
 
-  trace(4, "SBP decode_gpsion: len=%d\n", raw->len);
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 72) {
-    trace(2, "SBP decode_gpsion frame length error: len=%d\n", raw->len);
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
     return -1;
   }
 
@@ -1199,7 +1348,7 @@ static int decode_gpsion(raw_t *raw) {
 /* decode sbas navigation data -----------------------------------------------*/
 static int decode_snav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
-  uint8_t sat, code, sbas_msg;
+  uint8_t sbas_msg;
   int32_t week;
   uint32_t tow_ms, k;
   uint8_t uSbasPream[3] = {0x53, 0x9A, 0xC6};
@@ -1212,14 +1361,14 @@ static int decode_snav(raw_t *raw) {
     return -1;
   }
 
-  sat = puiTmp[0];
-  if (!((sat >= 120) && (sat <= 138))) {
+  const uint8_t sat = puiTmp[0];
+  if ((sat < MINPRNSBS) || (sat > MAXPRNSBS)) {
     trace(2, "MSG_SBAS_RAW PRN error: sat=%d\n", sat);
     return -1;
   }
 
-  code = puiTmp[1];
-  if (CODE_SBAS_L1CA != code) {
+  const uint8_t code = puiTmp[1];
+  if (!IS_SBAS(code)) {
     trace(2, "MSG_SBAS_RAW PRN error: code=%d\n", code);
     return -1;
   }
@@ -1271,25 +1420,28 @@ static int decode_sbp(raw_t *raw) {
   switch (type) {
     case ID_MSGOBS:
       return decode_msgobs(raw);
-    case ID_MSGEPHGPS_DEP1:
-      return decode_gpsnav_dep1(raw);
-    case ID_MSGEPHGPS_DEP2:
-      return decode_gpsnav_dep2(raw);
+    case ID_MSGEPHGPS_DEP_E:
+      return decode_gpsnav_dep_e(raw);
+    case ID_MSGEPHGPS_DEP_F:
+      return decode_gpsnav_dep_f(raw);
     case ID_MSGEPHGPS:
       return decode_gpsnav(raw);
     case ID_MSGEPHBDS:
       return decode_bdsnav(raw);
+    case ID_MSGEPHQZSS:
+      return decode_qzssnav(raw);
     case ID_MSGEPHGAL:
       return decode_galnav(raw);
-    case ID_MSGEPHGLO_DEP1:
-      return decode_glonav_dep1(raw);
+    case ID_MSGEPHGAL_DEP_A:
+      return decode_galnav_dep_a(raw);
+    case ID_MSGEPHGLO_DEP_D:
+      return decode_glonav_dep_d(raw);
     case ID_MSGEPHGLO:
       return decode_glonav(raw);
     case ID_MSGIONGPS:
       return decode_gpsion(raw);
     case ID_MSG_SBAS_RAW:
       return decode_snav(raw);
-
     default:
       trace(3, "decode_sbp: unused frame type=%04x len=%d\n", type, raw->len);
       /* there are many more SBF blocks to be extracted */
@@ -1431,14 +1583,13 @@ extern int input_sbpjsonf(raw_t *raw, FILE *fp) {
   if (0 == iRet) return 0;
 
   /* avoid parsing the payload if the message isn't supported in the first place
-   */
-  if ((uMsgType != ID_MSGOBS) && (uMsgType != ID_MSGEPHGPS_DEP1) &&
-      (uMsgType != ID_MSGEPHGPS_DEP2) && (uMsgType != ID_MSGEPHGPS) &&
+  if ((uMsgType != ID_MSGOBS) && (uMsgType != ID_MSGEPHGPS_DEP_E) &&
+      (uMsgType != ID_MSGEPHGPS_DEP_F) && (uMsgType != ID_MSGEPHGPS) &&
       (uMsgType != ID_MSGEPHBDS) && (uMsgType != ID_MSGEPHGAL) &&
-      (uMsgType != ID_MSGEPHGLO_DEP1) && (uMsgType != ID_MSGEPHGLO) &&
+      (uMsgType != ID_MSGEPHGLO_DEP_D) && (uMsgType != ID_MSGEPHGLO) &&
       (uMsgType != ID_MSGIONGPS) && (uMsgType != ID_MSG_SBAS_RAW)) {
     return 0;
-  }
+      }*/
 
   /* sender in clear */
   pcTmp = strstr((char *)raw->buff, JSON_SENDER_FIELD);
