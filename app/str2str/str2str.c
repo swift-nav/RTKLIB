@@ -59,11 +59,11 @@ static const char *help[] = {
     " messages, use -msg option. If the option -in or -out omitted, stdin for",
     " input or stdout for output is used. If the stream in the option -in or "
     "-out",
-#if defined(__GNUC__) && defined(__MINGW32__)
-    " is null, stdin or stdout is used as well.",
-#else
+#ifndef __MINGW32__
     " is null, stdin or stdout is used as well. To reload ntrip source table",
     " specified by the option -ft, send SIGUSR2 to the process",
+#else
+    " is null, stdin or stdout is used as well.",
 #endif
     " Command options are as follows.",
     "",
@@ -137,7 +137,7 @@ static void sigfunc(int sig) { intrflg = 1; }
 /* reload source table by SIGUSR2 --------------------------------------------*/
 static void reload_srctbl(int sig) {
   strsvrsetsrctbl(&strsvr, srctbl);
-#if defined(__GNUC__) && defined(__MINGW32__)
+#ifndef __MINGW32__
   signal(SIGUSR2, reload_srctbl);
 #endif
 }
@@ -388,7 +388,7 @@ int main(int argc, char **argv) {
   }
   signal(SIGTERM, sigfunc);
   signal(SIGINT, sigfunc);
-#if defined(__GNUC__) && defined(__MINGW32__)
+#ifndef __MINGW32__
   signal(SIGHUP, SIG_IGN);
   signal(SIGPIPE, SIG_IGN);
 #endif
@@ -421,7 +421,7 @@ int main(int argc, char **argv) {
   /* read and set ntrip source table */
   if (*srctbl) {
     strsvrsetsrctbl(&strsvr, srctbl);
-#if defined(__GNUC__) && defined(__MINGW32__)
+#ifndef __MINGW32__
     signal(SIGUSR2, reload_srctbl);
 #endif
   }
