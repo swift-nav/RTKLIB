@@ -20,6 +20,10 @@ build_script:
         cd ($env:APPVEYOR_BUILD_FOLDER + "\app\convbin\gcc")
         make clean all
       }
+      if ($env:Compiler -eq "mingw") {
+        cd ($env:APPVEYOR_BUILD_FOLDER + "\app\str2str\gcc")
+        make clean all
+      }
       if ($env:Compiler -eq "vs14") {
         cd ($env:APPVEYOR_BUILD_FOLDER + "\app\convbin\vs14")
         msbuild convbin-swiftnav.sln /p:Configuration=Release
@@ -30,6 +34,9 @@ artifacts:
   - path: app\convbin\gcc\sbp2rinex*
     name: sbp2rinex_mingw
 
+  - path: app\str2str\gcc\str2str*
+    name: sbp2rinex_mingw
+
   - path: app\convbin\vs14\Debug\sbp2rinex.exe
     name: sbp2rinex_vs_debug
   
@@ -37,10 +44,16 @@ artifacts:
     name: sbp2rinex_vs_release
 
 test_script:
-  - ps: | 
+  - ps: |
       if ($env:Compiler -eq "mingw") {
         . ($env:APPVEYOR_BUILD_FOLDER + "\exec1.ps1")
         cd ($env:APPVEYOR_BUILD_FOLDER + "\app\convbin\gcc")
+        exec {& make test}
+      }
+  - ps: |
+      if ($env:Compiler -eq "mingw") {
+        . ($env:APPVEYOR_BUILD_FOLDER + "\exec1.ps1")
+        cd ($env:APPVEYOR_BUILD_FOLDER + "\app\str2str\gcc")
         exec {& make test}
       }
   - ps: |
