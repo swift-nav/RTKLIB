@@ -51,12 +51,6 @@ test_script:
         exec {& make test}
       }
   - ps: |
-      if ($env:Compiler -eq "mingw") {
-        . ($env:APPVEYOR_BUILD_FOLDER + "\exec1.ps1")
-        cd ($env:APPVEYOR_BUILD_FOLDER + "\app\str2str\gcc")
-        exec {& make test}
-      }
-  - ps: |
       if ($env:Compiler -eq "vs14") {
         . ($env:APPVEYOR_BUILD_FOLDER + "\exec1.ps1")
         cd ($env:APPVEYOR_BUILD_FOLDER + "\app\convbin\vs14\Release")
