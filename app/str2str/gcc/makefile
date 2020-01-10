@@ -19,7 +19,7 @@ CTARGET=
 
 OPTIONS = -DENAGLO -DENAGAL -DENAQZS -DENACMP -DENAIRN -DTRACE -DNFREQ=7 -DNEXOBS=3 -DSVR_REUSEADDR
 ifeq ($(UNAME),Windows)
-OPTIONS += -DWIN32
+OPTIONS += -DWIN32 -Wno-unused-function -Wno-unused-variable
 endif
 
 CFLAGS = -Wall -O2 -ansi -std=c99 -Wno-unused-but-set-variable -I$(SRC) $(OPTIONS) $(CTARGET)
