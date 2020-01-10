@@ -13,9 +13,10 @@ matrix:
 
 script:
   - (cd ./app/convbin/gcc/ && make clean all test)
+  - (cd ./app/str2str/gcc/ && make clean all test)
 
 after_success:
-  - PRODUCT_VERSION=$TRAVIS_BUILD_NUMBER-$TRAVIS_OS_NAME ./.publish.sh app/convbin/gcc/sbp2rinex
+  - PRODUCT_VERSION=$TRAVIS_BUILD_NUMBER-$TRAVIS_OS_NAME ./.publish.sh app/convbin/gcc/sbp2rinex app/str2str/gcc/str2str
   - S3_PATH=$TRAVIS_BUILD_NUMBER-$TRAVIS_OS_NAME ./.comment.sh
 
 env:
