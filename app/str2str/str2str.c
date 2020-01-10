@@ -59,8 +59,12 @@ static const char *help[] = {
     " messages, use -msg option. If the option -in or -out omitted, stdin for",
     " input or stdout for output is used. If the stream in the option -in or "
     "-out",
+#if defined(__GNUC__) && defined(__MINGW32__)
+    " is null, stdin or stdout is used as well.",
+#else
     " is null, stdin or stdout is used as well. To reload ntrip source table",
     " specified by the option -ft, send SIGUSR2 to the process",
+#endif
     " Command options are as follows.",
     "",
     " -in  stream[#format] input  stream path and format",
@@ -133,7 +137,9 @@ static void sigfunc(int sig) { intrflg = 1; }
 /* reload source table by SIGUSR2 --------------------------------------------*/
 static void reload_srctbl(int sig) {
   strsvrsetsrctbl(&strsvr, srctbl);
+#if defined(__GNUC__) && defined(__MINGW32__)
   signal(SIGUSR2, reload_srctbl);
+#endif
 }
 /* decode format -------------------------------------------------------------*/
 static void decodefmt(char *path, int *fmt) {
@@ -382,8 +388,10 @@ int main(int argc, char **argv) {
   }
   signal(SIGTERM, sigfunc);
   signal(SIGINT, sigfunc);
+#if defined(__GNUC__) && defined(__MINGW32__)
   signal(SIGHUP, SIG_IGN);
   signal(SIGPIPE, SIG_IGN);
+#endif
 
   strsvrinit(&strsvr, nout);
 
@@ -413,7 +421,9 @@ int main(int argc, char **argv) {
   /* read and set ntrip source table */
   if (*srctbl) {
     strsvrsetsrctbl(&strsvr, srctbl);
+#if defined(__GNUC__) && defined(__MINGW32__)
     signal(SIGUSR2, reload_srctbl);
+#endif
   }
   for (intrflg = 0; !intrflg;) {
 
