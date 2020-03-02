@@ -426,6 +426,7 @@ extern "C" {
 #define STR_UDPSVR   12                 /* stream type: UDP server */
 #define STR_UDPCLI   13                 /* stream type: UDP server */
 #define STR_MEMBUF   14                 /* stream type: memory buffer */
+#define STR_WSSVR    15                 /* stream type: Websocket server */
 
 #define STRFMT_RTCM2 0                  /* stream format: RTCM 2 */
 #define STRFMT_RTCM3 1                  /* stream format: RTCM 3 */

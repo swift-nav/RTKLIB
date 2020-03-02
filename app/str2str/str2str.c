@@ -79,6 +79,7 @@ static const char *help[] = {
     "    ntrip caster server: ntripc_s://[:passwd@][:port] (only in)",
     "    ntrip caster client: ntripc_c://[user:passwd@][:port]/mntpnt (only "
     "out)",
+    "    ws server    : wss://:port",
     "    file         : [file://]path[::T][::+start][::xseppd][::S=swap]",
     "",
     "  format",
@@ -214,6 +215,8 @@ static int decodepath(const char *path, int *type, char *strpath, int *fmt) {
     *type = STR_NTRIPSVR;
   else if (!strncmp(path, "ntrip", 5))
     *type = STR_NTRIPCLI;
+  else if (!strncmp(path, "wss", 3))
+    *type = STR_WSSVR;
   else if (!strncmp(path, "file", 4))
     *type = STR_FILE;
   else {

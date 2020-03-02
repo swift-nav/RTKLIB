@@ -24,7 +24,7 @@ endif
 
 CFLAGS = -Wall -O2 -ansi -std=c99 -Wno-unused-but-set-variable -I$(SRC) $(OPTIONS) $(CTARGET)
 
-LDLIBS= -lm -lpthread
+LDLIBS= -lm -lpthread -lwslay -lnettle
 ifeq ($(UNAME),Linux)
 LDLIBS+= -lrt
 endif
@@ -34,7 +34,7 @@ endif
 
 
 all : str2str
-str2str : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
+str2str : str2str.o stream.o websocket.o rtkcmn.o solution.o sbas.o geoid.o
 str2str : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o gw10.o javad.o
 str2str : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
 str2str : septentrio.o cmr.o tersus.o
@@ -46,6 +46,8 @@ str2str.o  : ../str2str.c
 	$(CC) -c $(CFLAGS) ../str2str.c
 stream.o   : $(SRC)/stream.c
 	$(CC) -c $(CFLAGS) $(SRC)/stream.c
+websocket.o: $(SRC)/websocket.c
+	$(CC) -c $(CFLAGS) $(SRC)/websocket.c
 streamsvr.o: $(SRC)/streamsvr.c
 	$(CC) -c $(CFLAGS) $(SRC)/streamsvr.c
 rtkcmn.o   : $(SRC)/rtkcmn.c

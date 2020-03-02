@@ -84,6 +84,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #endif
+#include "websocket.h"
 
 /* constants -----------------------------------------------------------------*/
 
@@ -112,17 +113,17 @@
 #define FTP_CMD             "wget"      /* ftp/http command */
 #define FTP_TIMEOUT         30          /* ftp/http timeout (s) */
 
+#define WS_MAXRSP           32768       /* max size of websocket response */
+
 #define MIN(x,y)            ((x)<(y)?(x):(y))
 
 /* macros --------------------------------------------------------------------*/
 
 #ifdef WIN32
 #define dev_t               HANDLE
-#define socket_t            SOCKET
 typedef int socklen_t;
 #else
 #define dev_t               int
-#define socket_t            int
 #define closesocket         close
 #endif
 
@@ -243,6 +244,19 @@ typedef struct {            /* ftp download control type */
     gtime_t tnext;          /* next retry time (gpst) */
     thread_t thread;        /* download thread */
 } ftp_t;
+
+typedef struct {            /* websocket connection type */
+    int state;              /* state (0:close,1:connect) */
+    int nb;                 /* request buffer size */
+    unsigned char buff[WS_MAXRSP]; /* request buffer */
+    wslay_event_context_ptr ctx; /* context for wslay */
+} ws_con_t;
+
+typedef struct {            /* websocket server type */
+    int state;              /* state (0:close,1:connect) */
+    tcpsvr_t *tcp;          /* underlying tcp server */
+    ws_con_t con[MAXCLI];   /* websocket connections */
+} wssvr_t;
 
 typedef struct {            /* memory buffer type */
     int state,wp,rp;        /* state,write/read pointer */
@@ -2531,6 +2545,206 @@ static int statexftp(ftp_t *ftp, char *msg)
 {
     return !ftp?0:(ftp->state==0?2:(ftp->state<=2?3:-1));
 }
+/* open websocket server -----------------------------------------------------*/
+static wssvr_t *openwssvr(const char *path, char *msg)
+{
+    wssvr_t *svr;
+
+    tracet(3,"openwssvr: path=%s\n",path);
+
+    if (!(svr=(wssvr_t *)malloc(sizeof(wssvr_t)))) return NULL;
+    memset(svr, 0, sizeof(wssvr_t));
+
+    if (!(svr->tcp=opentcpsvr(path,msg))) {
+        tracet(2,"openwssvr: opentcpsvr error\n");
+        free(svr);
+        return NULL;
+    }
+
+    return svr;
+}
+/* close websocket server ----------------------------------------------------*/
+static void closewssvr(wssvr_t *svr)
+{
+    tracet(3,"closewssvr\n");
+
+    closetcpsvr(svr->tcp);
+    free(svr);
+}
+/* disconnect websocket connection -------------------------------------------*/
+static void discon_websocket(wssvr_t *svr, int i)
+{
+    tracet(3,"discon_websocket: i=%d\n",i);
+
+    wslay_event_context_free(svr->con[i].ctx);
+    discontcp(&svr->tcp->cli[i],ticonnect);
+    svr->con[i].nb=0;
+    svr->con[i].buff[0]='\0';
+    svr->con[i].state=0;
+}
+/* test websocket HTTP request -----------------------------------------------*/
+static void rsp_websocket(wssvr_t *svr, int i)
+{
+    char *p,*q;
+    ws_con_t *con=svr->con+i;
+
+    tracet(3,"rsp_websocket i=%d\n",i);
+    con->buff[con->nb]='\0';
+    tracet(5,"rsp_websocket: n=%d,buff=\n%s\n",con->nb,con->buff);
+
+    if (con->nb>=WS_MAXRSP-1) { /* buffer overflow */
+        tracet(2,"rsp_websocket: request buffer overflow\n");
+        discon_websocket(svr,i);
+        return;
+    }
+    /* check for GET request */
+    if (!(p=strstr((char *)con->buff,"GET"))||!(q=strstr(p,"\r\n\r\n"))) {
+        tracet(2,"rsp_websocket: Malformed GET request\n");
+        discon_websocket(svr,i);
+        return;
+    }
+
+    // terminate after first \r\n
+    q[2] = '\0';
+
+    char response_buf[32768];
+    int resp_len = websocket_check_http_header((char*)con->buff, response_buf, sizeof(response_buf));
+    if(resp_len < 0) {
+        tracet(2,"rsp_websocket: Invalid HTTP header\n");
+        discon_websocket(svr,i);
+        return;
+    }
+
+    struct wslay_event_callbacks callbacks = {
+        NULL,
+        websocket_send_callback,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    };
+
+    if(wslay_event_context_server_init(&con->ctx, &callbacks, &svr->tcp->cli[i].sock) != 0) {
+        tracet(2,"rsp_websocket: Failed to init wslay context\n");
+        discon_websocket(svr,i);
+        return;
+    }
+
+    /* send response */
+    send_nb(svr->tcp->cli[i].sock,(unsigned char *)response_buf,resp_len);
+
+    con->state=1;
+}
+/* handle websocket connect request ------------------------------------------*/
+static void wait_websocket(wssvr_t *svr, char *msg)
+{
+    unsigned char *buff;
+    int i,n,nmax,err;
+
+    tracet(4,"wait_websocket\n");
+
+    svr->state=svr->tcp->svr.state;
+
+    if (!waittcpsvr(svr->tcp,msg)) return;
+
+    for (i=0;i<MAXCLI;i++) {
+        if (svr->tcp->cli[i].state!=2||svr->con[i].state) continue;
+
+        /* receive HTTP header */
+        buff=svr->con[i].buff+svr->con[i].nb;
+        nmax=WS_MAXRSP-svr->con[i].nb-1;
+
+        if ((n=recv_nb(svr->tcp->cli[i].sock,buff,nmax))==-1) {
+            if ((err=errsock())) {
+                tracet(2,"wait_websocket: recv error sock=%d err=%d\n",
+                       svr->tcp->cli[i].sock,err);
+            }
+            discon_websocket(svr,i);
+            continue;
+        }
+        if (n<=0) continue;
+
+        /* check HTTP header */
+        svr->con[i].nb+=n;
+        rsp_websocket(svr,i);
+    }
+}
+/* read websocket server -----------------------------------------------------*/
+static int readwssvr(wssvr_t *svr, unsigned char *buff, int n, char *msg)
+{
+    int i,nr,err;
+
+    tracet(4,"readwssvr:\n");
+
+    wait_websocket(svr,msg);
+
+    for (i=0;i<MAXCLI;i++) {
+        if (!svr->con[i].state) continue;
+
+#if 0 // TODO
+        nr=recv_nb(ntripc->tcp->cli[i].sock,buff,n);
+
+        if (nr<0) {
+            if ((err=errsock())) {
+                tracet(2,"readntripc: recv error i=%d sock=%d err=%d\n",i,
+                       ntripc->tcp->cli[i].sock,err);
+            }
+            discon_ntripc(ntripc,i);
+        }
+        else if (nr>0) {
+            ntripc->tcp->cli[i].tact=tickget();
+
+            /* record received mountpoint */
+            strcpy(ntripc->mntpnt,ntripc->con[i].mntpnt);
+            return nr;
+        }
+#endif
+    }
+    return 0;
+}
+/* write websocket server ----------------------------------------------------*/
+static int writewssvr(wssvr_t *svr, unsigned char *buff, int n, char *msg)
+{
+    int i,ns=0;
+
+    tracet(4,"writewssvr: n=%d\n",n);
+
+    wait_websocket(svr,msg);
+
+    for (i=0;i<MAXCLI;i++) {
+        if (!svr->con[i].state) continue;
+
+        ns = websocket_send(svr->tcp->cli[i].sock,buff,n,svr->con[i].ctx);
+        if(ns < 0) {
+            tracet(2,"writewssvr: send error i=%d sock=%d\n",i,
+                       svr->tcp->cli[i].sock);
+            discon_websocket(svr,i);
+        }
+        else {
+            svr->tcp->cli[i].tact=tickget();
+        }
+    }
+    return ns;
+}
+/* get state websocket server ------------------------------------------------*/
+static int statewssvr(wssvr_t *svr)
+{
+    return !svr?0:(svr->state==0?svr->tcp->svr.state:svr->state);
+}
+/* get extended state websocket server ---------------------------------------*/
+static int statexwssvr(wssvr_t *svr, char *msg)
+{
+    char *p=msg;
+    int state=!svr?0:(svr->state==0?svr->tcp->svr.state:svr->state);
+
+    p+=sprintf(p,"websocket:\n");
+    p+=sprintf(p,"  state   = %d\n",state);
+    if (!state) return 0;
+    p+=sprintf(p,"  svr:\n");
+    p+=statextcp(&svr->tcp->svr,p);
+    return state;
+}
 /* open memory buffer --------------------------------------------------------*/
 static membuf_t *openmembuf(const char *path, char *msg)
 {
@@ -2680,8 +2894,9 @@ extern void strinit(stream_t *stream)
 *                                 STR_UDPSVR   = UDP server (read only)
 *                                 STR_UDPCLI   = UDP client (write only)
 *                                 STR_MEMBUF   = memory buffer (FIFO)
-*                                 STR_FTP      = download by FTP (raed only)
-*                                 STR_HTTP     = download by HTTP (raed only)
+*                                 STR_FTP      = download by FTP (read only)
+*                                 STR_HTTP     = download by HTTP (read only)
+*                                 STR_WSSVR    = Websocket server
 *          int mode         I   stream mode (STR_MODE_???)
 *                                 STR_MODE_R   = read only
 *                                 STR_MODE_W   = write only
@@ -2774,6 +2989,9 @@ extern void strinit(stream_t *stream)
 *                    toff  = download time offset (s)
 *                    tret  = download retry interval (s) (0:no retry)
 *
+*   STR_WSSVR    :port
+*                    port  = websocket server port to accept
+*
 *-----------------------------------------------------------------------------*/
 extern int stropen(stream_t *stream, int type, int mode, const char *path)
 {
@@ -2801,6 +3019,7 @@ extern int stropen(stream_t *stream, int type, int mode, const char *path)
         case STR_MEMBUF  : stream->port=openmembuf(path,     stream->msg); break;
         case STR_FTP     : stream->port=openftp   (path,0,   stream->msg); break;
         case STR_HTTP    : stream->port=openftp   (path,1,   stream->msg); break;
+        case STR_WSSVR   : stream->port=openwssvr (path,     stream->msg); break;
         default: stream->state=0; return 1;
     }
     stream->state=!stream->port?-1:1;
@@ -2832,6 +3051,7 @@ extern void strclose(stream_t *stream)
             case STR_MEMBUF  : closemembuf((membuf_t *)stream->port); break;
             case STR_FTP     : closeftp   ((ftp_t    *)stream->port); break;
             case STR_HTTP    : closeftp   ((ftp_t    *)stream->port); break;
+            case STR_WSSVR   : closewssvr ((wssvr_t  *)stream->port); break;
         }
     }
     else {
@@ -2903,6 +3123,7 @@ extern int strread(stream_t *stream, unsigned char *buff, int n)
         case STR_MEMBUF  : nr=readmembuf((membuf_t *)stream->port,buff,n,msg); break;
         case STR_FTP     : nr=readftp   ((ftp_t    *)stream->port,buff,n,msg); break;
         case STR_HTTP    : nr=readftp   ((ftp_t    *)stream->port,buff,n,msg); break;
+        case STR_WSSVR   : nr=readwssvr ((wssvr_t  *)stream->port,buff,n,msg); break;
         default:
             strunlock(stream);
             return 0;
@@ -2950,6 +3171,7 @@ extern int strwrite(stream_t *stream, unsigned char *buff, int n)
         case STR_MEMBUF  : ns=writemembuf((membuf_t *)stream->port,buff,n,msg); break;
         case STR_FTP     :
         case STR_HTTP    :
+        case STR_WSSVR   : ns=writewssvr((wssvr_t *)stream->port,buff,n,msg); break;
         default:
             strunlock(stream);
             return 0;
@@ -3038,6 +3260,7 @@ extern int strstat(stream_t *stream, char *msg)
         case STR_MEMBUF  : state=statemembuf((membuf_t *)stream->port); break;
         case STR_FTP     : state=stateftp   ((ftp_t    *)stream->port); break;
         case STR_HTTP    : state=stateftp   ((ftp_t    *)stream->port); break;
+        case STR_WSSVR   : state=statewssvr ((wssvr_t  *)stream->port); break;
         default:
             strunlock(stream);
             return 0;
@@ -3078,6 +3301,7 @@ extern int strstatx(stream_t *stream, char *msg)
         case STR_MEMBUF  : state=statexmembuf((membuf_t *)stream->port,msg); break;
         case STR_FTP     : state=statexftp   ((ftp_t    *)stream->port,msg); break;
         case STR_HTTP    : state=statexftp   ((ftp_t    *)stream->port,msg); break;
+        case STR_WSSVR   : state=statexwssvr ((wssvr_t  *)stream->port,msg); break;
         default:
             msg[0]='\0';
             strunlock(stream);
