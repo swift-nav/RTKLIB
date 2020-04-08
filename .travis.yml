@@ -57,7 +57,7 @@ script:
       tar -C "./travis_deploy" -czf swiftnav_rtklib_osx.tar.gz str2str sbp2rinex;
       VERSION="$(git describe --always --tags --dirty)";
       BUILD_TRIPLET="$($CC -dumpmachine)";
-      mv swiftnav_rtklib_osx.tar.gz "gnss_converters-${VERSION}-${BUILD_TRIPLET}.tar.gz";
+      mv swiftnav_rtklib_osx.tar.gz "swiftnav_rtklib-${VERSION}-${BUILD_TRIPLET}.tar.gz";
       ls -l;
     fi
 
