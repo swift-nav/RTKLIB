@@ -29,7 +29,12 @@ matrix:
 
 script:
 
-  - (cd ./app/convbin/gcc; ls -l; make clean all test)
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      (cd ./app/convbin/gcc; ls -l; make clean all);
+    else
+      (cd ./app/convbin/gcc; ls -l; make clean all test);
+    fi
+
   - (cd ./app/str2str/gcc; ls -l; make clean all)
 
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
