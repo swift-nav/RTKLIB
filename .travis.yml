@@ -25,11 +25,12 @@ matrix:
       before_install:
         - choco uninstall -y mingw
         - choco install -y --no-progress mingw --version=6.4.0;
+        - choco install -y --no-progress make
 
 script:
 
-  - ls -l; cd ./app/convbin/gcc; make clean all test
-  - ls -l; cd ./app/str2str/gcc; make clean all
+  - (cd ./app/convbin/gcc; ls -l; make clean all test)
+  - (cd ./app/str2str/gcc; ls -l; make clean all)
 
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
       mkdir travis_deploy;
