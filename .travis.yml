@@ -28,8 +28,8 @@ matrix:
 
 script:
 
-  - (cd ./app/convbin/gcc/ && make clean all test)
-  - (cd ./app/str2str/gcc/ && make clean all)
+  - cd ./app/convbin/gcc && make clean all test
+  - cd ./app/str2str/gcc && make clean all
 
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
       mkdir travis_deploy;
