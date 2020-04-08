@@ -1,22 +1,81 @@
+# yamllint disable rule:line-length
+---
 sudo: false
 language: c
 
 matrix:
   include:
-   - os: linux
-     before_install:
-      - pip install --user --upgrade awscli
-   - os: osx 
-     osx_image: Xcode 8.2
-     before_install:
-       - HOMEBREW_NO_AUTO_UPDATE=1 brew install awscli
+
+    - os: linux
+      before_install:
+        - pip install --user --upgrade awscli
+
+    - os: osx
+      osx_image: Xcode 8.2
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install awscli
+
+    - os: windows
+      language: c
+      env:
+        - TESTENV=rust
+        - CMAKE_GENERATOR="MinGW Makefiles"
+        - CC=gcc
+        - CXX=g++
+      before_install:
+        - choco uninstall -y mingw
+        - choco install -y --no-progress mingw --version=6.4.0;
+        - choco install -y --no-progress make
 
 script:
-  - (cd ./app/convbin/gcc/ && make clean all test)
-  - (cd ./app/str2str/gcc/ && make clean all)
+
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      (cd ./app/convbin/gcc; ls -l; make clean all);
+    else
+      (cd ./app/convbin/gcc; ls -l; make clean all test);
+    fi
+
+  - (cd ./app/str2str/gcc; ls -l; make clean all)
+
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      mkdir travis_deploy;
+      cp ./app/convbin/gcc/sbp2rinex.exe ./travis_deploy/sbp2rinex.exe;
+      cp ./app/str2str/gcc/str2str.exe ./travis_deploy/str2str.exe;
+      cd travis_deploy;
+      7z a -tzip ../swiftnav_rtklib_windows.zip sbp2rinex.exe str2str.exe;
+      cd ..;
+      VERSION="$(git describe --always --tags --dirty)";
+      BUILD_TRIPLET="$($CC -dumpmachine)";
+      mv swiftnav_rtklib_windows.zip "swiftnav_rtklib-${VERSION}-windows-${BUILD_TRIPLET}.zip";
+      ls -l;
+    fi
+
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      mkdir travis_deploy;
+      cp ./app/convbin/gcc/sbp2rinex ./travis_deploy/sbp2rinex;
+      cp ./app/str2str/gcc/str2str ./travis_deploy/str2str;
+      tar -C "./travis_deploy" -czf swiftnav_rtklib_osx.tar.gz str2str sbp2rinex;
+      VERSION="$(git describe --always --tags --dirty)";
+      BUILD_TRIPLET="$($CC -dumpmachine)";
+      mv swiftnav_rtklib_osx.tar.gz "swiftnav_rtklib-${VERSION}-${BUILD_TRIPLET}.tar.gz";
+      ls -l;
+    fi
+
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      mkdir travis_deploy;
+      cp ./app/convbin/gcc/sbp2rinex ./travis_deploy/sbp2rinex;
+      cp ./app/str2str/gcc/str2str ./travis_deploy/str2str;
+      tar -C "./travis_deploy" -czf swiftnav_rtklib_linux.tar.gz sbp2rinex str2str;
+      VERSION="$(git describe --always --tags --dirty)";
+      BUILD_TRIPLET="$($CC -dumpmachine)";
+      mv swiftnav_rtklib_linux.tar.gz "swiftnav_rtklib-${VERSION}-${BUILD_TRIPLET}.tar.gz";
+      ls -l;
+    fi
 
 after_success:
-  - PRODUCT_VERSION=$TRAVIS_BUILD_NUMBER-$TRAVIS_OS_NAME ./.publish.sh app/convbin/gcc/sbp2rinex app/str2str/gcc/str2str
+  - if [[ "$TRAVIS_OS_NAME" != "windwos" ]]; then
+      PRODUCT_VERSION=$TRAVIS_BUILD_NUMBER-$TRAVIS_OS_NAME ./.publish.sh app/convbin/gcc/sbp2rinex app/str2str/gcc/str2str;
+    fi
   - S3_PATH=$TRAVIS_BUILD_NUMBER-$TRAVIS_OS_NAME ./.comment.sh
 
 env:
@@ -24,3 +83,33 @@ env:
     - secure: "eg8RavBDMlfvtxDquSL+yOibciC+T4Tju5Iueht/ltrOYsM6eJsiy8Ci6PLDnoeBc2v75aF39XNL4Zeo5xHJMESolVoUQ5CRp1lv2ttQjayPLHMTmVgpDOf+HZQQGYXQ3sjxQa/HNQh1xAiNS2YjbHMOLLnHbHquVFLvnbjMgoRdqPyMhL69Z9gP/W4QNWtH6GYfMBJ6aVsPaYvreCa4oYfsy3pm3CyHsoFiMrbkskusJUAn5Sb/4sDoREv6tOrmEujW+NyDBB4S/EzAc78T38YfKfsZGsC3ek0/1qSzoxZHZm0mjJi2F1qwObMNImiJX9UZhDve7slgdQUEpxpajQO28cEtza6RMBV6cqURj5Q/X5CYYfu3z7RRhcRbBkww+dChXKBoLAJOPxUC0J0AMXUYrI++WodoGt/ohM9th0i4Zcr/dtY7k+v83t+Ho+nvbh27RAA6VaObCZTML8JFqS1vabi9d4om9ZbYyRCNXi7ijvK2rKbUXHyRiHOb1bAzAmej5Sziy7URM82kKgP5PHQ4ybbbIfLYqimXvAc5osfczr3ig5yYhRA2YJeyH+EGBtHBmswrWW7Y3+4JkjOIP2NYi2p3qBWl4usErtgIr61N2LajK4LI9C/5V+jzi3DOqAyAZy1iQA+ONx8x6y+iyjiWIIT01jrsjBuJ2MnR7gQ="
     - secure: "d9xUmXB4fukP2/eQMke7nyKXhyGvJUfzCLRJBLp7yxkt6uZgw32OO8dn7qaxIJV+un3VXHdhZ3dIP7kxJnLe65O0idH0HcVz/cJ0X9RS7NVWhH5cja/npNvcNtme34Kkb4gggmpx/1LKsEMUJs/+Xd2bKHRgEZVyqN27wsinMU09Fe/nzt/jqp2dL2ioYIW6dFkkKhG+qbl26WmlCwm08V7/LxwIT3RD098uHLjpFhO9SIVMjEgDPmZnlolPRdXrSQBff35U+Mdsi0HOuZwpd4h5gcBH6YOq2Fq/xB+ypf6L5O1udXP0wlnDGJduSowVque9qDnqAFACSv9Dz12IT2kJUcU6e+mm9yhbzV6Z9tr091NAc/3vRfyXJ45cz/hTxe+6FItbM9RmrZCBuIcaE3e3OJlZ3QFp5byiKuhw1om/ueIzzj0Npe8SBCjyf0BEIA4sP+KpE+WwdvlA7FzxxL+XdnnQqtjxjHYzeEw5oWqqM6vDZN9DbYmq4zHDGPjxEMcdTn8XLHQGl5MQ6QeK62GI6EhKF6FTrFEfGOhnFNdus+VC1Dm9LWZcrhsAXoybQKCO9Wq8NTapE+fDDfXCxEXkvq8tV02oW5t682PNwJif+XasZZN7qXc2mp0E8naG6DPZUKCl8nOYEMwCl/s6iPyODqX3pYZnFWumfBcHdsE="
     - secure: "IegmIVOvJKUAKTmogVG/u2fFmaMTj9eRQWK4NwQLMnC3Ai79zxqaaUUF/hUMoMduRKAtB1DsFRc6ykMmI6U/O36MQQDn0Od8v11OAROcq7HN89xMoibyEIDG+XjG+nsXHvSE3Mw/OrFC9yb69Xh0BTeDJI3M9RI3IHf5P+FdoJY+FJMImtUXTY8JDmIJbHSyrRhArLliHzBfp4IpirNNM0Ae8yYE0W/un3LNPAquIRQylZVeURPheNIOcnTd513Dxg7Ik9lOL6dAbpMzaTqu0fq1tGQmBgrWEenfRsfJWJxGX9hQwb1wIre3D2hm37qSQwG71oO5pkEIpq+2OvB4huXDEHudlZrCNY02ee6BiXfENdxa1VrfSIZgoFMDNa4lxB7qTYX0ZZCgSKYDHFdJlLQf9GYz1xyEhwJK0g4T7ZOC7EnX9ASN1OGfgV3uJuft9sr3gjoqjv0EA/SwDvCFNVAqXk2XYIsONQncBRgdMIEnSbdZnQFjER47bNDihmihNWCBfAxbIXB9oj5OYZWwaKDsC3o+A5q60rxuoqv/McQGmB2jbRoi89FhAo+J/pyiepTQZrslpmQkIpqp5+YgLuXoA8OsNPMRKqpYW144twnPnYIpyr7hBITjXZ0VjWAaBvf81DrdJgpWBfhIZ6HLCPqSCHQ+2tGcPgG4odrhgPw="
+
+_github_api_key: &_github_api_key
+  api_key:
+    secure: "p9O/wJpHQBUKf/HfohJNfQpAb0ncMNxdgKCcfkY4YjhwlZlTiCDl27BQNLnntYz/02Z8sp9fCiiRcBB/SoxtYwyLAQ0CtW6qwUVUAPTn6kgJ7J7XEUQ45/ANR2DaUmGV/Qe81w5MxvdJN7xSjNai9wnPgr/uj4vGq2uJRZPnHvdt/9m5omp3j2s8aGsY4Eed6yYJiAcVGk1636Sb5x64av0MNVQERkCf1szC07TTDWJrgwVDz73FdcmQQ1wuZv1ocvk2phGPMeFlgKzwanSJH9R+426z1zfRgQidqtC8e1UWxGsyBdR6m3Kk/t9ln6tXhyV589apZzUHvweng1hSh1GCK+YD2bO6h9smK/EgyLJU/kQ7CNEsA0Xe3YhrmVGTe+Jsz9Dn/DaFmS29JZYYmXNgpmDdBNNHXEvpueVzYUpaoZ2+3G+aT080l1vVBS9eMaxbW0aI06x8NHV8B35L5S47bS55tVXlWGArJTyB6yn9rlwtvMunN2L2Jj9S3mlkS8sGuuto8l7yTpY2lcF5Nh9mgRO60YXm6EiCSvvtHGLAF8q52pE1VwJeT87Wl69AkqNQ7bpOEd4lJV42Lb5UZVphOcYHuhdWKU0XdFxhlBRfA42uAtNMegzJdUOqV+0XgJiqvceeUN3TYNwd0cHps//IzkjRCuhQygnfZo/KQcs="
+
+deploy:
+  - provider: releases
+    file_glob: true
+    file: "swiftnav_rtklib-*windows*.zip"
+    skip_cleanup: true
+    "on":
+      tags: true
+      condition: "$TRAVIS_OS_NAME = windows"
+    <<: *_github_api_key
+  - provider: releases
+    file_glob: true
+    file: "swiftnav_rtklib-*darwin*.tar.gz"
+    skip_cleanup: true
+    "on":
+      tags: true
+      condition: "$TRAVIS_OS_NAME = osx"
+    <<: *_github_api_key
+  - provider: releases
+    file_glob: true
+    file: "swiftnav_rtklib-*linux*.tar.gz"
+    skip_cleanup: true
+    "on":
+      tags: true
+      condition: "$TRAVIS_OS_NAME = linux"
+    <<: *_github_api_key

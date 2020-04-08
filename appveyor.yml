@@ -35,7 +35,7 @@ artifacts:
     name: sbp2rinex_mingw
 
   - path: app\str2str\gcc\str2str*
-    name: sbp2rinex_mingw
+    name: sbp2str_mingw
 
   - path: app\convbin\vs14\Debug\sbp2rinex.exe
     name: sbp2rinex_vs_debug
