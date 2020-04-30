@@ -1359,7 +1359,7 @@ static const int codes_qzs[]={
 };
 static const int codes_bds[]={
     CODE_L1I,CODE_L1Q,CODE_L1X,CODE_L7I,CODE_L7Q,CODE_L7X,CODE_L6I,CODE_L6Q,
-    CODE_L6X
+    CODE_L6X,CODE_L5I, CODE_L5Q,CODE_L5X,
 };
 static const int codes_sbs[]={
     CODE_L1C,CODE_L5I,CODE_L5Q,CODE_L5X

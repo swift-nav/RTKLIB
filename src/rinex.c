@@ -308,6 +308,7 @@ static void convcode(double ver, int sys, const char *str, char *type)
         else if (sys==SYS_GAL) sprintf(type,"%c5X",str[0]);
         else if (sys==SYS_QZS) sprintf(type,"%c5X",str[0]);
         else if (sys==SYS_SBS) sprintf(type,"%c5X",str[0]);
+         else if (sys==SYS_CMP) sprintf(type,"%c5X",str[0]);
     }
     else if (str[1]=='6') {
         if      (sys==SYS_GAL) sprintf(type,"%c6X",str[0]);
