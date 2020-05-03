@@ -1744,8 +1744,8 @@ static int to_sigid(int sys, unsigned char code, int *freq)
     }
     /* freqency index for beidou and galileo */
     if (sys==SYS_CMP) {
-        if      (*freq==5) *freq=2; /* B2 */
-        else if (*freq==4) *freq=3; /* B3 */
+        if      (*freq==2) *freq=1; /* B1 */
+        else if (*freq==5) *freq=2; /* B2 */
     }
     else if (sys==SYS_GAL) {
         if (*freq==5) *freq=2; /* E5b */

@@ -246,7 +246,7 @@ static char *obscodes[]={       /* observation code strings */
     "2W","2Y","2M","2N","5I", "5Q","5X","7I","7Q","7X", /* 20-29 */
     "6A","6B","6C","6X","6Z", "6S","6L","8L","8Q","8X", /* 30-39 */
     "2I","2Q","6I","6Q","3I", "3Q","3X","1I","1Q","5A", /* 40-49 */
-    "5B","5C","9A","9B","9C", "9X",""  ,""  ,""  ,""    /* 50-59 */
+    "5B","5C","9A","9B","9C", "9X","5P","5D",""  ,""    /* 50-59 */
 };
 static unsigned char obsfreqs[]={
     /* 1:L1/E1, 2:L2/B1, 3:L5/E5a/L3, 4:L6/LEX/B3, 5:E5b/B2, 6:E5(a+b), 7:S */
@@ -255,7 +255,7 @@ static unsigned char obsfreqs[]={
     2, 2, 2, 2, 3,  3, 3, 5, 5, 5, /* 20-29 */
     4, 4, 4, 4, 4,  4, 4, 6, 6, 6, /* 30-39 */
     2, 2, 4, 4, 3,  3, 3, 1, 1, 3, /* 40-49 */
-    3, 3, 7, 7, 7,  7, 0, 0, 0, 0  /* 50-59 */
+    3, 3, 7, 7, 7,  7, 3, 3, 0, 0  /* 50-59 */
 };
 static char codepris[7][MAXFREQ][16]={  /* code priority table */
 
@@ -3341,7 +3341,8 @@ extern double satwavelen(int sat, int frq, const nav_t *nav)
     else if (sys==SYS_CMP) {
         if      (frq==0) return CLIGHT/FREQ1_CMP; /* B1 */
         else if (frq==1) return CLIGHT/FREQ2_CMP; /* B2 */
-        else if (frq==2) return CLIGHT/FREQ3_CMP; /* B3 */
+        else if (frq==2) return CLIGHT/FREQ5; /* B2a */
+        else if (frq==3) return CLIGHT/FREQ3_CMP; /* B3 */
     }
     else if (sys==SYS_GAL) {
         if      (frq==0) return CLIGHT/FREQ1; /* E1 */
