@@ -1079,6 +1079,9 @@ static int gentcp(tcp_t *tcp, int type, char *msg)
     tcp->addr.sin_port=htons(tcp->port);
     
     if (type==0) { /* server socket */
+
+        if (strlen(tcp->saddr) != 0)
+            tcp->addr.sin_addr.s_addr = inet_addr(tcp->saddr);
     
 #ifdef SVR_REUSEADDR
         /* multiple-use of server socket */
