@@ -12,7 +12,7 @@ install:
   - set PATH=C:\MinGW\bin;C:\MinGW\msys\1.0\bin;%PATH%
   - set CC=gcc
   - set INCLUDE=%cd%\src;..\..\..\src;%INCLUDE%
-  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mnaoumov/Invoke-NativeApplication/master/exec.ps1" -OutFile ".\exec1.ps1"
+  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mnaoumov/Invoke-NativeApplication/25827a3f8348c96c618d8487164dc94877b960f8/exec.ps1" -OutFile ".\exec1.ps1"
 
 build_script:
   - ps: |
