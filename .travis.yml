@@ -72,12 +72,6 @@ script:
       ls -l;
     fi
 
-after_success:
-  - if [[ "$TRAVIS_OS_NAME" != "windwos" ]]; then
-      PRODUCT_VERSION=$TRAVIS_BUILD_NUMBER-$TRAVIS_OS_NAME ./.publish.sh app/convbin/gcc/sbp2rinex app/str2str/gcc/str2str;
-    fi
-  - S3_PATH=$TRAVIS_BUILD_NUMBER-$TRAVIS_OS_NAME ./.comment.sh
-
 env:
   global:
     - secure: "eg8RavBDMlfvtxDquSL+yOibciC+T4Tju5Iueht/ltrOYsM6eJsiy8Ci6PLDnoeBc2v75aF39XNL4Zeo5xHJMESolVoUQ5CRp1lv2ttQjayPLHMTmVgpDOf+HZQQGYXQ3sjxQa/HNQh1xAiNS2YjbHMOLLnHbHquVFLvnbjMgoRdqPyMhL69Z9gP/W4QNWtH6GYfMBJ6aVsPaYvreCa4oYfsy3pm3CyHsoFiMrbkskusJUAn5Sb/4sDoREv6tOrmEujW+NyDBB4S/EzAc78T38YfKfsZGsC3ek0/1qSzoxZHZm0mjJi2F1qwObMNImiJX9UZhDve7slgdQUEpxpajQO28cEtza6RMBV6cqURj5Q/X5CYYfu3z7RRhcRbBkww+dChXKBoLAJOPxUC0J0AMXUYrI++WodoGt/ohM9th0i4Zcr/dtY7k+v83t+Ho+nvbh27RAA6VaObCZTML8JFqS1vabi9d4om9ZbYyRCNXi7ijvK2rKbUXHyRiHOb1bAzAmej5Sziy7URM82kKgP5PHQ4ybbbIfLYqimXvAc5osfczr3ig5yYhRA2YJeyH+EGBtHBmswrWW7Y3+4JkjOIP2NYi2p3qBWl4usErtgIr61N2LajK4LI9C/5V+jzi3DOqAyAZy1iQA+ONx8x6y+iyjiWIIT01jrsjBuJ2MnR7gQ="
