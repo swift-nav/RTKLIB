@@ -365,10 +365,10 @@ static int Base64_Decode(uint8_t *_pcData,
 
   output_length = _uDataLen / 4 * 3;
 
-  if ('=' == _pcData[_uDataLen - 1]) {
+  if (_uDataLen > 0 && '=' == _pcData[_uDataLen - 1]) {
     output_length--;
   }
-  if ('=' == _pcData[_uDataLen - 2]) {
+  if (_uDataLen > 1 && '=' == _pcData[_uDataLen - 2]) {
     output_length--;
   }
 
