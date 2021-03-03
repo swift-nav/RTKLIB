@@ -1,1 +1,1 @@
-#define SWIFT_VER_RTKLIB  "2021.03.02" /* swift tool version */
+#define SWIFT_VER_RTKLIB  "v2.2" /* swift tool version */

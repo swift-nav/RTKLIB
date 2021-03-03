@@ -7,10 +7,12 @@ Source Code Location:   github.com/swift-nav/RTKLIB
 ===============================================================================
 
 -------------------------------------------------------------------------------
-Release 2021.03.02                                                   2021-03-02
+Release 2.2                                                          2021-03-02
 -------------------------------------------------------------------------------
 CHANGES:
 * Updated to RTKLIB v2.4.3 b33
+* Add UDP client and server feature to str2str
+* Allow tcpsvr:// to bind to an arbitrary address
 
 KNOWN ISSUES:
 none
