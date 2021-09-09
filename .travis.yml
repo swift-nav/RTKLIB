@@ -39,10 +39,11 @@ script:
 
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
       mkdir travis_deploy;
+      cp ./LICENSE.txt ./travis_deploy/LICENSE.txt;
       cp ./app/convbin/gcc/sbp2rinex.exe ./travis_deploy/sbp2rinex.exe;
       cp ./app/str2str/gcc/str2str.exe ./travis_deploy/str2str.exe;
       cd travis_deploy;
-      7z a -tzip ../swiftnav_rtklib_windows.zip sbp2rinex.exe str2str.exe;
+      7z a -tzip ../swiftnav_rtklib_windows.zip sbp2rinex.exe str2str.exe LICENSE.txt;
       cd ..;
       VERSION="$(git describe --always --tags --dirty)";
       BUILD_TRIPLET="$($CC -dumpmachine)";
@@ -52,9 +53,10 @@ script:
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       mkdir travis_deploy;
+      cp ./LICENSE.txt ./travis_deploy/LICENSE.txt;
       cp ./app/convbin/gcc/sbp2rinex ./travis_deploy/sbp2rinex;
       cp ./app/str2str/gcc/str2str ./travis_deploy/str2str;
-      tar -C "./travis_deploy" -czf swiftnav_rtklib_osx.tar.gz str2str sbp2rinex;
+      tar -C "./travis_deploy" -czf swiftnav_rtklib_osx.tar.gz str2str sbp2rinex LICENSE.txt;
       VERSION="$(git describe --always --tags --dirty)";
       BUILD_TRIPLET="$($CC -dumpmachine)";
       mv swiftnav_rtklib_osx.tar.gz "swiftnav_rtklib-${VERSION}-${BUILD_TRIPLET}.tar.gz";
@@ -63,9 +65,10 @@ script:
 
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       mkdir travis_deploy;
+      cp ./LICENSE.txt ./travis_deploy/LICENSE.txt;
       cp ./app/convbin/gcc/sbp2rinex ./travis_deploy/sbp2rinex;
       cp ./app/str2str/gcc/str2str ./travis_deploy/str2str;
-      tar -C "./travis_deploy" -czf swiftnav_rtklib_linux.tar.gz sbp2rinex str2str;
+      tar -C "./travis_deploy" -czf swiftnav_rtklib_linux.tar.gz sbp2rinex str2str LICENSE.txt;
       VERSION="$(git describe --always --tags --dirty)";
       BUILD_TRIPLET="$($CC -dumpmachine)";
       mv swiftnav_rtklib_linux.tar.gz "swiftnav_rtklib-${VERSION}-${BUILD_TRIPLET}.tar.gz";
