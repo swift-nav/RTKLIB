@@ -1438,6 +1438,136 @@ static void holdamb(rtk_t *rtk, const double *xa)
     }
     free(v); free(H);
 }
+/* wide-lane transformation matrix (T) --------------------*/
+static void wlmat(rtk_t *rtk, double *T, int nb)
+{
+    int i,j,k,na=rtk->na,nf=NF(&rtk->opt),row,col,ns;
+
+    trace(3,"wlmat   :\n");
+    /* form wide-lane transformation matrix */
+    ns=nb/nf;
+    row=na+ns;
+    col=na+nb;
+    for(i=0;i<na;i++) T[i+i*row]=1.0;
+    for (k=0;k<nf;k++) {
+        for (i=0;i<ns;i++) {
+            for (j=0;j<ns;j++) {
+                if (i==j) {
+                    T[na*row+(i+na)+j*row+k*ns*row] = k==0?1.0:-1.0;
+                }
+            }
+        }
+    }
+    trace(3,"T=\n"); tracemat(3,T,row,col,2,0);
+
+    return;
+}
+/* resolve integer ambiguity by LAMBDA ---------------------------------------*/
+static int resamb_WL(rtk_t *rtk, double *bias, double *xa)
+{
+    prcopt_t *opt=&rtk->opt;
+    int i,j,ny,nb,info,nx=rtk->nx,na=rtk->na,k,ns,row,col;
+    double *D,*DP,*y,*Qy,*b,*db,*Qb,*Qab,*QQ,s[2];
+    double *T,*Qw,*xw,*Qw1;
+
+    trace(3,"resamb_WL : nx=%d\n",nx);
+
+    rtk->sol.ratio=0.0;
+
+    if (rtk->opt.mode<=PMODE_DGPS||rtk->opt.modear==ARMODE_OFF||
+        rtk->opt.thresar[0]<1.0) {
+        return 0;
+    }
+    /* single to double-difference transformation matrix (D') */
+    D=zeros(nx,nx);
+    if ((nb=ddmat(rtk,D))<=0) {
+        errmsg(rtk,"no valid double-difference\n");
+        free(D);
+        return 0;
+    }
+    ny=na+nb; y=mat(ny,1); Qy=mat(ny,ny); DP=mat(ny,nx);
+
+    /* transform single to double-differenced phase-bias (y=D'*x, Qy=D'*P*D) */
+    matmul("TN",ny, 1,nx,1.0,D ,rtk->x,0.0,y );
+    matmul("TN",ny,nx,nx,1.0,D ,rtk->P,0.0,DP);
+    matmul("NN",ny,ny,nx,1.0,DP,D     ,0.0,Qy);
+
+    trace(4,"N(0)="); tracemat(4,y+na,1,nb,10,3);
+
+    if (nb%rtk->opt.nf!=0) {    /* to do */
+        return 0;
+    }
+    ns=nb/rtk->opt.nf;
+    row=ns+na;
+    col=ny;
+
+    T=zeros(row,col); xw=mat(row,1); Qw=mat(row,row); Qw1=mat(row, col);
+    /* form wide-lane transformation matrix */
+    wlmat(rtk,T,nb);
+
+    /* transform double-differenced ambguities to wide-lane ambiguities */
+    matmul("NN",row,1,col,1.0,T ,y,0.0,xw);
+    matmul("NN",row,col,col,1.0,T ,Qy,0.0, Qw1);
+    matmul("NT",row,row,col,1.0,Qw1,T ,0.0,Qw);
+
+    b=mat(ns,2); db=mat(ns,1); Qb=mat(ns,ns); Qab=mat(na,ns); QQ=mat(na,ns);
+    /* phase-bias covariance (Qb) and real-parameters to bias covariance (Qab) */
+    for (i=0;i<ns;i++) for (j=0;j<ns;j++) Qb [i+j*ns]=Qw[na+i+(na+j)*row];
+    for (i=0;i<na;i++) for (j=0;j<ns;j++) Qab[i+j*na]=Qw[   i+(na+j)*row];
+
+    trace(4,"N(0)="); tracemat(4,xw+na,1,ns,10,3);
+
+    /* lambda/mlambda integer least-square estimation */
+    if (!(info=lambda(ns,2,xw+na,Qb,b,s))) {
+
+        trace(4,"N(1)="); tracemat(4,b   ,1,ns,10,3);
+        trace(4,"N(2)="); tracemat(4,b+ns,1,ns,10,3);
+
+        rtk->sol.ratio=s[0]>0?(float)(s[1]/s[0]):0.0f;
+        if (rtk->sol.ratio>999.9) rtk->sol.ratio=999.9f;
+        trace(4,"R-ratio= %lf threshold = %lf\n",s[1]/s[0],opt->thresar[0]);
+
+        /* validation by popular ratio-test */
+        if (s[0]<=0.0||s[1]/s[0]>=opt->thresar[0]) {
+
+            /* transform float to fixed solution (xa=xa-Qab*Qb\(b0-b)) */
+            for (i=0;i<na;i++) {
+                rtk->xa[i]=rtk->x[i];
+                for (j=0;j<na;j++) rtk->Pa[i+j*na]=rtk->P[i+j*nx];
+            }
+            for (i=0;i<ns;i++) {
+                bias[i]=b[i];
+                xw[na+i]-=b[i];
+            }
+            if (!matinv(Qb,ns)) {
+                matmul("NN",ns,1,ns, 1.0,Qb ,xw+na,0.0,db);
+                matmul("NN",na,1,ns,-1.0,Qab,db  ,1.0,rtk->xa);
+
+                /* covariance of fixed solution (Qa=Qa-Qab*Qb^-1*Qab') */
+                matmul("NN",na,ns,ns, 1.0,Qab,Qb ,0.0,QQ);
+                matmul("NT",na,na,ns,-1.0,QQ ,Qab,1.0,rtk->Pa);
+
+                trace(3,"resamb : validation ok (ns=%d ratio=%.2f s=%.2f/%.2f)\n",
+                      ns,s[0]==0.0?0.0:s[1]/s[0],s[0],s[1]);
+
+                /* restore single-differenced ambiguity (to do) */
+                restamb(rtk,bias,ns,xa);
+            }
+            else ns=0;
+        }
+        else { /* validation failed */
+            errmsg(rtk,"ambiguity validation failed (ns=%d ratio=%.2f s=%.2f/%.2f)\n",
+                   ns,s[1]/s[0],s[0],s[1]);
+            ns=0;
+        }
+    }
+
+    free(D); free(y); free(Qy); free(DP);
+    free(b); free(db); free(Qb); free(Qab); free(QQ);
+    free(T); free(xw); free(Qw); free(Qw1);
+
+    return ns; /* number of ambiguities */
+}
 /* resolve integer ambiguity by LAMBDA ---------------------------------------*/
 static int resamb_LAMBDA(rtk_t *rtk, double *bias, double *xa)
 {
@@ -1681,6 +1811,12 @@ static int relpos(rtk_t *rtk, const obsd_t *obs, int nu, int nr,
     if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_WLNL) {
 
         if (resamb_WLNL(rtk,obs,sat,iu,ir,ns,nav,azel)) {
+            stat=SOLQ_FIX;
+        }
+    }
+    /* resolve integer ambiguity by WL */
+    else if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_WL) {
+        if (resamb_WL(rtk,bias,xa)>1) {
             stat=SOLQ_FIX;
         }
     }

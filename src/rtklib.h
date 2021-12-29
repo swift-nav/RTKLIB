@@ -399,6 +399,7 @@ extern "C" {
 #define ARMODE_FIXHOLD 3                /* AR mode: fix and hold */
 #define ARMODE_WLNL 4                   /* AR mode: wide lane/narrow lane */
 #define ARMODE_TCAR 5                   /* AR mode: triple carrier ar */
+#define ARMODE_WL   6                   /* AR mode: wide lane ar */
 
 #define SBSOPT_LCORR 1                  /* SBAS option: long term correction */
 #define SBSOPT_FCORR 2                  /* SBAS option: fast correction */
