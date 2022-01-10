@@ -1373,7 +1373,7 @@ static int ddmat(rtk_t *rtk, double *D)
 /* restore single-differenced ambiguity --------------------------------------*/
 static void restamb(rtk_t *rtk, const double *bias, int nb, double *xa)
 {
-    int i,n,m,f,index[MAXSAT],nv=0,nf=NF(&rtk->opt);
+    int i,n,m,f,index[MAXSAT],index0[MAXSAT],nv=0,nf=NF(&rtk->opt);
 
     trace(3,"restamb :\n");
 
@@ -1386,14 +1386,27 @@ static void restamb(rtk_t *rtk, const double *bias, int nb, double *xa)
             if (!test_sys(rtk->ssat[i].sys,m)||rtk->ssat[i].fix[f]!=2) {
                 continue;
             }
+            if (f==0) {
+                index0[n]=IB(i+1,0,&rtk->opt);
+            }
             index[n++]=IB(i+1,f,&rtk->opt);
         }
         if (n<2) continue;
 
-        xa[index[0]]=rtk->x[index[0]];
+        /* in case of ARMODE_WL, use float ambiguity for L1 */
+        if (rtk->opt.modear==ARMODE_WL) {
+            for (i=0;i<n;i++) {
+                if (i!=0&&f!=0) {
+                    xa[index[i]]=bias[nv++]-(xa[index0[0]]-xa[index0[i]]-xa[index[0]]);
+                }
+            }
+        }
+        else {
+            xa[index[0]]=rtk->x[index[0]];
 
-        for (i=1;i<n;i++) {
-            xa[index[i]]=xa[index[0]]-bias[nv++];
+            for (i=1;i<n;i++) {
+                xa[index[i]]=xa[index[0]]-bias[nv++];
+            }
         }
     }
 }
@@ -1401,7 +1414,7 @@ static void restamb(rtk_t *rtk, const double *bias, int nb, double *xa)
 static void holdamb(rtk_t *rtk, const double *xa)
 {
     double *v,*H,*R;
-    int i,n,m,f,info,index[MAXSAT],nb=rtk->nx-rtk->na,nv=0,nf=NF(&rtk->opt);
+    int i,n,m,f,info,index[MAXSAT],index0[MAXSAT],nb=rtk->nx-rtk->na,nv=0,nf=NF(&rtk->opt);
 
     trace(3,"holdamb :\n");
 
@@ -1414,16 +1427,34 @@ static void holdamb(rtk_t *rtk, const double *xa)
                 rtk->ssat[i].azel[1]<rtk->opt.elmaskhold) {
                 continue;
             }
+            if (f==0) {
+                index0[n]=IB(i+1,0,&rtk->opt);
+            }
             index[n++]=IB(i+1,f,&rtk->opt);
             rtk->ssat[i].fix[f]=3; /* hold */
         }
         /* constraint to fixed ambiguity */
-        for (i=1;i<n;i++) {
-            v[nv]=(xa[index[0]]-xa[index[i]])-(rtk->x[index[0]]-rtk->x[index[i]]);
+        if (rtk->opt.modear==ARMODE_WL) {
+            if (f!=0) {
+                for (i=1;i<n;i++) {
+                    v[nv]=xa[index0[0]]-xa[index0[i]]-(xa[index[0]]-xa[index[i]])
+                            -(rtk->x[index0[0]]-rtk->x[index0[i]]-(rtk->x[index[0]]-rtk->x[index[i]]));
 
-            H[index[0]+nv*rtk->nx]= 1.0;
-            H[index[i]+nv*rtk->nx]=-1.0;
-            nv++;
+                    H[index[0]+nv*rtk->nx]= -1.0;
+                    H[index[i]+nv*rtk->nx]=1.0;
+                    H[index0[0]+nv*rtk->nx]= 1.0;
+                    H[index0[i]+nv*rtk->nx]=-1.0;
+                    nv++;
+                }
+            }
+        } else {
+            for (i=1;i<n;i++) {
+                v[nv]=(xa[index[0]]-xa[index[i]])-(rtk->x[index[0]]-rtk->x[index[i]]);
+
+                H[index[0]+nv*rtk->nx]= 1.0;
+                H[index[i]+nv*rtk->nx]=-1.0;
+                nv++;
+            }
         }
     }
     if (nv>0) {
@@ -1817,6 +1848,7 @@ static int relpos(rtk_t *rtk, const obsd_t *obs, int nu, int nr,
     /* resolve integer ambiguity by WL */
     else if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_WL) {
         if (resamb_WL(rtk,bias,xa)>1) {
+            holdamb(rtk,xa);
             stat=SOLQ_FIX;
         }
     }
