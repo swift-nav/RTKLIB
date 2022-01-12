@@ -47,7 +47,7 @@
 
 /** from https://files.igs.org/pub/data/format/rinex303.pdf Appendix A8 **/
 /* Data source: I/NAV E1-B */
-#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B (1<<0)
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B  (1<<0)
 /* Data source F/NAV E5a-I */
 #define GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I (1<<1)
 /* Data source I/NAV E5b-I */
