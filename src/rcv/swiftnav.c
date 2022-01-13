@@ -45,6 +45,19 @@
 #define BDS_WEEK_TO_GPS_WEEK 1356
 #define BDS_SECOND_TO_GPS_SECOND 14
 
+/** from https://files.igs.org/pub/data/format/rinex303.pdf Appendix A8 **/
+/* Data source: I/NAV E1-B */
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B  (1<<0)
+/* Data source F/NAV E5a-I */
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I (1<<1)
+/* Data source I/NAV E5b-I */
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I (1<<2)
+/* af0-af2, Toc, SISA are for E5a,E1 */
+#define GAL_BROADCAST_ORBIT5_TOC_SISA_E5A           (1<<8)
+/* af0-af2, Toc, SISA are for E5b,E1 */
+#define GAL_BROADCAST_ORBIT5_TOC_SISA_E5B           (1<<9)
+
+
 /* get fields (little-endian) ------------------------------------------------*/
 #define U1(p) (*((uint8_t *)(p)))
 #define I1(p) (*((int8_t *)(p)))
@@ -1168,7 +1181,8 @@ static int decode_galnav(raw_t *raw) {
   }
 
   const uint8_t source = puiTmp[156];
-  eph.code = (1 == source) ? 0x2 : 0x5;
+  eph.code = (source == 1) ? (GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5A) :
+          (GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B | GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5B);
 
   trace(3, "%s: decoded eph for E%02d\n", __FUNCTION__, prn);
 

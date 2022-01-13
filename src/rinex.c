@@ -1025,7 +1025,7 @@ static int readrnxobs(FILE *fp, gtime_t ts, gtime_t te, double tint,
     unsigned char slips[MAXSAT][NFREQ]={{0}};
     int i,n,flag=0,stat=0;
     
-    trace(4,"readrnxobs: rcv=%d ver=%.2f tsys=%d\n",rcv,ver,tsys);
+    trace(4,"readrnxobs: rcv=%d ver=%.2f tsys=%d\n",rcv,ver,*tsys);
     
     if (!obs||rcv>MAXRCV) return 0;
     
