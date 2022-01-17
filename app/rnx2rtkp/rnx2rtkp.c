@@ -162,8 +162,8 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-a")) solopt.posf=SOLF_ENU;
         else if (!strcmp(argv[i],"-n")) solopt.posf=SOLF_NMEA;
         else if (!strcmp(argv[i],"-g")) solopt.degf=1;
-	else if (!strcmp(argv[i],"-w")) { /* enable widelane mode */
-          prcopt.modear=ARMODE_WL;
+	    else if (!strcmp(argv[i],"-w")) { /* enable widelane mode */
+            prcopt.modear=ARMODE_WL;
         }
         else if (!strcmp(argv[i],"-r")&&i+3<argc) {
             prcopt.refpos=prcopt.rovpos=0;
