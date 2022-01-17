@@ -1395,7 +1395,7 @@ static void restamb(rtk_t *rtk, const double *bias, int nb, double *xa)
         if (n<2) continue;
 
         /* in case of ARMODE_WL, use float ambiguity for L1 */
-        if (rtk->opt.modear==ARMODE_WL) {
+        if (rtk->opt.modear==ARMODE_WL||rtk->opt.modear==ARMODE_WL_FIXHOLD) {
             for (i=1;i<n;i++) {
                 if (f>0&&index0[0]!=0&&
                     index0[i]!=0&&
@@ -1568,14 +1568,14 @@ static int dd_wl_mat(rtk_t *rtk, double *D)
 static int resamb_WL(rtk_t *rtk, double *bias, double *xa)
 {
     prcopt_t *opt=&rtk->opt;
-    int i,j,ny,nb,info,nx=rtk->nx,na=rtk->na,k,ns,row,col;
+    int i,j,ny,nb,info,nx=rtk->nx,na=rtk->na;
     double *D,*DP,*y,*Qy,*b,*db,*Qb,*Qab,*QQ,s[2];
 
     trace(3,"resamb_WL : nx=%d\n",nx);
 
     rtk->sol.ratio=0.0;
 
-    if (rtk->opt.modear!=ARMODE_WL||rtk->opt.thresar[0]<1.0||rtk->opt.nf<2) {
+    if((rtk->opt.modear!=ARMODE_WL&&rtk->opt.modear!=ARMODE_WL_FIXHOLD)||rtk->opt.thresar[0]<1.0||rtk->opt.nf<2) {
         return 0;
     }
     /* single to double-differenced wide-lane transformation matrix (D') */
@@ -1900,9 +1900,9 @@ static int relpos(rtk_t *rtk, const obsd_t *obs, int nu, int nr,
         }
     }
     /* resolve integer ambiguity by WL */
-    else if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_WL) {
+    else if (stat!=SOLQ_NONE&&(rtk->opt.modear==ARMODE_WL||rtk->opt.modear==ARMODE_WL_FIXHOLD)) {
         if (resamb_WL(rtk,bias,xa)>1) {
-            holdamb(rtk,xa);
+            if(rtk->opt.modear==ARMODE_WL_FIXHOLD) holdamb(rtk,xa);
             stat=SOLQ_FIX;
         }
     }
