@@ -1585,7 +1585,7 @@ static int resamb_WL(rtk_t *rtk, double *bias, double *xa)
         free(D);
         return 0;
     };
-    trace(1,"na = %d, nb = %d\n", na, nb);
+    trace(2,"na = %d, nb = %d\n", na, nb);
     ny=na+nb; y=mat(ny,1); Qy=mat(ny,ny); DP=mat(ny,nx);
     b=mat(nb,2); db=mat(nb,1); Qb=mat(nb,nb); Qab=mat(na,nb); QQ=mat(na,nb);
 
@@ -1633,7 +1633,7 @@ static int resamb_WL(rtk_t *rtk, double *bias, double *xa)
                       nb,s[0]==0.0?0.0:s[1]/s[0],s[0],s[1]);
 
                 /* restore single-differenced ambiguity */
-                trace(1,"nb = %d\n",nb);
+                trace(2,"nb = %d\n",nb);
                 restamb(rtk,bias,nb,xa);
             }
             else nb=0;
