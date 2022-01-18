@@ -1889,7 +1889,7 @@ static void save_msm_obs(rtcm_t *rtcm, int sys, msm_h_t *h, const double *r,
                     rtcm->obs.data[index].D[ind[k]]=(float)(-(rr[i]+rrf[j])/wl);
                 }
                 rtcm->obs.data[index].LLI[ind[k]]=
-                    lossoflock(rtcm,sat,ind[k],lock[j])+(half[j]?3:0);
+                    lossoflock(rtcm,sat,ind[k],lock[j])+(half[j]?2:0);
                 rtcm->obs.data[index].SNR [ind[k]]=(unsigned char)(cnr[j]*4.0);
                 rtcm->obs.data[index].code[ind[k]]=code[k];
             }
