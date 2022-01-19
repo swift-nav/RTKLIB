@@ -79,6 +79,30 @@ typedef struct {                /* stream file type */
 static const int navsys[]={     /* system codes */
     SYS_GPS,SYS_GLO,SYS_GAL,SYS_QZS,SYS_SBS,SYS_CMP,SYS_IRN,0
 };
+/* initialise a sbp_t --------------------------------------------------------*/
+static int init_sbp(sbp_t *sbp)
+{
+    int i;
+
+    trace(3,"init_sbp:\n");
+
+    sbp->staid=0;
+    sbp->sta.name[0]=sbp->sta.marker[0]='\0';
+    sbp->sta.antdes[0]=sbp->sta.antsno[0]='\0';
+    sbp->sta.rectype[0]=sbp->sta.recver[0]=sbp->sta.recsno[0]='\0';
+    sbp->sta.antsetup=sbp->sta.itrf=sbp->sta.deltype=0;
+    for (i=0;i<3;i++) {
+        sbp->sta.pos[i]=sbp->sta.del[i]=0.0;
+    }
+    sbp->sta.hgt=0.0;
+
+    return 1;
+}
+/* free a sbp_t --------------------------------------------------------------*/
+static void free_sbp(sbp_t *sbp)
+{
+    // FIXME: free station list
+}
 /* convert rinex obs type ver.3 -> ver.2 -------------------------------------*/
 static void convcode(double ver, int sys, char *type)
 {
@@ -117,6 +141,26 @@ static void convcode(double ver, int sys, char *type)
     else {
         type[2]='\0';
     }
+}
+static const sta_t* get_first_station(const stas_t *stas, rnxopt_t *opt)
+{
+    const sta_t *sta=NULL;
+    int staid=-1;
+    const stas_t *p;
+
+    /* search first epoch station info */
+    for (p=stas;p;p=p->next) {
+        sta=&p->sta;
+        staid=p->staid;
+        if (timediff(p->time,opt->tstart)<DTTOL) break;
+    }
+    /* comment */
+    if (staid>=0) {
+        if (!*opt->marker) sprintf(opt->marker,"%04d",staid);
+        sprintf(opt->comment[1]+strlen(opt->comment[1]),", station ID: %d",
+                staid);
+    }
+    return sta;
 }
 /* set rinex station and receiver info to options ----------------------------*/
 static void rnx2opt(const rnxctr_t *rnx, rnxopt_t *opt)
@@ -166,27 +210,15 @@ static void rnx2opt(const rnxctr_t *rnx, rnxopt_t *opt)
 /* set rtcm antenna and receiver info to options -----------------------------*/
 static void rtcm2opt(const rtcm_t *rtcm, const stas_t *stas, rnxopt_t *opt)
 {
-    const stas_t *p;
-    const sta_t *sta=NULL;
+    const sta_t *sta;
     double pos[3],enu[3];
-    int i,staid=-1;
+    int i;
 
     trace(3,"rtcm2opt:\n");
 
-    /* search first epoch station info */
-    for (p=stas;p;p=p->next) {
-        sta=&p->sta;
-        staid=p->staid;
-        if (timediff(p->time,opt->tstart)<DTTOL) break;
-    }
+    sta = get_first_station(stas, opt);
     if (!sta) {
         sta=&rtcm->sta;
-    }
-    /* comment */
-    if (staid>=0) {
-        if (!*opt->marker) sprintf(opt->marker,"%04d",staid);
-        sprintf(opt->comment[1]+strlen(opt->comment[1]),", station ID: %d",
-                staid);
     }
     /* receiver and antenna info */
     if (!*opt->rec[0]&&!*opt->rec[1]&&!*opt->rec[2]) {
@@ -277,6 +309,20 @@ static void raw2opt(const raw_t *raw, rnxopt_t *opt)
         opt->antdel[2]=0.0;
     }
 }
+/* set rinex station and SBP antenna and receiver info -----------------------*/
+static void sbp2opt(strfile_t *str, const stas_t *stas, rnxopt_t *opt)
+{
+    const sta_t *sta;
+
+    trace(3,"sbp2opt:\n");
+
+    sta = get_first_station(stas, opt);
+    if (!sta) {
+        sta=&str->raw.sbp.sta;
+    }
+    str->raw.sta = *sta;
+    raw2opt(&str->raw, opt);
+}
 /* generate stream file ------------------------------------------------------*/
 static strfile_t *gen_strfile(int format, const char *opt, gtime_t time)
 {
@@ -305,6 +351,12 @@ static strfile_t *gen_strfile(int format, const char *opt, gtime_t time)
         str->obs=&str->raw.obs;
         str->nav=&str->raw.nav;
         strcpy(str->raw.opt,opt);
+        if (format==STRFMT_SBP||format==STRFMT_SBPJSON) {
+            if (!init_sbp(&str->raw.sbp)) {
+                showmsg("init sbp error");
+                return 0;
+            }
+        }
     }
     else if (format==STRFMT_RINEX) {
         if (!init_rnxctr(&str->rnx)) {
@@ -330,6 +382,9 @@ static void free_strfile(strfile_t *str)
     }
     else if (str->format<=MAXRCVFMT) {
         free_raw(&str->raw);
+        if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
+            free_sbp(&str->raw.sbp);
+        }
     }
     else if (str->format==STRFMT_RINEX) {
         free_rnxctr(&str->rnx);
@@ -487,27 +542,35 @@ static void setopt_obstype(const unsigned char *codes,
         }
     }
 }
-/* update station list -------------------------------------------------------*/
-static void update_stas(stas_t **stas, strfile_t *str)
+/* add station to station list -----------------------------------------------*/
+static void add_station(stas_t **stas, int staid, const gtime_t *time, const sta_t *sta)
 {
     stas_t *p;
 
-    if (str->format!=STRFMT_RTCM2&&str->format!=STRFMT_RTCM3) return;
-
     for (p=*stas;p;p=p->next) {
-        if (p->staid==str->rtcm.staid) {
-            p->sta=str->rtcm.sta;
+        if (p->staid==staid) {
+            p->sta=*sta;
             return;
         }
     }
     if (!(p=(stas_t *)calloc(sizeof(stas_t),1))) return;
-    p->staid=str->rtcm.staid;
-    p->time=str->rtcm.time;
-    p->sta=str->rtcm.sta;
+    p->staid=staid;
+    p->time=*time,
+    p->sta=*sta;
     p->next=*stas;
     *stas=p;
-    trace(2,"update_stas: staid=%d time=%s\n",str->rtcm.staid,
-          time_str(str->rtcm.time,0));
+    trace(2,"add_station: staid=%d time=%s\n",staid,
+          time_str(*time,0));
+}
+/* update station list -------------------------------------------------------*/
+static void update_stas(stas_t **stas, strfile_t *str)
+{
+    if (str->format==STRFMT_RTCM2||str->format==STRFMT_RTCM3) {
+        add_station(stas, str->rtcm.staid, &str->rtcm.time, &str->rtcm.sta);
+    }
+    if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
+        add_station(stas, str->raw.sbp.staid, &str->raw.time, &str->raw.sbp.sta);
+    }
 }
 /* update half-cycle ambiguity status ----------------------------------------*/
 static void update_halfc(halfc_t *halfc, obsd_t *obs)
@@ -964,6 +1027,12 @@ static void convobs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *staid,
             outrnxevent(ofp[0],opt,str->rtcm.staid,stas);
         }
         *staid=str->rtcm.staid;
+    } else if ((str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON)&&
+        str->raw.sbp.staid!=*staid) {
+        if (*staid>=0) {
+            outrnxevent(ofp[0],opt,str->raw.sbp.staid,stas);
+        }
+        *staid=str->raw.sbp.staid;
     }
     /* half-cycle ambiguity correction */
     if (opt->halfcyc) {
@@ -1311,6 +1380,9 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
     /* set receiver and antenna information to option */
     if (format==STRFMT_RTCM2||format==STRFMT_RTCM3) {
         rtcm2opt(&str->rtcm,stas,opt);
+    }
+    else if (format==STRFMT_SBP||format==STRFMT_SBPJSON) {
+        sbp2opt(str,stas,opt);
     }
     else if (format==STRFMT_RINEX) {
         rnx2opt(&str->rnx,opt);
