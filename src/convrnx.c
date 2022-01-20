@@ -658,6 +658,9 @@ static int scan_obstype(int format, char **files, int nf, rnxopt_t *opt,
         if (!open_strfile(str,files[m])) {
             continue;
         }
+        if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
+            if(str->raw.sbp.staid!=0) update_stas(stas,str);
+        }
         /* scan codes and station info in input file */
         while ((type=input_strfile(str))>=-1) {
 

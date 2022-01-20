@@ -1425,9 +1425,9 @@ static int decode_base_pos_ecef(raw_t *raw) {
   rr[1] = R8(puiTmp + 8);
   rr[2] = R8(puiTmp + 16);
 
-  if(rr[0] == raw->sbp.sta.pos[0] &&
-     rr[1] == raw->sbp.sta.pos[1] &&
-     rr[2] == raw->sbp.sta.pos[2]) {
+  if (rr[0] == raw->sbp.sta.pos[0] &&
+      rr[1] == raw->sbp.sta.pos[1] &&
+      rr[2] == raw->sbp.sta.pos[2]) {
     /* no change in position */
     return 0;
   }
