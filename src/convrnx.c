@@ -82,19 +82,9 @@ static const int navsys[]={     /* system codes */
 /* initialise a sbp_t --------------------------------------------------------*/
 static int init_sbp(sbp_t *sbp)
 {
-    int i;
-
     trace(3,"init_sbp:\n");
 
-    sbp->staid=0;
-    sbp->sta.name[0]=sbp->sta.marker[0]='\0';
-    sbp->sta.antdes[0]=sbp->sta.antsno[0]='\0';
-    sbp->sta.rectype[0]=sbp->sta.recver[0]=sbp->sta.recsno[0]='\0';
-    sbp->sta.antsetup=sbp->sta.itrf=sbp->sta.deltype=0;
-    for (i=0;i<3;i++) {
-        sbp->sta.pos[i]=sbp->sta.del[i]=0.0;
-    }
-    sbp->sta.hgt=0.0;
+    memset(sbp, 0, sizeof(sbp_t));
 
     return 1;
 }

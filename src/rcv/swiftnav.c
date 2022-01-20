@@ -1419,6 +1419,8 @@ static int decode_base_pos_ecef(raw_t *raw) {
     return -1;
   }
 
+  if ((NULL == strstr(raw->opt, "BASEPOS"))) return 0;
+
   rr[0] = R8(puiTmp + 0);
   rr[1] = R8(puiTmp + 8);
   rr[2] = R8(puiTmp + 16);
@@ -1427,7 +1429,7 @@ static int decode_base_pos_ecef(raw_t *raw) {
      rr[1] == raw->sbp.sta.pos[1] &&
      rr[2] == raw->sbp.sta.pos[2]) {
     /* no change in position */
-    return -1;
+    return 0;
   }
 
   raw->sbp.staid++;
