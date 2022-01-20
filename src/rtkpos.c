@@ -1568,7 +1568,7 @@ static int dd_wl_mat(rtk_t *rtk, double *D)
 static int resamb_WL(rtk_t *rtk, double *bias, double *xa)
 {
     prcopt_t *opt=&rtk->opt;
-    int i,j,ny,nb,info,nx=rtk->nx,na=rtk->na,k,ns,row,col;
+    int i,j,ny,nb,info,nx=rtk->nx,na=rtk->na;
     double *D,*DP,*y,*Qy,*b,*db,*Qb,*Qab,*QQ,s[2];
 
     trace(3,"resamb_WL : nx=%d\n",nx);
@@ -1585,7 +1585,7 @@ static int resamb_WL(rtk_t *rtk, double *bias, double *xa)
         free(D);
         return 0;
     };
-    trace(1,"na = %d, nb = %d\n", na, nb);
+    trace(2,"na = %d, nb = %d\n", na, nb);
     ny=na+nb; y=mat(ny,1); Qy=mat(ny,ny); DP=mat(ny,nx);
     b=mat(nb,2); db=mat(nb,1); Qb=mat(nb,nb); Qab=mat(na,nb); QQ=mat(na,nb);
 
@@ -1633,7 +1633,7 @@ static int resamb_WL(rtk_t *rtk, double *bias, double *xa)
                       nb,s[0]==0.0?0.0:s[1]/s[0],s[0],s[1]);
 
                 /* restore single-differenced ambiguity */
-                trace(1,"nb = %d\n",nb);
+                trace(2,"nb = %d\n",nb);
                 restamb(rtk,bias,nb,xa);
             }
             else nb=0;
@@ -1902,7 +1902,7 @@ static int relpos(rtk_t *rtk, const obsd_t *obs, int nu, int nr,
     /* resolve integer ambiguity by WL */
     else if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_WL) {
         if (resamb_WL(rtk,bias,xa)>1) {
-            holdamb(rtk,xa);
+            if (rtk->opt.wlmodear==1) holdamb(rtk,xa);
             stat=SOLQ_FIX;
         }
     }

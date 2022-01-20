@@ -155,7 +155,10 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-b")) prcopt.soltype=1;
         else if (!strcmp(argv[i],"-c")) prcopt.soltype=2;
         else if (!strcmp(argv[i],"-i")) prcopt.modear=2;
-        else if (!strcmp(argv[i],"-h")) prcopt.modear=3;
+        else if (!strcmp(argv[i],"-h")) {
+            prcopt.modear=3;
+            prcopt.wlmodear=1;
+        }
         else if (!strcmp(argv[i],"-t")) solopt.timef=1;
         else if (!strcmp(argv[i],"-u")) solopt.times=TIMES_UTC;
         else if (!strcmp(argv[i],"-e")) solopt.posf=SOLF_XYZ;
