@@ -64,6 +64,8 @@ static const char *help[]={
 " -g        output latitude/longitude in the form of ddd mm ss.ss' [ddd.ddd]",
 " -t        output time in the form of yyyy/mm/dd hh:mm:ss.ss [sssss.ss]",
 " -u        output time in utc [gpst]",
+" -z        output single point position when unable to compute",
+"           DGPS/float/fix/PPP position",
 " -d col    number of decimals in time [3]",
 " -s sep    field separator [' ']",
 " -r x y z  reference (base) receiver ecef pos (m) [average of single pos]",
@@ -164,6 +166,7 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-h")) prcopt.modear=(prcopt.modear==ARMODE_WL?ARMODE_WL_FIXHOLD:ARMODE_FIXHOLD);
         else if (!strcmp(argv[i],"-t")) solopt.timef=1;
         else if (!strcmp(argv[i],"-u")) solopt.times=TIMES_UTC;
+        else if (!strcmp(argv[i],"-z")) prcopt.outsingle=1;
         else if (!strcmp(argv[i],"-e")) solopt.posf=SOLF_XYZ;
         else if (!strcmp(argv[i],"-a")) solopt.posf=SOLF_ENU;
         else if (!strcmp(argv[i],"-n")) solopt.posf=SOLF_NMEA;
