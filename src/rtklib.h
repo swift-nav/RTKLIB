@@ -1047,6 +1047,7 @@ typedef struct {        /* processing options type */
     snrmask_t snrmask;  /* SNR mask */
     int sateph;         /* satellite ephemeris/clock (EPHOPT_???) */
     int modear;         /* AR mode (0:off,1:continuous,2:instantaneous,3:fix and hold,4:ppp-ar) */
+    int wlmodear;       /* wide lane AR fix and hold (0: off, 1: on) */
     int glomodear;      /* GLONASS AR mode (0:off,1:on,2:auto cal,3:ext cal) */
     int bdsmodear;      /* BeiDou AR mode (0:off,1:on) */
     int maxout;         /* obs outage count to reset bias */

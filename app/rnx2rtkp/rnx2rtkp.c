@@ -163,7 +163,10 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-b")) prcopt.soltype=1;
         else if (!strcmp(argv[i],"-c")) prcopt.soltype=2;
         else if (!strcmp(argv[i],"-i")) prcopt.modear=ARMODE_INST;
-        else if (!strcmp(argv[i],"-h")) prcopt.modear=(prcopt.modear==ARMODE_WL?ARMODE_WL_FIXHOLD:ARMODE_FIXHOLD);
+        else if (!strcmp(argv[i],"-h")) {
+            if (prcopt.modear!=ARMODE_WL) prcopt.modear=ARMODE_FIXHOLD;
+            prcopt.wlmodear=1;
+        }
         else if (!strcmp(argv[i],"-t")) solopt.timef=1;
         else if (!strcmp(argv[i],"-u")) solopt.times=TIMES_UTC;
         else if (!strcmp(argv[i],"-z")) prcopt.outsingle=1;
@@ -171,7 +174,7 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-a")) solopt.posf=SOLF_ENU;
         else if (!strcmp(argv[i],"-n")) solopt.posf=SOLF_NMEA;
         else if (!strcmp(argv[i],"-g")) solopt.degf=1;
-        else if (!strcmp(argv[i],"-w")) prcopt.modear=(prcopt.modear==ARMODE_FIXHOLD?ARMODE_WL_FIXHOLD:ARMODE_WL);
+        else if (!strcmp(argv[i],"-w")) prcopt.modear=ARMODE_WL;
         else if (!strcmp(argv[i],"-r")&&i+3<argc) {
             prcopt.refpos=prcopt.rovpos=POSOPT_POS;
             for (j=0;j<3;j++) prcopt.rb[j]=atof(argv[++i]);

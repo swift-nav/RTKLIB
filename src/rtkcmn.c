@@ -190,7 +190,7 @@ const double lam_carr[MAXFREQ]={ /* carrier wave length (m) */
 const prcopt_t prcopt_default={ /* defaults processing options */
     PMODE_SINGLE,0,2,SYS_GPS,   /* mode,soltype,nf,navsys */
     15.0*D2R,{{0,0}},           /* elmin,snrmask */
-    0,1,1,1,                    /* sateph,modear,glomodear,bdsmodear */
+    0,1,0,1,1,                    /* sateph,modear,wlmodear,glomodear,bdsmodear */
     5,0,10,1,                   /* maxout,minlock,minfix,armaxiter */
     0,0,0,0,                    /* estion,esttrop,dynamics,tidecorr */
     1,0,0,0,0,                  /* niter,codesmooth,intpref,sbascorr,sbassatsel */
