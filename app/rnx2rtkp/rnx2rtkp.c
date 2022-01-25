@@ -156,7 +156,7 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-c")) prcopt.soltype=2;
         else if (!strcmp(argv[i],"-i")) prcopt.modear=2;
         else if (!strcmp(argv[i],"-h")) {
-            prcopt.modear=3;
+            if (prcopt.modear!=ARMODE_WL) prcopt.modear=3;
             prcopt.wlmodear=1;
         }
         else if (!strcmp(argv[i],"-t")) solopt.timef=1;
