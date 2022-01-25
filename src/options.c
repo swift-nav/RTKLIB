@@ -55,7 +55,7 @@ static char snrmask_[NFREQ][1024];
 #define GEOOPT  "0:internal,1:egm96,2:egm08_2.5,3:egm08_1,4:gsi2000"
 #define STAOPT  "0:all,1:single"
 #define STSOPT  "0:off,1:state,2:residual"
-#define ARMOPT  "0:off,1:continuous,2:instantaneous,3:fix-and-hold"
+#define ARMOPT  "0:off,1:continuous,2:instantaneous,3:fix-and-hold,4:WLNL,5:TCAR,6:wide-lane"
 #define POSOPT  "0:llh,1:xyz,2:single,3:posfile,4:rinexhead,5:rtcm,6:raw"
 #define TIDEOPT "0:off,1:on,2:otl"
 #define PHWOPT  "0:off,1:on,2:precise"
