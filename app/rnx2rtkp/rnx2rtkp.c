@@ -70,11 +70,9 @@ static const char *help[]={
 " -s sep    field separator [' ']",
 " -r x y z  reference (base) receiver ecef pos (m) [average of single pos]",
 "           rover receiver ecef pos (m) for fixed or ppp-fixed mode",
-" -rr mode  rover position mode (1:average of single pos, 2:read from file,",
-"           3:read from RINEX header) [1]",
-" -rb mode  base position mode (1:average of single pos, 2:read from file,",
-"           3:read from RINEX header,6:read from RINEX header and site",
-"           occupancy events) [1]",
+" -rb mode  reference (base) receiver position mode (1:average of single pos,",
+"           2:read from file,3:read from RINEX header,6:read from RINEX header",
+"           and subsequent site occupancy events) [1]",
 " -l lat lon hgt reference (base) receiver latitude/longitude/height (deg/m)",
 "           rover latitude/longitude/height for fixed or ppp-fixed mode",
 " -y level  output soltion status (0:off,1:states,2:residuals) [0]",
@@ -180,7 +178,6 @@ int main(int argc, char **argv)
             for (j=0;j<3;j++) prcopt.rb[j]=atof(argv[++i]);
             matcpy(prcopt.ru,prcopt.rb,3,1);
         }
-        else if (!strcmp(argv[i],"-rr")&&i+1<argc) prcopt.rovpos=atoi(argv[++i]);
         else if (!strcmp(argv[i],"-rb")&&i+1<argc) prcopt.refpos=atoi(argv[++i]);
         else if (!strcmp(argv[i],"-l")&&i+3<argc) {
             prcopt.refpos=prcopt.rovpos=POSOPT_POS;
