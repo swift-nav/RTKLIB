@@ -88,11 +88,6 @@ static int init_sbp(sbp_t *sbp)
 
     return 1;
 }
-/* free a sbp_t --------------------------------------------------------------*/
-static void free_sbp(sbp_t *sbp)
-{
-    // FIXME: free station list
-}
 /* convert rinex obs type ver.3 -> ver.2 -------------------------------------*/
 static void convcode(double ver, int sys, char *type)
 {
@@ -372,9 +367,6 @@ static void free_strfile(strfile_t *str)
     }
     else if (str->format<=MAXRCVFMT) {
         free_raw(&str->raw);
-        if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
-            free_sbp(&str->raw.sbp);
-        }
     }
     else if (str->format==STRFMT_RINEX) {
         free_rnxctr(&str->rnx);
