@@ -28,7 +28,7 @@ static const char *help[]={
 "",
 " usage: rnx2rtkp [option]... file file [...]",
 "",
-" Read RINEX OBS/NAV/GNAV/HNAV/CLK, SP3, SBAS message log files and ccompute ",
+" Read RINEX OBS/NAV/GNAV/HNAV/CLK, SP3, SBAS message log files and compute ",
 " receiver (rover) positions and output position solutions.",
 " The first RINEX OBS file shall contain receiver (rover) observations. For the",
 " relative mode, the second RINEX OBS file shall contain reference",
@@ -64,10 +64,15 @@ static const char *help[]={
 " -g        output latitude/longitude in the form of ddd mm ss.ss' [ddd.ddd]",
 " -t        output time in the form of yyyy/mm/dd hh:mm:ss.ss [sssss.ss]",
 " -u        output time in utc [gpst]",
+" -z        output single point position when unable to compute",
+"           DGPS/float/fix/PPP position",
 " -d col    number of decimals in time [3]",
 " -s sep    field separator [' ']",
 " -r x y z  reference (base) receiver ecef pos (m) [average of single pos]",
 "           rover receiver ecef pos (m) for fixed or ppp-fixed mode",
+" -rb mode  reference (base) receiver position mode (1:average of single pos,",
+"           2:read from file,3:read from RINEX header,6:read from RINEX header",
+"           and subsequent site occupancy events) [1]",
 " -l lat lon hgt reference (base) receiver latitude/longitude/height (deg/m)",
 "           rover latitude/longitude/height for fixed or ppp-fixed mode",
 " -y level  output soltion status (0:off,1:states,2:residuals) [0]",
@@ -155,27 +160,27 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-d")&&i+1<argc) solopt.timeu=atoi(argv[++i]);
         else if (!strcmp(argv[i],"-b")) prcopt.soltype=1;
         else if (!strcmp(argv[i],"-c")) prcopt.soltype=2;
-        else if (!strcmp(argv[i],"-i")) prcopt.modear=2;
+        else if (!strcmp(argv[i],"-i")) prcopt.modear=ARMODE_INST;
         else if (!strcmp(argv[i],"-h")) {
-            if (prcopt.modear!=ARMODE_WL) prcopt.modear=3;
+            if (prcopt.modear!=ARMODE_WL) prcopt.modear=ARMODE_FIXHOLD;
             prcopt.wlmodear=1;
         }
         else if (!strcmp(argv[i],"-t")) solopt.timef=1;
         else if (!strcmp(argv[i],"-u")) solopt.times=TIMES_UTC;
+        else if (!strcmp(argv[i],"-z")) prcopt.outsingle=1;
         else if (!strcmp(argv[i],"-e")) solopt.posf=SOLF_XYZ;
         else if (!strcmp(argv[i],"-a")) solopt.posf=SOLF_ENU;
         else if (!strcmp(argv[i],"-n")) solopt.posf=SOLF_NMEA;
         else if (!strcmp(argv[i],"-g")) solopt.degf=1;
-	    else if (!strcmp(argv[i],"-w")) { /* enable widelane mode */
-            prcopt.modear=ARMODE_WL;
-        }
+        else if (!strcmp(argv[i],"-w")) prcopt.modear=ARMODE_WL;
         else if (!strcmp(argv[i],"-r")&&i+3<argc) {
-            prcopt.refpos=prcopt.rovpos=0;
+            prcopt.refpos=prcopt.rovpos=POSOPT_POS;
             for (j=0;j<3;j++) prcopt.rb[j]=atof(argv[++i]);
             matcpy(prcopt.ru,prcopt.rb,3,1);
         }
+        else if (!strcmp(argv[i],"-rb")&&i+1<argc) prcopt.refpos=atoi(argv[++i]);
         else if (!strcmp(argv[i],"-l")&&i+3<argc) {
-            prcopt.refpos=prcopt.rovpos=0;
+            prcopt.refpos=prcopt.rovpos=POSOPT_POS;
             for (j=0;j<3;j++) pos[j]=atof(argv[++i]);
             for (j=0;j<2;j++) pos[j]*=D2R;
             pos2ecef(pos,prcopt.rb);
