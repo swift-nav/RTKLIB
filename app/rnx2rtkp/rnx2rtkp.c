@@ -57,6 +57,7 @@ static const char *help[]={
 " -c        forward/backward combined solutions [off]",
 " -i        instantaneous integer ambiguity resolution [off]",
 " -h        fix and hold for integer ambiguity resolution [off]",
+" -w        widelane integer ambiguity resolution [off]",
 " -e        output x/y/z-ecef position [latitude/longitude/height]",
 " -a        output e/n/u-baseline [latitude/longitude/height]",
 " -n        output NMEA-0183 GGA sentence [off]",
@@ -155,13 +156,19 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-b")) prcopt.soltype=1;
         else if (!strcmp(argv[i],"-c")) prcopt.soltype=2;
         else if (!strcmp(argv[i],"-i")) prcopt.modear=2;
-        else if (!strcmp(argv[i],"-h")) prcopt.modear=3;
+        else if (!strcmp(argv[i],"-h")) {
+            if (prcopt.modear!=ARMODE_WL) prcopt.modear=3;
+            prcopt.wlmodear=1;
+        }
         else if (!strcmp(argv[i],"-t")) solopt.timef=1;
         else if (!strcmp(argv[i],"-u")) solopt.times=TIMES_UTC;
         else if (!strcmp(argv[i],"-e")) solopt.posf=SOLF_XYZ;
         else if (!strcmp(argv[i],"-a")) solopt.posf=SOLF_ENU;
         else if (!strcmp(argv[i],"-n")) solopt.posf=SOLF_NMEA;
         else if (!strcmp(argv[i],"-g")) solopt.degf=1;
+	    else if (!strcmp(argv[i],"-w")) { /* enable widelane mode */
+            prcopt.modear=ARMODE_WL;
+        }
         else if (!strcmp(argv[i],"-r")&&i+3<argc) {
             prcopt.refpos=prcopt.rovpos=0;
             for (j=0;j<3;j++) prcopt.rb[j]=atof(argv[++i]);
