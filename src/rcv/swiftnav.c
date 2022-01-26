@@ -39,6 +39,8 @@
 #define ID_MSGIONGPS 0x0090    /* GPS ionospheric parameters */
 #define ID_MSG_SBAS_RAW 0x7777 /* SBAS data */
 
+#define ID_MSG_BASE_POS_ECEF 0x0048 /* Base station position in ECEF */
+
 #define SEC_DAY 86400.0
 
 /** Constant difference of Beidou time from GPS time */
@@ -1404,6 +1406,42 @@ static int decode_snav(raw_t *raw) {
   return 3;
 }
 
+/* decode base station position message --------------------------------------*/
+static int decode_base_pos_ecef(raw_t *raw) {
+  uint8_t *puiTmp = (raw->buff) + 6;
+  double rr[3];
+  int j;
+
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
+
+  if ((raw->len) < 26) {
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
+    return -1;
+  }
+
+  if ((NULL == strstr(raw->opt, "BASEPOS"))) return 0;
+
+  rr[0] = R8(puiTmp + 0);
+  rr[1] = R8(puiTmp + 8);
+  rr[2] = R8(puiTmp + 16);
+
+  if (rr[0] == raw->sbp.sta.pos[0] &&
+      rr[1] == raw->sbp.sta.pos[1] &&
+      rr[2] == raw->sbp.sta.pos[2]) {
+    /* no change in position */
+    return 0;
+  }
+
+  raw->sbp.staid++;
+  raw->sbp.sta.deltype=0; /* xyz */
+  for (j=0;j<3;j++) {
+    raw->sbp.sta.pos[j]=rr[j];
+    raw->sbp.sta.del[j]=0.0;
+  }
+  raw->sbp.sta.hgt=0.0;
+  return 5;
+}
+
 /* decode SBF raw message --------------------------------------------------*/
 static int decode_sbp(raw_t *raw) {
   uint16_t crc, uCalcCrc;
@@ -1456,6 +1494,8 @@ static int decode_sbp(raw_t *raw) {
       return decode_gpsion(raw);
     case ID_MSG_SBAS_RAW:
       return decode_snav(raw);
+    case ID_MSG_BASE_POS_ECEF:
+      return decode_base_pos_ecef(raw);
     default:
       trace(3, "decode_sbp: unused frame type=%04x len=%d\n", type, raw->len);
       /* there are many more SBF blocks to be extracted */

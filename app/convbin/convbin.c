@@ -75,6 +75,7 @@ static const char *help[]={
     "                  json      - Swift Navigation SBP-JSON",
     "     -ro opt,opt  receiver option(s) (use comma between multiple opt):",
     "                  CONVBASE  - convert base station observations",
+    "                  BASEPOS   - determine base station location from input file",
     "                  EPHALL    - include all ephemeris",
     "                  INVCP     - invert carrier phase polarity",
     "                  OBSALL    - include observations with RAIM flag set",
