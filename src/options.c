@@ -83,8 +83,9 @@ EXPORT opt_t sysopts[]={
     {"pos1-posopt6",    3,  (void *)&prcopt_.posopt[5],  SWTOPT },
     {"pos1-exclsats",   2,  (void *)exsats_,             "prn ..."},
     {"pos1-navsys",     0,  (void *)&prcopt_.navsys,     NAVOPT },
-    
+
     {"pos2-armode",     3,  (void *)&prcopt_.modear,     ARMOPT },
+    {"pos2-wlarmode",   3,  (void *)&prcopt_.wlmodear,   SWTOPT },
     {"pos2-gloarmode",  3,  (void *)&prcopt_.glomodear,  GAROPT },
     {"pos2-bdsarmode",  3,  (void *)&prcopt_.bdsmodear,  SWTOPT },
     {"pos2-arthres",    1,  (void *)&prcopt_.thresar[0], ""     },
