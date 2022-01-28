@@ -1,4 +1,5 @@
 *.o
+*.d
 *.obs
 *.ini
 *.local
@@ -17,5 +18,7 @@
 *.opendb
 Release
 Release_Build
+Debug
 Debug_Build
 __history
+__astcache
