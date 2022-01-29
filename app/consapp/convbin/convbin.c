@@ -50,6 +50,7 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 #include "rtklib.h"
+#include "rtklib_swift.h"
 
 #define PRGNAME   "sbp2rinex"
 #define TRACEFILE "convbin.trace"
@@ -64,6 +65,7 @@ static const char *help[]={
     " Usage:",
     "",
     "     sbp2rinex [option ...] file",
+    "",
     " SBAS message file complies with RTKLIB SBAS/LEX message format.",
     "",
     " Options [default]:",
@@ -79,6 +81,7 @@ static const char *help[]={
     "                  json      - Swift Navigation SBP-JSON",
     "     -ro opt,opt  receiver option(s) (use comma between multiple opt):",
     "                  CONVBASE  - convert base station observations",
+    "                  BASEPOS   - determine base station location from input file",
     "                  EPHALL    - include all ephemeris",
     "                  INVCP     - invert carrier phase polarity",
     "                  OBSALL    - include observations with RAIM flag set",
@@ -126,8 +129,9 @@ void settspan(gtime_t ts, gtime_t te) {}
 void settime(gtime_t time) {}
 
 /* print help ----------------------------------------------------------------*/
-static void printhelp(void)
+static void printhelp(rnxopt_t *opt)
 {
+    fprintf(stderr, " %s\n", opt->prog);
     int i;
     for (i=0;i<(int)(sizeof(help)/sizeof(*help));i++) fprintf(stderr,"%s\n",help[i]);
     exit(0);
@@ -249,6 +253,7 @@ static int convbin(int format, rnxopt_t *opt, const char *ifile, char **file,
         else strcpy(work,ofile[i]);
         sprintf(ofile[i],"%s%c%s",dir,FILEPATHSEP,work);
     }
+    fprintf(stderr, "%s\n", opt->prog);
     fprintf(stderr,"input file  : %s (%s)\n",ifile,formatstrs[format]);
 
     if (*ofile[0]) fprintf(stderr,"->rinex obs : %s\n",ofile[0]);
@@ -477,7 +482,7 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
         else if (!strcmp(argv[i],"-trace" )&&i+1<argc) {
             *trace=atoi(argv[++i]);
         }
-        else if (!strncmp(argv[i],"-",1)) printhelp();
+        else if (!strncmp(argv[i],"-",1)) printhelp(opt);
 
         else *ifile=argv[i];
     }
@@ -545,6 +550,8 @@ int main(int argc, char **argv)
     int format,trace=0,stat;
     char *ifile="",*ofile[NOUTFILE]={0},*dir="";
 
+    sprintf(opt.prog,"%s %s (RTKLIB %s%s)",PRGNAME,SWIFT_VER_RTKLIB,VER_RTKLIB,PATCH_LEVEL);
+
     /* parse command line options */
     format=cmdopts(argc,argv,&opt,&ifile,ofile,&dir,&trace);
 
@@ -556,8 +563,12 @@ int main(int argc, char **argv)
         fprintf(stderr,"input format can not be recognized\n");
         return -1;
     }
-    sprintf(opt.prog,"%s %s",PRGNAME,VER_RTKLIB);
-    
+    sprintf(opt.comment[0],"log: %-55.55s",ifile);
+    sprintf(opt.comment[1],"format: %s",formatstrs[format]);
+    if (*opt.rcvopt) {
+        strcat(opt.comment[1],", option: ");
+        strcat(opt.comment[1],opt.rcvopt);
+    }
     if (trace>0) {
         traceopen(TRACEFILE);
         tracelevel(trace);

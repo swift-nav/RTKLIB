@@ -39,11 +39,26 @@
 #define ID_MSGIONGPS 0x0090    /* GPS ionospheric parameters */
 #define ID_MSG_SBAS_RAW 0x7777 /* SBAS data */
 
+#define ID_MSG_BASE_POS_ECEF 0x0048 /* Base station position in ECEF */
+
 #define SEC_DAY 86400.0
 
 /** Constant difference of Beidou time from GPS time */
 #define BDS_WEEK_TO_GPS_WEEK 1356
 #define BDS_SECOND_TO_GPS_SECOND 14
+
+/** from https://files.igs.org/pub/data/format/rinex303.pdf Appendix A8 **/
+/* Data source: I/NAV E1-B */
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B  (1<<0)
+/* Data source F/NAV E5a-I */
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I (1<<1)
+/* Data source I/NAV E5b-I */
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I (1<<2)
+/* af0-af2, Toc, SISA are for E5a,E1 */
+#define GAL_BROADCAST_ORBIT5_TOC_SISA_E5A           (1<<8)
+/* af0-af2, Toc, SISA are for E5b,E1 */
+#define GAL_BROADCAST_ORBIT5_TOC_SISA_E5B           (1<<9)
+
 
 /* get fields (little-endian) ------------------------------------------------*/
 #define U1(p) (*((uint8_t *)(p)))
@@ -365,10 +380,10 @@ static int Base64_Decode(uint8_t *_pcData,
 
   output_length = _uDataLen / 4 * 3;
 
-  if ('=' == _pcData[_uDataLen - 1]) {
+  if (_uDataLen > 0 && '=' == _pcData[_uDataLen - 1]) {
     output_length--;
   }
-  if ('=' == _pcData[_uDataLen - 2]) {
+  if (_uDataLen > 1 && '=' == _pcData[_uDataLen - 2]) {
     output_length--;
   }
 
@@ -1168,7 +1183,8 @@ static int decode_galnav(raw_t *raw) {
   }
 
   const uint8_t source = puiTmp[156];
-  eph.code = (1 == source) ? 0x2 : 0x5;
+  eph.code = (source == 1) ? (GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5A) :
+          (GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B | GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5B);
 
   trace(3, "%s: decoded eph for E%02d\n", __FUNCTION__, prn);
 
@@ -1390,6 +1406,42 @@ static int decode_snav(raw_t *raw) {
   return 3;
 }
 
+/* decode base station position message --------------------------------------*/
+static int decode_base_pos_ecef(raw_t *raw) {
+  uint8_t *puiTmp = (raw->buff) + 6;
+  double rr[3];
+  int j;
+
+  trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
+
+  if ((raw->len) < 26) {
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
+    return -1;
+  }
+
+  if ((NULL == strstr(raw->opt, "BASEPOS"))) return 0;
+
+  rr[0] = R8(puiTmp + 0);
+  rr[1] = R8(puiTmp + 8);
+  rr[2] = R8(puiTmp + 16);
+
+  if (rr[0] == raw->sbp.sta.pos[0] &&
+      rr[1] == raw->sbp.sta.pos[1] &&
+      rr[2] == raw->sbp.sta.pos[2]) {
+    /* no change in position */
+    return 0;
+  }
+
+  raw->sbp.staid++;
+  raw->sbp.sta.deltype=0; /* xyz */
+  for (j=0;j<3;j++) {
+    raw->sbp.sta.pos[j]=rr[j];
+    raw->sbp.sta.del[j]=0.0;
+  }
+  raw->sbp.sta.hgt=0.0;
+  return 5;
+}
+
 /* decode SBF raw message --------------------------------------------------*/
 static int decode_sbp(raw_t *raw) {
   uint16_t crc, uCalcCrc;
@@ -1442,6 +1494,8 @@ static int decode_sbp(raw_t *raw) {
       return decode_gpsion(raw);
     case ID_MSG_SBAS_RAW:
       return decode_snav(raw);
+    case ID_MSG_BASE_POS_ECEF:
+      return decode_base_pos_ecef(raw);
     default:
       trace(3, "decode_sbp: unused frame type=%04x len=%d\n", type, raw->len);
       /* there are many more SBF blocks to be extracted */

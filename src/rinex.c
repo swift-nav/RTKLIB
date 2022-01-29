@@ -1014,8 +1014,15 @@ static int readrnxobsb(FILE *fp, const char *opt, double ver, int *tsys,
             data[n].time=time;
             data[n].sat=(uint8_t)sats[i-1];
             
-            /* decode RINEX observation data */
-            if (decode_obsdata(fp,buff,ver,mask,index,data+n)) n++;
+            /* decode obs data */
+            if (decode_obsdata(fp,buff,ver,mask,index,data+n)&&n<MAXOBS) {
+                if (sta) {
+                    data[n].refpos[0]=sta->pos[0];
+                    data[n].refpos[1]=sta->pos[1];
+                    data[n].refpos[2]=sta->pos[2];
+                }
+                n++;
+            }
         }
         else if (*flag==3||*flag==4) { /* new site or header info follows */
             
@@ -1035,7 +1042,7 @@ static int readrnxobs(FILE *fp, gtime_t ts, gtime_t te, double tint,
     uint8_t slips[MAXSAT][NFREQ+NEXOBS]={{0}};
     int i,n,flag=0,stat=0;
     
-    trace(4,"readrnxobs: rcv=%d ver=%.2f tsys=%d\n",rcv,ver,tsys);
+    trace(4,"readrnxobs: rcv=%d ver=%.2f tsys=%d\n",rcv,ver,*tsys);
     
     if (!obs||rcv>MAXRCV) return 0;
     

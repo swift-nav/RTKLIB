@@ -74,6 +74,8 @@ static const char *help[] = {
     "    serial       : serial://port[:brate[:bsize[:parity[:stopb[:fctr]]]]]",
     "    tcp server   : tcpsvr://:port",
     "    tcp client   : tcpcli://addr[:port]",
+    "    udp server   : udpsvr://addr:port",
+    "    udp client   : udpcli://addr:port",
     "    ntrip client : ntrip://[user[:passwd]@]addr[:port][/mntpnt]",
     "    ntrip server : ntrips://[:passwd@]addr[:port]/mntpnt[:str] (only out)",
     "    ntrip caster server: ntripc_s://[:passwd@][:port] (only in)",
@@ -204,6 +206,10 @@ static int decodepath(const char *path, int *type, char *strpath, int *fmt) {
     *type = STR_SERIAL;
   else if (!strncmp(path, "tcpsvr", 6))
     *type = STR_TCPSVR;
+  else if (!strncmp(path, "udpsvr", 6))
+    *type = STR_UDPSVR;
+  else if (!strncmp(path, "udpcli", 6))
+    *type = STR_UDPCLI;
   else if (!strncmp(path, "tcpcli", 6))
     *type = STR_TCPCLI;
   else if (!strncmp(path, "ntripc_s", 8))

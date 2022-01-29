@@ -12,7 +12,7 @@ install:
   - set PATH=C:\MinGW\bin;C:\MinGW\msys\1.0\bin;%PATH%
   - set CC=gcc
   - set INCLUDE=%cd%\src;..\..\..\src;%INCLUDE%
-  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mnaoumov/Invoke-NativeApplication/master/exec.ps1" -OutFile ".\exec1.ps1"
+  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mnaoumov/Invoke-NativeApplication/25827a3f8348c96c618d8487164dc94877b960f8/exec.ps1" -OutFile ".\exec1.ps1"
 
 build_script:
   - ps: |
@@ -35,7 +35,7 @@ artifacts:
     name: sbp2rinex_mingw
 
   - path: app\str2str\gcc\str2str*
-    name: sbp2rinex_mingw
+    name: sbp2str_mingw
 
   - path: app\convbin\vs14\Debug\sbp2rinex.exe
     name: sbp2rinex_vs_debug

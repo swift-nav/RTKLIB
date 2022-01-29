@@ -1,4 +1,3 @@
-
 The RTKLIB software package is distributed under the following BSD 2-clause
 license. Users are permitted to develop, produce or sell their own non-
 commercial or commercial products utilizing, linking or including RTKLIB as long
@@ -37,4 +36,3 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Notes:
 Previous versions of RTKLIB until ver. 2.4.1 had been distributed under GPLv3
 license.
-
