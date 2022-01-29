@@ -1,11 +1,7 @@
 /*------------------------------------------------------------------------------
 * notvatel.c : NovAtel OEM7/OEM6/OEM5/OEM4/OEM3 receiver functions
 *
-<<<<<<< HEAD
-*          Copyright (C) 2007-2019 by T.TAKASU, All rights reserved.
-=======
 *          Copyright (C) 2007-2020 by T.TAKASU, All rights reserved.
->>>>>>> upstream/rtklib_2.4.3
 *
 * reference :
 *     [1] NovAtel, OM-20000094 Rev6 OEMV Family Firmware Reference Manual, 2008
@@ -61,8 +57,6 @@
 *                           output L2W instead of L2D for L2Pcodeless
 *                           test toc difference to output beidou ephemeris
 *           2019/05/10 1.17 save galileo E5b data to obs index 2
-<<<<<<< HEAD
-=======
 *           2020/11/30 1.18 support OEM7 receiver (ref [6])
 *                           support NavIC/IRNSS
 *                           support GPS/QZS L1C, GLO L3, GAL E6, QZS L6, BDS B3,
@@ -79,7 +73,6 @@
 *                           use API sat2freq() to get carrier-frequency
 *                           use API code2idx() to get freq-index
 *                           use integer types in stdint.h
->>>>>>> upstream/rtklib_2.4.3
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -322,55 +315,7 @@ static int decode_track_stat(uint32_t stat, int *sys, int *code, int *track,
             trace(2,"oem4 unknown system: sys=%d\n",satsys);
             return -1;
     }
-<<<<<<< HEAD
-    if (*sys==SYS_GPS||*sys==SYS_QZS) {
-        switch (sigtype) {
-            case  0: freq=0; *code=CODE_L1C; break; /* L1C/A */
-            case  5: freq=0; *code=CODE_L1P; break; /* L1P */
-            case  9: freq=1; *code=CODE_L2W; break; /* L2Pcodeless */
-            case 14: freq=2; *code=CODE_L5Q; break; /* L5Q (OEM6) */
-            case 17: freq=1; *code=CODE_L2X; break; /* L2C(M+L) */
-            default: freq=-1; break;
-        }
-    }
-    else if (*sys==SYS_GLO) {
-        switch (sigtype) {
-            case  0: freq=0; *code=CODE_L1C; break; /* L1C/A */
-            case  1: freq=1; *code=CODE_L2C; break; /* L2C/A (OEM6) */
-            case  5: freq=1; *code=CODE_L2P; break; /* L2P */
-            default: freq=-1; break;
-        }
-    }
-    else if (*sys==SYS_GAL) {
-        switch (sigtype) {
-            case  1: freq=0; *code=CODE_L1B; break; /* E1B  (OEM6) */
-            case  2: freq=0; *code=CODE_L1C; break; /* E1C  (OEM6) */
-            case 12: freq=2; *code=CODE_L5Q; break; /* E5aQ (OEM6) */
-            case 17: freq=1; *code=CODE_L7Q; break; /* E5bQ (OEM6) */
-            case 20: freq=5; *code=CODE_L8Q; break; /* AltBOCQ (OEM6) */
-            default: freq=-1; break;
-        }
-    }
-    else if (*sys==SYS_CMP) {
-        switch (sigtype) {
-            case  0: freq=0; *code=CODE_L1I; break; /* B1 with D1 (OEM6) */
-            case  1: freq=1; *code=CODE_L7I; break; /* B2 with D1 (OEM6) */
-            case  4: freq=0; *code=CODE_L1I; break; /* B1 with D2 (OEM6) */
-            case  5: freq=1; *code=CODE_L7I; break; /* B2 with D2 (OEM6) */
-            default: freq=-1; break;
-        }
-    }
-    else if (*sys==SYS_SBS) {
-        switch (sigtype) {
-            case  0: freq=0; *code=CODE_L1C; break; /* L1C/A */
-            case  6: freq=2; *code=CODE_L5I; break; /* L5I (OEM6) */
-            default: freq=-1; break;
-        }
-    }
-    if (freq<0) {
-=======
     if (!(*code=sig2code(*sys,sigtype))||(idx=code2idx(*sys,*code))<0) {
->>>>>>> upstream/rtklib_2.4.3
         trace(2,"oem4 signal type error: sys=%d sigtype=%d\n",*sys,sigtype);
         return -1;
     }
@@ -394,13 +339,6 @@ static int checkpri(const char *opt, int sys, int code, int idx)
         if (code==CODE_L2C) return (nex<1)?-1:NFREQ;
     }
     else if (sys==SYS_GAL) {
-<<<<<<< HEAD
-        if (strstr(opt,"-EL1B")&&freq==0) return code==CODE_L1B?0:-1;
-        if (code==CODE_L1B) return nex<1?-1:NFREQ;
-        if (code==CODE_L8Q) return nex<3?-1:NFREQ+2;
-    }
-    return freq<NFREQ?freq:-1;
-=======
         if (strstr(opt,"-EL6B")&&idx==3) return (code==CODE_L6B)?3:-1;
         if (code==CODE_L6B) return (nex<2)?-1:NFREQ;
     }
@@ -417,7 +355,6 @@ static int checkpri(const char *opt, int sys, int code, int idx)
         if (code==CODE_L7D) return (nex<2)?-1:NFREQ+1;
     }
     return idx<NFREQ?idx:-1;
->>>>>>> upstream/rtklib_2.4.3
 }
 /* decode RANGECMPB ----------------------------------------------------------*/
 static int decode_rangecmpb(raw_t *raw)

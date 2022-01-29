@@ -1571,6 +1571,7 @@ EXPORT int update_cmr (raw_t *raw, rtksvr_t *svr, obs_t *obs);
 EXPORT int input_oem4  (raw_t *raw, uint8_t data);
 EXPORT int input_oem3  (raw_t *raw, uint8_t data);
 EXPORT int input_ubx   (raw_t *raw, uint8_t data);
+EXPORT int input_sbp   (raw_t *raw, uint8_t data);
 EXPORT int input_ss2   (raw_t *raw, uint8_t data);
 EXPORT int input_cres  (raw_t *raw, uint8_t data);
 EXPORT int input_stq   (raw_t *raw, uint8_t data);

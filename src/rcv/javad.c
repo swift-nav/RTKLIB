@@ -1,11 +1,7 @@
 /*------------------------------------------------------------------------------
 * javad.c : javad receiver dependent functions
 *
-<<<<<<< HEAD
-*          Copyright (C) 2011-2019 by T.TAKASU, All rights reserved.
-=======
 *          Copyright (C) 2011-2020 by T.TAKASU, All rights reserved.
->>>>>>> upstream/rtklib_2.4.3
 *
 * reference :
 *     [1] Javad GNSS, GREIS GNSS Receiver External Interface Specification,
@@ -48,8 +44,6 @@
 *                           fix bug on saving galileo bgd to ephemeris
 *                           add receiver option -GALINAV, -GALFNAV
 *           2019/05/10 1.15 save galileo E5b data to obs index 2
-<<<<<<< HEAD
-=======
 *           2020/11/30 1.16 output L1C for GLONASS G1 as default
 *                           change receiver option -RL1C -> -RL1P
 *                           CODE_L1I -> CODE_L2I for BDS B1I (RINEX 3.04)
@@ -57,7 +51,6 @@
 *                           fix bug on decoding SVH in message [NE] for GLONASS
 *                           use API code2idx() to get freq-index
 *                           use integer types in stdint.h
->>>>>>> upstream/rtklib_2.4.3
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -120,16 +113,7 @@ static int sig2idx(int sys, char sig, int *code)
         {CODE_L2I,0       ,CODE_L7I,CODE_L6I,CODE_L5X,CODE_L1X}, /* BDS */
         {0       ,0       ,0       ,0       ,CODE_L5X,0       }  /* IRN */
     };
-<<<<<<< HEAD
-    const int freqs[7][6]={
-        {1,1,2,2,3,1}, {1,1,4,2,3,1}, {1,0,0,0,3,0},     /* GPS,QZS,SBS */
-        {1,6,2,4,3,0}, {1,1,2,2,3,0}, {1,0,2,3,3,1},     /* GAL,GLO,BDS */
-        {0,0,0,0,3,0}                                    /* IRN */
-    };
-    int i,j;
-=======
     int i,j,idx;
->>>>>>> upstream/rtklib_2.4.3
     
     switch (sig) {
         case 'c':
@@ -180,37 +164,7 @@ static int checkpri(int sys, int code, const char *opt, int idx)
         if (code==CODE_L1Z) return nex<1?-1:NFREQ;
         if (code==CODE_L1X) return nex<2?-1:NFREQ+1;
     }
-<<<<<<< HEAD
-    return freq<NFREQ?freq:-1;
-}
-/* carrier frequency for systems ---------------------------------------------*/
-static double freq_sys(int sys, int freq, int freqn)
-{
-    if (sys==SYS_GLO) {
-        switch (freq) {
-            case 0: return FREQ1_GLO+DFRQ1_GLO*freqn; /* L1 */
-            case 1: return FREQ2_GLO+DFRQ2_GLO*freqn; /* L2 */
-            case 2: return FREQ3_GLO;                 /* L3 */
-        }
-        return 0.0;
-    }
-    else if (sys==SYS_CMP) {
-        switch (freq) {
-            case 0: return FREQ1_CMP; /* B1 */
-            case 1: return FREQ2_CMP; /* B2 */
-            case 2: return FREQ3_CMP; /* B3 */
-        }
-        return 0.0;
-    }
-    else if (sys==SYS_GAL&&freq==1) { /* Galileo E5b */
-        return FREQ7;
-    }
-    else {
-        return CLIGHT/lam_carr[freq];
-    }
-=======
     return idx;
->>>>>>> upstream/rtklib_2.4.3
 }
 /* checksum ------------------------------------------------------------------*/
 static int checksum(uint8_t *buff, int len)

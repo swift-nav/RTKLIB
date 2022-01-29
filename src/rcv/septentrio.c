@@ -223,16 +223,6 @@ static int decode_measepoch(raw_t *raw)
             trace(2,"sbf measepoch sig error: sat=%d sig=%d\n",sat,sig);
             p+=len1+len2*n2;
             continue;
-<<<<<<< HEAD
-        };
-
-        raw->obs.data[n].sat=(unsigned char)sat;
-
-        /* start new observation period */
-        if (fabs(timediff(raw->obs.data[0].time,raw->time))>1E-9) {
-            raw->obs.n=0;
-=======
->>>>>>> upstream/rtklib_2.4.3
         }
         init_obsd(raw->time,sat,raw->obs.data+n);
         P1=D1=0.0;
@@ -243,41 +233,9 @@ static int decode_measepoch(raw_t *raw)
             P1=(U1(p+3)&0x0f)*4294967.296+U4(p+4)*0.001;
             raw->obs.data[n].P[idx]=P1;
         }
-<<<<<<< HEAD
-        /* detect which signals is stored in Type1 sub-block */
-#if 1
-        h=getFreqNo(signType1);
-#else
-        freqType1 = getSigFreq(signType1,8);
-        if      (freqType1 == FREQ1) h = 0;
-        else if (freqType1 == FREQ2) h = 1;
-        else if (freqType1 == FREQ5) h = 2;
-        else if (freqType1 == FREQ6) h = 3;
-        else if (freqType1 == FREQ7) h = 4;
-        else if (freqType1 == FREQ8) h = 5;
-        else                         h = 0;
-#endif
-        /* store signal info */
-        if (h<=NFREQ+NEXOBS) {
-            raw->obs.data[n].L[h]    = adr;
-            raw->obs.data[n].P[h]    = psr;
-            raw->obs.data[n].D[h]    = (float)dopplerType1;
-            raw->obs.data[n].SNR[h]  = (unsigned char)(SNR_DBHZ*4.0);
-            raw->obs.data[n].code[h] = (unsigned char)code;
-
-            /* lock to signal indication */
-            if ((ObsInfo&0x4)==0x4) raw->obs.data[n].LLI[h]|=0x2; /* half-cycle ambiguity */
-            if (LockTime!=65535){
-                LockTime = LockTime>254?254:LockTime; /* limit locktime to sizeof(unsigned char) */
-                if (locktime[sat][signType1]>LockTime) raw->obs.data[n].LLI[h]|=0x1;
-                raw->lockt[sat][h]       = (unsigned char)LockTime;
-                locktime[sat][signType1] = (unsigned char)LockTime;
-            };
-=======
         if (I4(p+8)!=-2147483648) {
             D1=I4(p+8)*0.0001;
             raw->obs.data[n].D[idx]=(float)D1;
->>>>>>> upstream/rtklib_2.4.3
         }
         lock=U2(p+16);
         if (P1!=0.0&&freq1>0.0&&lock!=65535&&(I1(p+14)!=-128||U2(p+12)!=0)) {
@@ -836,76 +794,8 @@ static int decode_sbf(raw_t *raw)
         trace(2,"sbf crc error: type=%d len=%d\n",type,raw->len);
         return -1;
     }
-<<<<<<< HEAD
-
-    /* get satellite number */
-    prn=U1(p+8);
-    if (prn < 120) return -1;
-    if (prn > 139) return -1;
-
-    tow=U4(p+2)/1000;
-    week=U2(p+6);
-    week=adjgpsweek(week);
-
-    count=U1(p+9);
-    sbLength=U1(p+10);
-
-    if (count >4) return -1;
-
-    for (i=0;i<count;i++)
-    {
-        no=U1(p+14+i*sbLength+1);
-        raw->nav.sbssat.sat[no-1].lcorr.iode=U1(p+14+i*sbLength+3);
-        raw->nav.sbssat.sat[no-1].lcorr.dpos[0]=R4(p+14+i*sbLength+ 4);
-        raw->nav.sbssat.sat[no-1].lcorr.dpos[1]=R4(p+14+i*sbLength+ 8);
-        raw->nav.sbssat.sat[no-1].lcorr.dpos[2]=R4(p+14+i*sbLength+12);
-        if (U1(p+14+i*sbLength)==1)
-        {
-            raw->nav.sbssat.sat[no-1].lcorr.dvel[i]=R4(p+14+i*sbLength+16);
-            raw->nav.sbssat.sat[no-1].lcorr.dvel[i]=R4(p+14+i*sbLength+20);
-            raw->nav.sbssat.sat[no-1].lcorr.dvel[i]=R4(p+14+i*sbLength+24);
-
-            raw->nav.sbssat.sat[no-1].lcorr.daf1=R4(p+14+i*sbLength+32);
-        } else
-        {
-            raw->nav.sbssat.sat[no-1].lcorr.dvel[0]=raw->nav.sbssat.sat[no-1].lcorr.dvel[1]=raw->nav.sbssat.sat[no-1].lcorr.dvel[2]=0.0;
-            raw->nav.sbssat.sat[no-1].lcorr.daf1=0;
-        };
-        raw->nav.sbssat.sat[no-1].lcorr.daf0=R4(p+14+i*sbLength+28);
-
-        t=(int)U4(p+14+i*sbLength+32)-(int)tow%86400;
-        if      (t<=-43200) t+=86400;
-        else if (t>  43200) t-=86400;
-        raw->nav.sbssat.sat[no-1].lcorr.t0=gpst2time(week,(double)(tow+t));
-    };
-
-    return 0;
-}
-
-#endif /* UNUSED */
-
-/* decode SBF raw message --------------------------------------------------*/
-static int decode_sbf(raw_t *raw)
-{
-    unsigned short crc;
-
-    /* read the SBF block ID and revision */
-    int type = U2(raw->buff+4) & 0x1fff << 0;
-    int revision = U2(raw->buff+4) >> 13;
-    (void)revision;
-
-    trace(3,"decode_sbf: type=%04x len=%d\n",type,raw->len);
-
-    /* read the SBF block CRC */
-    crc = U2(raw->buff+2);
-
-    /* checksum skipping first 4 bytes */
-    if (sbf_checksum(raw->buff+4, raw->len-4) !=  crc){
-        trace(2,"sbf checksum error: type=%04x len=%d\n",type, raw->len);
-=======
     if (raw->len<14) {
         trace(2,"sbf length error: type=%d len=%d\n",type,raw->len);
->>>>>>> upstream/rtklib_2.4.3
         return -1;
     }
     tow =U4(p+8);

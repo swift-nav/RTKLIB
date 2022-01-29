@@ -1,11 +1,7 @@
 /*------------------------------------------------------------------------------
 * BINEX.c : BINEX dependent functions
 *
-<<<<<<< HEAD
-*          Copyright (C) 2013-2019 by T.TAKASU, All rights reserved.
-=======
 *          Copyright (C) 2013-2020 by T.TAKASU, All rights reserved.
->>>>>>> upstream/rtklib_2.4.3
 *
 * reference :
 *     [1] UNAVCO, BINEX: Binary exchange format (updated on July 13, 2018)
@@ -25,8 +21,6 @@
 *           2018/12/06 1.8 fix bug on decoding galileo ephemeirs iode (0x01-04)
 *           2019/05/10 1.9 save galileo E5b data to obs index 2
 *           2019/07/25 1.10 support upgraded galileo ephemeris (0x01-14)
-<<<<<<< HEAD
-=======
 *           2020/11/30 1.11 support NavIC/IRNSS raw obs data (0x7f-05)
 *                           support BDS B2b in raw obs data (0x7f-05)
 *                           support IRNSS decoded ephemeris (0x01-07)
@@ -36,7 +30,6 @@
 *                           use API code2idx() to get frequency index
 *                           use API code2idx() to get carrier frequency
 *                           use integer types in stdint.h
->>>>>>> upstream/rtklib_2.4.3
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -467,12 +460,8 @@ static int decode_bnx_01_04(raw_t *raw, uint8_t *buff, int len)
     if (!(eph_sel&1)&&set==0) return 0;
     if (!(eph_sel&2)&&set==1) return 0;
     
-<<<<<<< HEAD
-    eph.A=sqrtA*sqrtA;
-=======
     eph.sat=sat;
     eph.A=SQR(sqrtA);
->>>>>>> upstream/rtklib_2.4.3
     eph.iodc=eph.iode;
     eph.toe=gpst2time(eph.week,eph.toes);
     eph.toc=gpst2time(eph.week,eph.toes);
@@ -630,20 +619,6 @@ static int decode_bnx_01_06(raw_t *raw, uint8_t *buff, int len)
     raw->ephset=0;
     return 2;
 }
-<<<<<<< HEAD
-/* decode binex mesaage 0x01-14: upgraded decoded galileo ephmemeris ---------*/
-static int decode_bnx_01_14(raw_t *raw, unsigned char *buff, int len)
-{
-    eph_t eph={0};
-    unsigned char *p=buff;
-    double tow,ura,sqrtA;
-    int prn,tocs,eph_sel=0;
-    
-    trace(4,"binex 0x01-14: len=%d\n",len);
-    
-    if (strstr(raw->opt,"-GALINAV")) eph_sel=1;
-    if (strstr(raw->opt,"-GALFNAV")) eph_sel=2;
-=======
 /* decode BINEX mesaage 0x01-07: decoded IRNSS ephmemeris --------------------*/
 static int decode_bnx_01_07(raw_t *raw, uint8_t *buff, int len)
 {
@@ -721,7 +696,6 @@ static int decode_bnx_01_14(raw_t *raw, uint8_t *buff, int len)
     
     if (strstr(raw->opt,"-GALFNAV")) eph_sel=1;
     if (strstr(raw->opt,"-GALINAV")) eph_sel=2;
->>>>>>> upstream/rtklib_2.4.3
     
     if (len>=135) {
         prn       =U1(p)+1;      p+=1;
@@ -752,22 +726,6 @@ static int decode_bnx_01_14(raw_t *raw, uint8_t *buff, int len)
         eph.idot  =R4(p)*SC2RAD; p+=4;
         ura       =R4(p);        p+=4;
         eph.svh   =U2(p);        p+=2;
-<<<<<<< HEAD
-        eph.code  =U2(p); /* data source defined as rinex 3.03 */
-    }
-    else {
-        trace(2,"binex 0x01-14: length error len=%d\n",len);
-        return -1;
-    }
-    if (!(eph.sat=satno(SYS_GAL,prn))) {
-        trace(2,"binex 0x01-14: satellite error prn=%d\n",prn);
-        return -1;
-    }
-    if (eph_sel==1&&!(eph.code&(1<<9))) return 0; /* only I/NAV */
-    if (eph_sel==2&&!(eph.code&(1<<8))) return 0; /* only F/NAV */
-    
-    eph.A=sqrtA*sqrtA;
-=======
         eph.code  =U2(p); /* data source defined as RINEX 3.03 */
     }
     else {
@@ -784,24 +742,10 @@ static int decode_bnx_01_14(raw_t *raw, uint8_t *buff, int len)
     
     eph.sat=sat;
     eph.A=SQR(sqrtA);
->>>>>>> upstream/rtklib_2.4.3
     eph.iodc=eph.iode;
     eph.toe=gpst2time(eph.week,eph.toes);
     eph.toc=gpst2time(eph.week,tocs);
     eph.ttr=adjweek(eph.toe,tow);
-<<<<<<< HEAD
-    eph.sva=ura<0.0?(int)(-ura)-1:sisaindex(ura); /* sisa index */
-    if (!strstr(raw->opt,"-EPHALL")) {
-        if (raw->nav.eph[eph.sat-1].iode==eph.iode&&
-            raw->nav.eph[eph.sat-1].iodc==eph.iodc) return 0; /* unchanged */
-    }
-    raw->nav.eph[eph.sat-1]=eph;
-    raw->ephsat=eph.sat;
-    return 2;
-}
-/* decode binex mesaage 0x01: gnss navigaion informtion ----------------------*/
-static int decode_bnx_01(raw_t *raw, unsigned char *buff, int len)
-=======
     eph.sva=ura<0.0?(int)(-ura)-1:sisaindex(ura); /* SISA index */
     if (!strstr(raw->opt,"-EPHALL")) {
         if (raw->nav.eph[sat-1+MAXSAT*set].iode==eph.iode&&
@@ -817,7 +761,6 @@ static int decode_bnx_01(raw_t *raw, unsigned char *buff, int len)
 }
 /* decode BINEX mesaage 0x01: GNSS navigation information --------------------*/
 static int decode_bnx_01(raw_t *raw, uint8_t *buff, int len)
->>>>>>> upstream/rtklib_2.4.3
 {
     int srec=U1(buff),prn=U1(buff+1);
     
@@ -834,10 +777,7 @@ static int decode_bnx_01(raw_t *raw, uint8_t *buff, int len)
         case 0x04: return decode_bnx_01_04(raw,buff+1,len-1);
         case 0x05: return decode_bnx_01_05(raw,buff+1,len-1);
         case 0x06: return decode_bnx_01_06(raw,buff+1,len-1);
-<<<<<<< HEAD
-=======
         case 0x07: return decode_bnx_01_07(raw,buff+1,len-1);
->>>>>>> upstream/rtklib_2.4.3
         case 0x14: return decode_bnx_01_14(raw,buff+1,len-1);
     }
     return 0;
@@ -1027,22 +967,8 @@ static uint8_t *decode_bnx_7f_05_obs(raw_t *raw, uint8_t *buff, int sat,
     
     /* get code priority */
     for (i=0;i<nobs;i++) {
-<<<<<<< HEAD
-        code2obs(codes[code[i]&0x3F],freq+i);
-        pri[i]=getcodepri(sys,codes[code[i]&0x3F],raw->opt);
-        
-        /* frequency index for beidou */
-        if (sys==SYS_CMP) {
-            if      (freq[i]==5) freq[i]=2; /* B2 */
-            else if (freq[i]==4) freq[i]=3; /* B3 */
-        }
-        else if (sys==SYS_GAL) {
-            if (freq[i]==5) freq[i]=2; /* E5b */
-        }
-=======
         idx[i]=code2idx(sys,codes[code[i]]);
         pri[i]=getcodepri(sys,codes[code[i]],raw->opt);
->>>>>>> upstream/rtklib_2.4.3
     }
     for (i=0;i<NFREQ;i++) {
         for (j=0,k=-1;j<nobs;j++) {
@@ -1057,17 +983,10 @@ static uint8_t *decode_bnx_7f_05_obs(raw_t *raw, uint8_t *buff, int sat,
         else {
             freq=code2freq(sys,codes[code[k]],fcn);
             data->P[i]=range[k];
-<<<<<<< HEAD
-            data->L[i]=wl<=0.0?0.0:phase[k]/wl;
-            data->D[i]=(float)dopp[k];
-            data->SNR[i]=(unsigned char)(cnr[k]/0.25+0.5);
-            data->code[i]=codes[code[k]&0x3F];
-=======
             data->L[i]=phase[k]*freq/CLIGHT;
             data->D[i]=dopp[k];
             data->SNR[i]=(uint16_t)(cnr[k]/SNR_UNIT+0.5);
             data->code[i]=codes[code[k]];
->>>>>>> upstream/rtklib_2.4.3
             data->LLI[i]=slip[k]?1:0;
             mask[k]=1;
         }
@@ -1085,17 +1004,10 @@ static uint8_t *decode_bnx_7f_05_obs(raw_t *raw, uint8_t *buff, int sat,
         else {
             freq=code2freq(sys,codes[code[k]],fcn);
             data->P[i]=range[k];
-<<<<<<< HEAD
-            data->L[i]=wl<=0.0?0.0:phase[k]/wl;
-            data->D[i]=(float)dopp[k];
-            data->SNR[i]=(unsigned char)(cnr[k]/0.25+0.5);
-            data->code[i]=codes[code[k]&0x3F];
-=======
             data->L[i]=phase[k]*freq/CLIGHT;
             data->D[i]=dopp[k];
             data->SNR[i]=(uint16_t)(cnr[k]/SNR_UNIT+0.5);
             data->code[i]=codes[code[k]];
->>>>>>> upstream/rtklib_2.4.3
             data->LLI[i]=slip[k]?1:0;
             mask[k]=1;
         }

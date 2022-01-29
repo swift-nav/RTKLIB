@@ -65,8 +65,6 @@
 *           2019/05/10 1.27 disable half-cyc-subtract flag on LLI for RXM-RAWX
 *                           save galileo E5b data to obs index 2
 *                           handle C17 as no-GEO (MEO/IGSO)
-<<<<<<< HEAD
-=======
 *           2020/11/30 1.28 update reference [5]
 *                           support UBX-CFG-VALDEL,VALGET,VALSET
 *                           support hex field format for ubx binary message
@@ -77,7 +75,6 @@
 *                           support QZSS L1S (CODE_L1Z)
 *                           CODE_L1I -> CODE_L2I for BDS B1I (RINEX 3.04)
 *                           use integer types in stdint.h
->>>>>>> upstream/rtklib_2.4.3
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -180,19 +177,11 @@ static int ubx_sig(int sys, int sigid)
         if (sigid==0) return CODE_L1C; /* G1C/A (GLO L1 OF) */
         if (sigid==2) return CODE_L2C; /* G2C/A (GLO L2 OF) */
     }
-<<<<<<< HEAD
-    else if (sys == SYS_GAL) {
-        if (code==CODE_L1C) return 1;
-        if (code==CODE_L1B) return NFREQ+1;
-        if (code==CODE_L7I) return 2; /* E5bI */
-        if (code==CODE_L7Q) return 2; /* E5bQ */
-=======
     else if (sys==SYS_GAL) {
         if (sigid==0) return CODE_L1C; /* E1C */
         if (sigid==1) return CODE_L1B; /* E1B */
         if (sigid==5) return CODE_L7I; /* E5bI */
         if (sigid==6) return CODE_L7Q; /* E5bQ */
->>>>>>> upstream/rtklib_2.4.3
     }
     else if (sys==SYS_QZS) {
         if (sigid==0) return CODE_L1C; /* L1C/A */
@@ -396,16 +385,6 @@ static int decode_rxmrawx(raw_t *raw)
             P-=toff*CLIGHT;
             L-=toff*code2freq(sys,code,frqid-7);
         }
-<<<<<<< HEAD
-        halfv=tstat&4?1:0; /* half cycle valid */
-        halfc=tstat&8?1:0; /* half cycle subtracted from phase */
-        slip=lockt==0||lockt*1E-3<raw->lockt[sat-1][f-1]||
-             halfc!=raw->halfc[sat-1][f-1]||(std_slip&&cpstd>=std_slip);
-        raw->lockt[sat-1][f-1]=lockt*1E-3;
-        raw->halfc[sat-1][f-1]=halfc;
-        LLI=(slip?LLI_SLIP:0)|(!halfv?LLI_HALFC:0);
-        
-=======
         /* half-cycle shift correction for BDS GEO */
         if (sys==SYS_CMP&&(prn<=5||prn>=59)&&L!=0.0) {
             L+=0.5;
@@ -418,7 +397,6 @@ static int decode_rxmrawx(raw_t *raw)
         raw->halfc[sat-1][idx]=halfc;
         LLI=(slip?LLI_SLIP:0)|(!halfv?LLI_HALFC:0)|(halfc?LLI_HALFS:0);
 
->>>>>>> upstream/rtklib_2.4.3
         for (j=0;j<n;j++) {
             if (raw->obs.data[j].sat==sat) break;
         }
@@ -892,14 +870,10 @@ static int decode_cnav(raw_t *raw, int sat, int off)
         trace(2,"ubx rxmsfrbx cnav subframe id error: sat=%2d\n",sat);
         return -1;
     }
-<<<<<<< HEAD
-    if (prn>5&&prn<59) { /* IGSO/MEO */
-=======
     satsys(sat,&prn);
     
     if (prn>=6&&prn<=58) { /* IGSO/MEO */
         memcpy(raw->subfrm[sat-1]+(id-1)*38,buff,38);
->>>>>>> upstream/rtklib_2.4.3
         
         if (id==3) {
             if (!decode_bds_d1(raw->subfrm[sat-1],&eph,NULL,NULL)) return 0;
@@ -912,13 +886,8 @@ static int decode_cnav(raw_t *raw, int sat, int off)
         }
         else return 0;
     }
-<<<<<<< HEAD
-    else { /* GEO (C01-05, C59-63) */
-        if (id!=1) return 0;
-=======
     else { /* GEO */
         pgn=getbitu(buff,42,4); /* page numuber */
->>>>>>> upstream/rtklib_2.4.3
         
         if (id==1&&pgn>=1&&pgn<=10) {
             memcpy(raw->subfrm[sat-1]+(pgn-1)*38,buff,38);
