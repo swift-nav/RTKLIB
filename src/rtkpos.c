@@ -1785,29 +1785,15 @@ static int relpos(rtk_t *rtk, const obsd_t *obs, int nu, int nr,
         }
         else stat=SOLQ_NONE;
     }
-    /* resolve integer ambiguity by WL-NL */
-    if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_WLNL) {
-
-        if (resamb_WLNL(rtk,obs,sat,iu,ir,ns,nav,azel)) {
-            stat=SOLQ_FIX;
-        }
-    }
     /* resolve integer ambiguity by WL */
-    else if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_WL) {
+    if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_WL) {
         if (resamb_WL(rtk,bias,xa)>1) {
             if (rtk->opt.wlmodear==1) holdamb(rtk,xa);
             stat=SOLQ_FIX;
         }
     }
-    /* resolve integer ambiguity by TCAR */
-    else if (stat!=SOLQ_NONE&&rtk->opt.modear==ARMODE_TCAR) {
-
-        if (resamb_TCAR(rtk,obs,sat,iu,ir,ns,nav,azel)) {
-            stat=SOLQ_FIX;
-        }
-    }
     /* resolve integer ambiguity by LAMBDA */
-    if (stat!=SOLQ_NONE&&resamb_LAMBDA(rtk,bias,xa)>1) {
+    else if (stat!=SOLQ_NONE&&resamb_LAMBDA(rtk,bias,xa)>1) {
         
         if (zdres(0,obs,nu,rs,dts,var,svh,nav,xa,opt,0,y,e,azel,freq)) {
             

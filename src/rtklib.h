@@ -475,7 +475,7 @@ extern "C" {
 #define GEOID_GSI2000_M15 4             /* geoid model: GSI geoid 2000 1.0x1.5" */
 #define GEOID_RAF09       5             /* geoid model: IGN RAF09 for France 1.5"x2" */
 
-#define COMMENTH    '%'                 /* comment line indicator for solution */
+#define COMMENTH    "%"                 /* comment line indicator for solution */
 #define MSG_DISCONN "$_DISCONNECT\r\n"  /* disconnect message */
 
 #define DLOPT_FORCE   0x01              /* download option: force download existing */
