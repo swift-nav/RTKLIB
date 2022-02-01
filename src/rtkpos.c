@@ -1360,7 +1360,7 @@ static void holdamb(rtk_t *rtk, const double *xa)
                                                 -(xa[index[0]]-xa[index[i]]));
 
                     H[index[0]+nv*rtk->nx]= -1.0;
-                    H[index[i]+nv*rtk->nx]=1.0;
+                    H[index[i]+nv*rtk->nx]=  1.0;
                     H[index0[0]+nv*rtk->nx]= 1.0;
                     H[index0[i]+nv*rtk->nx]=-1.0;
                     nv++;
@@ -1403,7 +1403,6 @@ static int dd_wl_mat(rtk_t *rtk, double *D)
     for (i=0;i<na;i++) D[i+i*nx]=1.0;
 
     for (m=0;m<5;m++) { /* m=0:gps/sbs,1:glo,2:gal,3:bds,4:qzs */
-
         nofix=(m==1&&rtk->opt.glomodear==0)||(m==3&&rtk->opt.bdsmodear==0);
         if (nofix) {
             continue;

@@ -58,7 +58,6 @@
 
 /* help text -----------------------------------------------------------------*/
 static const char *help[]={
-<<<<<<< HEAD:app/convbin/convbin.c
     "",
     " Converts Swift Navigation receiver SBP binary and SBP JSON raw data logs to RINEX files.",
     "",
@@ -491,7 +490,6 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
     }
     if (nf>=1) opt->freqtype|=FREQTYPE_L1;
     if (nf>=2) opt->freqtype|=FREQTYPE_L2;
-<<<<<<< HEAD:app/convbin/convbin.c
     if (nf>=3) opt->freqtype|=FREQTYPE_L3;
     if (nf>=4) opt->freqtype|=FREQTYPE_L4;
     if (nf>=5) opt->freqtype|=FREQTYPE_L5;
