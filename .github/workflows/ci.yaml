@@ -35,5 +35,5 @@ jobs:
           CC: gcc-6
           CXX: g++-6
         run: |
-          (cd ./consapp/convbin/gcc; ls -l; make clean all test);
-          (cd ./consapp/str2str/gcc; ls -l; make clean all)
+          (cd ./app/consapp/convbin/gcc; ls -l; make clean all test);
+          (cd ./app/consapp/str2str/gcc; ls -l; make clean all)
