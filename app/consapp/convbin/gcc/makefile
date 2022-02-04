@@ -22,12 +22,12 @@ OPTIONS= -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=5 -DNEXOBS
 
 CC=gcc
 CFLAGS=-O2 -ansi -std=c99 -Wall -Wno-unused-function -Wno-unused-but-set-variable $(INCLUDE) $(OPTIONS)
-DATDIR=../../../test/data/rcvraw
+DATDIR=../../../../test/data/rcvraw
 SEP="/"
 
 ifeq ($(UNAME),Windows)
 OPTIONS += -DWIN32
-DATDIR=..\\..\\..\\test\\data\\rcvraw
+DATDIR=..\\..\\..\\..\\test\\data\\rcvraw
 SEP="\\"
 endif
 
