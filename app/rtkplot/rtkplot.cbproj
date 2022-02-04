@@ -399,6 +399,9 @@
             <BuildOrder>38</BuildOrder>
             <BuildOrder>22</BuildOrder>
         </CppCompile>
+        <CppCompile Include="..\..\src\rcv\swiftnav.c">
+            <BuildOrder>62</BuildOrder>
+        </CppCompile>
         <CppCompile Include="..\..\src\rcv\tersus.c">
             <BuildOrder>61</BuildOrder>
         </CppCompile>
