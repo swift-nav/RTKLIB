@@ -43,8 +43,8 @@ all  : sbp2rinex
 
 sbp2rinex  : convbin.o rtkcmn.o rinex.o sbas.o preceph.o rcvraw.o convrnx.o
 sbp2rinex  : rtcm.o rtcm2.o rtcm3.o rtcm3e.o pntpos.o ephemeris.o ionex.o
-sbp2rinex  : novatel.o swiftnav.o ublox.o skytraq.o gw10.o javad.o nvs.o
-sbp2rinex  : binex.o rt17.o qzslex.o septentrio.o cmr.o tersus.o
+sbp2rinex  : novatel.o swiftnav.o ublox.o skytraq.o javad.o nvs.o
+sbp2rinex  : binex.o rt17.o septentrio.o
 
 sbp2rinex  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
@@ -95,10 +95,6 @@ rt17.o     : $(SRC)/rcv/rt17.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/rt17.c
 septentrio.o: $(SRC)/rcv/septentrio.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/septentrio.c
-cmr.o      : $(SRC)/rcv/cmr.c
-	$(CC) -c $(CFLAGS) $(SRC)/rcv/cmr.c
-tersus.o      : $(SRC)/rcv/tersus.c
-	$(CC) -c $(CFLAGS) $(SRC)/rcv/tersus.c
 
 convbin.o  : $(SRC)/rtklib.h makefile
 rtkcmn.o   : $(SRC)/rtklib.h makefile
@@ -123,7 +119,6 @@ javad.o    : $(SRC)/rtklib.h makefile
 nvs.o      : $(SRC)/rtklib.h makefile
 binex.o    : $(SRC)/rtklib.h makefile
 rt17.o     : $(SRC)/rtklib.h makefile
-qzslex.o   : $(SRC)/rtklib.h makefile
 septentrio.o: $(SRC)/rtklib.h makefile
 cmr.o      : $(SRC)/rtklib.h makefile
 tersus.o   : $(SRC)/rtklib.h makefile
