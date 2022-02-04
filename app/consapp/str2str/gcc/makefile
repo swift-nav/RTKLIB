@@ -34,9 +34,9 @@ endif
 
 all : str2str
 str2str : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
-str2str : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o gw10.o javad.o
+str2str : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o javad.o
 str2str : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
-str2str : septentrio.o cmr.o tersus.o
+str2str : septentrio.o
 
 str2str  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
@@ -98,7 +98,6 @@ novatel.o  : $(SRC)/rtklib.h makefile
 ublox.o    : $(SRC)/rtklib.h makefile
 swiftnav.o : $(SRC)/rtklib.h makefile
 skytraq.o  : $(SRC)/rtklib.h makefile
-gw10.o     : $(SRC)/rtklib.h makefile
 javad.o    : $(SRC)/rtklib.h makefile
 nvs.o      : $(SRC)/rtklib.h makefile
 binex.o    : $(SRC)/rtklib.h makefile
@@ -109,8 +108,6 @@ rtcm3.o    : $(SRC)/rtklib.h makefile
 rtcm3e.o   : $(SRC)/rtklib.h makefile
 preceph.o  : $(SRC)/rtklib.h makefile
 septentrio.o: $(SRC)/rtklib.h makefile
-cmr.o      : $(SRC)/rtklib.h makefile
-tersus.o   : $(SRC)/rtklib.h makefile
 
 install:
 	cp str2str $(BINDIR)

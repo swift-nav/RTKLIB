@@ -31,15 +31,15 @@
 *-----------------------------------------------------------------------------*/
 #include <signal.h>
 #include <unistd.h>
+#include "rtklib.h"
 
 #define PRGNAME "str2str"      /* program name */
-#define MAX_STREAMS 9          /* max number of streams */
+#define MAXSTR 9               /* max number of streams */
 #define TRFILE "str2str.trace" /* trace file */
 
 /* global variables ----------------------------------------------------------*/
 static strsvr_t strsvr;          /* stream server */
 static volatile int intrflg = 0; /* interrupt flag */
-static char srctbl[1024] = "";   /* source table file */
 
 /* help text -----------------------------------------------------------------*/
 static const char *help[] = {
@@ -78,9 +78,7 @@ static const char *help[] = {
     "    udp client   : udpcli://addr:port",
     "    ntrip client : ntrip://[user[:passwd]@]addr[:port][/mntpnt]",
     "    ntrip server : ntrips://[:passwd@]addr[:port]/mntpnt[:str] (only out)",
-    "    ntrip caster server: ntripc_s://[:passwd@][:port] (only in)",
-    "    ntrip caster client: ntripc_c://[user:passwd@][:port]/mntpnt (only "
-    "out)",
+    "    ntrip caster : ntripc_c://[user:passwd@][:port]/mntpnt[:srctbl] (only out)",
     "    file         : [file://]path[::T][::+start][::xseppd][::S=swap]",
     "",
     "  format",
@@ -92,14 +90,11 @@ static const char *help[] = {
     "    sbp          : Swift Navigation SBP",
     "    json         : Swift Navigation SBP-JSON",
     "    stq          : SkyTraq S1315F (only in)",
-    "    gw10         : Furuno GW10 (only in)",
     "    javad        : Javad (only in)",
     "    nvs          : NVS BINR (only in)",
     "    binex        : BINEX (only in)",
     "    rt17         : Trimble RT17 (only in)",
     "    sbf          : Septentrio SBF (only in)",
-    "    cmr          : CMR/CMR+ (only in)",
-    "    tersus       : TERSUS (only in)",
     "",
     " -msg \"type[(tint)][,type[(tint)]...]\"",
     "                   rtcm message types and output intervals (s)",
@@ -123,7 +118,6 @@ static const char *help[] = {
     " -x  proxy_addr    http/ntrip proxy address [no]",
     " -b  str_no        relay back messages from output str to input str [no]",
     " -t  level         trace level [0]",
-    " -ft file          ntrip souce table file []",
     " -fl file          log file [str2str.trace]",
     " -h                print help",
 };
@@ -136,13 +130,6 @@ static void printhelp(void) {
 }
 /* signal handler ------------------------------------------------------------*/
 static void sigfunc(int sig) { intrflg = 1; }
-/* reload source table by SIGUSR2 --------------------------------------------*/
-static void reload_srctbl(int sig) {
-  strsvrsetsrctbl(&strsvr, srctbl);
-#ifndef __MINGW32__
-  signal(SIGUSR2, reload_srctbl);
-#endif
-}
 /* decode format -------------------------------------------------------------*/
 static void decodefmt(char *path, int *fmt) {
   char *p;
@@ -166,8 +153,6 @@ static void decodefmt(char *path, int *fmt) {
       *fmt = STRFMT_SBPJSON;
     else if (!strcmp(p, "#stq"))
       *fmt = STRFMT_STQ;
-    else if (!strcmp(p, "#gw10"))
-      *fmt = STRFMT_GW10;
     else if (!strcmp(p, "#javad"))
       *fmt = STRFMT_JAVAD;
     else if (!strcmp(p, "#nvs"))
@@ -178,10 +163,6 @@ static void decodefmt(char *path, int *fmt) {
       *fmt = STRFMT_RT17;
     else if (!strcmp(p, "#sbf"))
       *fmt = STRFMT_SEPT;
-    else if (!strcmp(p, "#cmr"))
-      *fmt = STRFMT_CMR;
-    else if (!strcmp(p, "#tersus"))
-      *fmt = STRFMT_TERSUS;
     else
       return;
     *p = '\0';
@@ -212,10 +193,8 @@ static int decodepath(const char *path, int *type, char *strpath, int *fmt) {
     *type = STR_UDPCLI;
   else if (!strncmp(path, "tcpcli", 6))
     *type = STR_TCPCLI;
-  else if (!strncmp(path, "ntripc_s", 8))
-    *type = STR_NTRIPC_S;
-  else if (!strncmp(path, "ntripc_c", 8))
-    *type = STR_NTRIPC_C;
+  else if (!strncmp(path, "ntripc", 6))
+    *type = STR_NTRIPCAS;
   else if (!strncmp(path, "ntrips", 6))
     *type = STR_NTRIPSVR;
   else if (!strncmp(path, "ntrip", 5))
@@ -232,7 +211,7 @@ static int decodepath(const char *path, int *type, char *strpath, int *fmt) {
 /* read receiver commands ----------------------------------------------------*/
 static void readcmd(const char *file, char *cmd, int type) {
   FILE *fp;
-  char buff[MAX_STREAMS], *p = cmd;
+  char buff[MAXSTR], *p = cmd;
   int i = 0;
 
   *p = '\0';
@@ -253,14 +232,14 @@ static void readcmd(const char *file, char *cmd, int type) {
 /* str2str -------------------------------------------------------------------*/
 int main(int argc, char **argv)
 {
-    static char cmd_strs[MAXSTR][MAXRCVCMD]={"","","","",""};
-    static char cmd_periodic_strs[MAXSTR][MAXRCVCMD]={"","","","",""};
+    static char cmd_strs[MAXSTR][MAXRCVCMD]={"","","","","","","","",""};
+    static char cmd_periodic_strs[MAXSTR][MAXRCVCMD]={"","","","","","","","",""};
     const char ss[]={'E','-','W','C','C'};
     strconv_t *conv[MAXSTR]={NULL};
     double pos[3],stapos[3]={0},stadel[3]={0};
     static char s1[MAXSTR][MAXSTRPATH]={{0}},s2[MAXSTR][MAXSTRPATH]={{0}};
     char *paths[MAXSTR],*logs[MAXSTR];
-    char *cmdfile[MAXSTR]={"","","","",""},*cmds[MAXSTR],*cmds_periodic[MAXSTR];
+    char *cmdfile[MAXSTR]={"","","","","","","","",""},*cmds[MAXSTR],*cmds_periodic[MAXSTR];
     char *local="",*proxy="",*msg="1004,1019",*opt="",buff[256],*p;
     char strmsg[MAXSTRMSG]="",*antinfo="",*rcvinfo="";
     char *ant[]={"","",""},*rcv[]={"","",""},*logfile="";
@@ -320,7 +299,12 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-t"  )&&i+1<argc) trlevel=atoi(argv[++i]);
         else if (*argv[i]=='-') printhelp();
     }
-    if (n<=0) n=1; /* stdout */
+    if (n==0) {
+        /* use stdout as only output */
+        fprintf(stderr, "using stdout as output\n");
+        n=1; /* stdout */
+        decodepath("/dev/stdout",types+n,paths[n],fmts+n);
+    }
     
     for (i=0;i<n;i++) {
         if (fmts[i+1]<=0) continue;
@@ -364,7 +348,6 @@ int main(int argc, char **argv)
     
     strsetdir(local);
     strsetproxy(proxy);
-    
     for (i=0;i<MAXSTR;i++) {
         if (*cmdfile[i]) readcmd(cmdfile[i],cmds[i],0);
         if (*cmdfile[i]) readcmd(cmdfile[i],cmds_periodic[i],2);
@@ -374,85 +357,6 @@ int main(int argc, char **argv)
                      stapos)) {
         fprintf(stderr,"stream server start error\n");
         return -1;
-      }
-    } else if (!strcmp(argv[i], "-out") && ((i + 1) < argc) &&
-               (nout < (MAX_STREAMS - 1))) {
-      if (!decodepath(argv[++i], types + nout + 1, paths[nout + 1],
-                      fmts + nout + 1)) {
-        return -1;
-      }
-      nout++;
-    } else if (!strcmp(argv[i], "-p") && i + 3 < argc) {
-      pos[0] = atof(argv[++i]) * D2R;
-      pos[1] = atof(argv[++i]) * D2R;
-      pos[2] = atof(argv[++i]);
-      pos2ecef(pos, stapos);
-    } else if (!strcmp(argv[i], "-px") && i + 3 < argc) {
-      stapos[0] = atof(argv[++i]);
-      stapos[1] = atof(argv[++i]);
-      stapos[2] = atof(argv[++i]);
-    } else if (!strcmp(argv[i], "-o") && i + 3 < argc) {
-      stadel[0] = atof(argv[++i]);
-      stadel[1] = atof(argv[++i]);
-      stadel[2] = atof(argv[++i]);
-    } else if (!strcmp(argv[i], "-msg") && i + 1 < argc)
-      msg = argv[++i];
-    else if (!strcmp(argv[i], "-opt") && i + 1 < argc)
-      opt = argv[++i];
-    else if (!strcmp(argv[i], "-sta") && i + 1 < argc)
-      sta = atoi(argv[++i]);
-    else if (!strcmp(argv[i], "-d") && i + 1 < argc)
-      dispint = atoi(argv[++i]);
-    else if (!strcmp(argv[i], "-s") && i + 1 < argc)
-      opts[0] = atoi(argv[++i]);
-    else if (!strcmp(argv[i], "-r") && i + 1 < argc)
-      opts[1] = atoi(argv[++i]);
-    else if (!strcmp(argv[i], "-n") && i + 1 < argc)
-      opts[5] = atoi(argv[++i]);
-    else if (!strcmp(argv[i], "-f") && i + 1 < argc)
-      opts[6] = atoi(argv[++i]);
-    else if (!strcmp(argv[i], "-c") && i + 1 < argc)
-      cmdfile[0] = argv[++i];
-    else if (!strcmp(argv[i], "-c1") && i + 1 < argc)
-      cmdfile[1] = argv[++i];
-    else if (!strcmp(argv[i], "-c2") && i + 1 < argc)
-      cmdfile[2] = argv[++i];
-    else if (!strcmp(argv[i], "-c3") && i + 1 < argc)
-      cmdfile[3] = argv[++i];
-    else if (!strcmp(argv[i], "-c4") && i + 1 < argc)
-      cmdfile[4] = argv[++i];
-    else if (!strcmp(argv[i], "-a") && i + 1 < argc)
-      antinfo = argv[++i];
-    else if (!strcmp(argv[i], "-i") && i + 1 < argc)
-      rcvinfo = argv[++i];
-    else if (!strcmp(argv[i], "-l") && i + 1 < argc)
-      local = argv[++i];
-    else if (!strcmp(argv[i], "-x") && i + 1 < argc)
-      proxy = argv[++i];
-    else if (!strcmp(argv[i], "-b") && i + 1 < argc)
-      opts[7] = atoi(argv[++i]);
-    else if (!strcmp(argv[i], "-ft") && i + 1 < argc)
-      strcpy(srctbl, argv[++i]);
-    else if (!strcmp(argv[i], "-fl") && i + 1 < argc)
-      logfile = argv[++i];
-    else if (!strcmp(argv[i], "-t") && i + 1 < argc)
-      trlevel = atoi(argv[++i]);
-    else if (*argv[i] == '-')
-      printhelp();
-  }
-  if (nout == 0) {
-    /* use stdout as only output */
-    fprintf(stderr, "using stdout as output\n");
-    nout = 1;
-    decodepath("/dev/stdout", types + nout, paths[nout], fmts + nout);
-  }
-
-  for (i = 0; i < nout; i++) {
-    if (fmts[i + 1] <= 0)
-      continue;
-    if (fmts[i + 1] != STRFMT_RTCM3) {
-      fprintf(stderr, "unsupported output format\n");
-      return -1;
     }
     for (intrflg=0;!intrflg;) {
         
@@ -467,92 +371,19 @@ int main(int argc, char **argv)
         
         sleepms(dispint);
     }
-    conv[i] = strconvnew(fmts[0], fmts[i + 1], msg, sta, sta != 0, opt);
-    if (NULL == conv[i]) {
-      fprintf(stderr, "stream conversion error\n");
-      return -1;
+    for (i = 0; i < MAXSTR; i++) {
+        if (cmdfile[i])
+            readcmd(cmdfile[i], cmds[i], 1);
     }
-    strcpy(buff, antinfo);
-    for (p = strtok(buff, ","), j = 0; p && j < 3; p = strtok(NULL, ","))
-      ant[j++] = p;
-    strcpy(conv[i]->out.sta.antdes, ant[0]);
-    strcpy(conv[i]->out.sta.antsno, ant[1]);
-    conv[i]->out.sta.antsetup = atoi(ant[2]);
-    strcpy(buff, rcvinfo);
-    for (p = strtok(buff, ","), j = 0; p && j < 3; p = strtok(NULL, ","))
-      rcv[j++] = p;
-    strcpy(conv[i]->out.sta.rectype, rcv[0]);
-    strcpy(conv[i]->out.sta.recver, rcv[1]);
-    strcpy(conv[i]->out.sta.recsno, rcv[2]);
-    matcpy(conv[i]->out.sta.pos, stapos, 3, 1);
-    matcpy(conv[i]->out.sta.del, stadel, 3, 1);
-  }
-  signal(SIGTERM, sigfunc);
-  signal(SIGINT, sigfunc);
-#ifndef __MINGW32__
-  signal(SIGHUP, SIG_IGN);
-  signal(SIGPIPE, SIG_IGN);
-#endif
+    /* stop stream server */
+    strsvrstop(&strsvr, cmds);
 
-  strsvrinit(&strsvr, nout);
-
-  if (trlevel > 0) {
-    traceopen(*logfile ? logfile : TRFILE);
-    tracelevel(trlevel);
-  }
-  fprintf(stderr, "stream server start\n");
-
-  strsetdir(local);
-  strsetproxy(proxy);
-
-  for (i = 0; i < MAX_STREAMS; i++) {
-    if (cmdfile[i]) {
-      readcmd(cmdfile[i], cmds[i], 0);
+    for (i = 0; i < n; i++) {
+        strconvfree(conv[i]);
     }
-    if (cmdfile[i]) {
-      readcmd(cmdfile[i], cmds_periodic[i], 2);
+    if (trlevel > 0) {
+        traceclose();
     }
-  }
-  /* start stream server */
-  if (!strsvrstart(&strsvr, opts, types, paths, conv, cmds, cmds_periodic,
-                   stapos)) {
-    fprintf(stderr, "stream server start error\n");
-    return -1;
-  }
-  /* read and set ntrip source table */
-  if (*srctbl) {
-    strsvrsetsrctbl(&strsvr, srctbl);
-#ifndef __MINGW32__
-    signal(SIGUSR2, reload_srctbl);
-#endif
-  }
-  for (intrflg = 0; !intrflg;) {
-
-    /* get stream server status */
-    strsvrstat(&strsvr, stat, byte, bps, strmsg);
-
-    /* show stream server status */
-    for (i = 0, p = buff; i < MAX_STREAMS; i++)
-      p += sprintf(p, "%c", ss[stat[i] + 1]);
-
-    fprintf(stderr, "%s [%s] %10d B %7d bps %s\n",
-            time_str(utc2gpst(timeget()), 0), buff, byte[0], bps[0], strmsg);
-
-    sleepms(dispint);
-  }
-  for (i = 0; i < MAX_STREAMS; i++) {
-    if (cmdfile[i])
-      readcmd(cmdfile[i], cmds[i], 1);
-  }
-  /* stop stream server */
-  strsvrstop(&strsvr, cmds);
-
-  for (i = 0; i < nout; i++) {
-    strconvfree(conv[i]);
-  }
-  if (trlevel > 0) {
-    traceclose();
-  }
-  fprintf(stderr, "stream server stop\n");
-  return 0;
+    fprintf(stderr, "stream server stop\n");
+    return 0;
 }

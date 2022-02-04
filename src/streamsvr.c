@@ -272,9 +272,8 @@ static void write_rtcm3_msm(stream_t *str, rtcm_t *out, int msg, int sync)
             strwrite(str,out->buff,out->nbyte);
         }
     }
-  }
-  out->obs.data = data;
-  out->obs.n = nobs;
+    out->obs.data = data;
+    out->obs.n = nobs;
 }
 /* write obs data messages ---------------------------------------------------*/
 static void write_obs(gtime_t time, stream_t *str, strconv_t *conv)
@@ -392,19 +391,6 @@ static void write_nav_cycle(stream_t *str, strconv_t *conv)
         /* write messages to stream */
         strwrite(str,conv->out.buff,conv->out.nbyte);
     }
-    conv->out.ephsat = conv->ephsat[i] = sat;
-
-    /* generate messages */
-    if (conv->otype == STRFMT_RTCM2) {
-      if (!gen_rtcm2(&conv->out, conv->msgs[i], 0)) continue;
-    } else if (conv->otype == STRFMT_RTCM3) {
-      if (!gen_rtcm3(&conv->out, conv->msgs[i], 0)) continue;
-    } else
-      continue;
-
-    /* write messages to stream */
-    strwrite(str, conv->out.buff, conv->out.nbyte);
-  }
 }
 /* write cyclic station info messages ----------------------------------------*/
 static void write_sta_cycle(stream_t *str, strconv_t *conv)
