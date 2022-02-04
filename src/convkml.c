@@ -96,6 +96,9 @@ static void outcircle(FILE *fp,
                       const double *pos_ecef_m,
                       double radius_m,
                       int style) {
+  double enu[3], xyz[3], llh[3];
+  int k;
+
   int num_points = (6 * radius_m); /* roughly proportional to circumference */
   if (num_points < 6) num_points = 6;
   if (num_points > 120) num_points = 120;
@@ -108,8 +111,8 @@ static void outcircle(FILE *fp,
   fprintf(fp,"    <outerBoundaryIs>\n");
   fprintf(fp,"      <LinearRing>\n");
   fprintf(fp,"        <coordinates>\n");
-  double enu[3], xyz[3], llh[3];
-  for (int k=0; k<num_points; k++) {
+
+  for (k=0; k<num_points; k++) {
     float theta = 2.0 * PI * k / num_points;
     enu[0] = radius_m * cosf(theta);
     enu[1] = radius_m * sinf(theta);

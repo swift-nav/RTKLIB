@@ -530,7 +530,8 @@ object OptDialog: TOptDialog
           'Continuous'
           'Instantaneous'
           'Fix and Hold'
-          'PPP-AR')
+          'Wide Lane'
+          'Wide Lane with Fix and Hold')
       end
       object ValidThresAR: TEdit
         Left = 248
@@ -1336,7 +1337,8 @@ object OptDialog: TOptDialog
             'X/Y/Z-ECEF (m)'
             'Average of Single Position'
             'Get from Position File'
-            'RINEX Header Postion')
+            'RINEX Header Postion'
+            'RINEX Header Position and Site Occupation Events')
         end
       end
       object StaPosFile: TEdit

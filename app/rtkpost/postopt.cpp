@@ -635,8 +635,16 @@ void __fastcall TOptDialog::LoadOpt(AnsiString file)
 	PosOpt5	     ->Checked		=prcopt.posopt[4];
 	PosOpt6	     ->Checked		=prcopt.posopt[5];
 //	MapFunc	     ->ItemIndex	=prcopt.mapfunc;
-	
-	AmbRes		 ->ItemIndex	=prcopt.modear;
+
+	if(prcopt.modear>ARMODE_FIXHOLD) {
+		if(prcopt.wlmodear==0) {
+			AmbRes   ->ItemIndex    =4;
+		} else {
+			AmbRes   ->ItemIndex    =5;
+		}
+	} else {
+		AmbRes  ->ItemIndex	    =prcopt.modear;
+	}
 	GloAmbRes	 ->ItemIndex	=prcopt.glomodear;
 	BdsAmbRes	 ->ItemIndex	=prcopt.bdsmodear;
 	ValidThresAR ->Text			=s.sprintf("%.3g",prcopt.thresar[0]);
@@ -706,7 +714,7 @@ void __fastcall TOptDialog::LoadOpt(AnsiString file)
 	IntpRefObs	 ->ItemIndex	=prcopt.intpref;
 	SbasSat		 ->Text			=s.sprintf("%d",prcopt.sbassatsel);
 	RovPosType	 ->ItemIndex	=prcopt.rovpos==0?0:prcopt.rovpos+2;
-	RefPosType	 ->ItemIndex	=prcopt.refpos==0?0:prcopt.refpos+2;
+	RefPosType	 ->ItemIndex	=prcopt.refpos==0?0:prcopt.refpos==POSOPT_RINEX_DYN?6:prcopt.refpos+2;
 	RovPosTypeP					=RovPosType->ItemIndex;
 	RefPosTypeP					=RefPosType->ItemIndex;
 	SetPos(RovPosType->ItemIndex,editu,prcopt.ru);
@@ -782,6 +790,11 @@ void __fastcall TOptDialog::SaveOpt(AnsiString file)
 //	prcopt.mapfunc	=MapFunc	->ItemIndex;
 	
 	prcopt.modear	=AmbRes		->ItemIndex;
+	prcopt.wlmodear=0;
+	if(AmbRes->ItemIndex>3) {
+		prcopt.modear=ARMODE_WL;
+		if(AmbRes->ItemIndex==5) prcopt.wlmodear=1;
+	}
 	prcopt.glomodear=GloAmbRes	->ItemIndex;
 	prcopt.bdsmodear=BdsAmbRes	->ItemIndex;
 	prcopt.thresar[0]=str2dbl(ValidThresAR->Text);
@@ -846,7 +859,7 @@ void __fastcall TOptDialog::SaveOpt(AnsiString file)
 	prcopt.intpref	=IntpRefObs->ItemIndex;
 	prcopt.sbassatsel=SbasSat->Text.ToInt();
 	prcopt.rovpos=RovPosType->ItemIndex<3?0:RovPosType->ItemIndex-2;
-	prcopt.refpos=RefPosType->ItemIndex<3?0:RefPosType->ItemIndex-2;
+	prcopt.refpos=RefPosType->ItemIndex<3?0:RefPosType->ItemIndex==6?POSOPT_RINEX_DYN:RefPosType->ItemIndex-2;
 	if (prcopt.rovpos==0) GetPos(RovPosType->ItemIndex,editu,prcopt.ru);
 	if (prcopt.refpos==0) GetPos(RefPosType->ItemIndex,editr,prcopt.rb);
 	
