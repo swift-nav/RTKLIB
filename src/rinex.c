@@ -2230,8 +2230,8 @@ extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
         }
     }
     else { /* ver.3 */
-        fprintf(fp,"> %04.0f %02.0f %02.0f %02.0f %02.0f %010.7f  %d%3d%21s\n",
-                ep[0],ep[1],ep[2],ep[3],ep[4],ep[5],flag,ns,"");
+        fprintf(fp,"> %04.0f %02.0f %02.0f %02.0f %02.0f %010.7f  %d%3d%6s%15.12f\n",
+                ep[0],ep[1],ep[2],ep[3],ep[4],ep[5],flag,ns,"",_dClockBias);
     }
     for (i=0;i<ns;i++) {
         sys=satsys(obs[ind[i]].sat,NULL);
