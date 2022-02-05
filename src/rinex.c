@@ -2265,7 +2265,7 @@ extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
                 case 'P': outrnxobsf(fp,obs[ind[i]].P[k],-1); break;
                 case 'L': outrnxobsf(fp,obs[ind[i]].L[k]+dL,obs[ind[i]].LLI[k]); break;
                 case 'D': outrnxobsf(fp,obs[ind[i]].D[k],-1); break;
-                case 'S': outrnxobsf(fp,obs[ind[i]].SNR[k]*SNR_UNIT,-1); break;
+                case 'S': outrnxobsf(fp,obs[ind[i]].SNR[k]*0.25,-1); break;
             }
         }
         if (opt->rnxver>=300&&fprintf(fp,"\n")==EOF) return 0;

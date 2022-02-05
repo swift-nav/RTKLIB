@@ -340,11 +340,11 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
 {
     double eps[]={1980,1,1,0,0,0},epe[]={2037,12,31,0,0,0};
     double epr[]={2010,1,1,0,0,0},span=0.0;
-    int i,j,k,sat,nf=5,nc=2,format=-1;
+    int i,j,k,sat,nf=7,nc=2,format=-1;
     char *p,*sys,*fmt="",*paths[1],path[1024],buff[256];
     
-    opt->rnxver=304;
-    opt->obstype=OBSTYPE_PR|OBSTYPE_CP;
+    opt->rnxver=303;
+    opt->obstype=OBSTYPE_PR|OBSTYPE_CP|OBSTYPE_DOP|OBSTYPE_SNR;
     opt->navsys=SYS_GPS|SYS_GLO|SYS_GAL|SYS_QZS|SYS_SBS|SYS_CMP|SYS_IRN;
 
     for (i=0;i<6;i++) for (j=0;j<64;j++) opt->mask[i][j]='1';

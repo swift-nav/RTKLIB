@@ -1513,9 +1513,6 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
         free_strfile(str);
         return 0;
     }
-
-    /* set format and file in RINEX options comments */
-    setopt_file(format,epath,nf,mask,opt);
     
     /* replace keywords in output file */
     for (i=0;i<NOUTFILE;i++) {
