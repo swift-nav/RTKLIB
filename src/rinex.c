@@ -123,7 +123,7 @@
 
 #define SQR(x)      ((x)*(x))
 
-#define NAVEXP      "D"                 /* exponent letter in RINEX NAV */
+#define NAVEXP      "E"                 /* exponent letter in RINEX NAV */
 #define NUMSYS      7                   /* number of systems */
 #define MAXRNXLEN   (16*MAXOBSTYPE+4)   /* max RINEX record length */
 #define MAXPOSHEAD  1024                /* max head line position */
@@ -198,13 +198,13 @@ static int sat2code(int sat, char *code)
 {
     int prn;
     switch (satsys(sat,&prn)) {
-        case SYS_GPS: sprintf(code,"G%02d",prn-MINPRNGPS+1); break;
-        case SYS_GLO: sprintf(code,"R%02d",prn-MINPRNGLO+1); break;
-        case SYS_GAL: sprintf(code,"E%02d",prn-MINPRNGAL+1); break;
-        case SYS_SBS: sprintf(code,"S%02d",prn-100); break;
-        case SYS_QZS: sprintf(code,"J%02d",prn-MINPRNQZS+1); break;
-        case SYS_CMP: sprintf(code,"C%02d",prn-MINPRNCMP+1); break;
-        case SYS_IRN: sprintf(code,"I%02d",prn-MINPRNIRN+1); break;
+        case SYS_GPS: sprintf(code,"G%2d",prn-MINPRNGPS+1); break;
+        case SYS_GLO: sprintf(code,"R%2d",prn-MINPRNGLO+1); break;
+        case SYS_GAL: sprintf(code,"E%2d",prn-MINPRNGAL+1); break;
+        case SYS_SBS: sprintf(code,"S%2d",prn-100); break;
+        case SYS_QZS: sprintf(code,"J%2d",prn-MINPRNQZS+1); break;
+        case SYS_CMP: sprintf(code,"C%2d",prn-MINPRNCMP+1); break;
+        case SYS_IRN: sprintf(code,"I%2d",prn-MINPRNIRN+1); break;
         default: return 0;
     }
     return 1;
@@ -2086,11 +2086,11 @@ extern int outrnxobsh(FILE *fp, const rnxopt_t *opt, const nav_t *nav)
         fprintf(fp,"%10.3f%50s%-20s\n",opt->tint,"","INTERVAL");
     }
     time2epoch(opt->tstart,ep);
-    fprintf(fp,"  %04.0f    %02.0f    %02.0f    %02.0f    %02.0f   %010.7f     %-12s%-20s\n",
+    fprintf(fp,"  %04.0f    %2.0f    %2.0f    %2.0f    %2.0f   %010.7f     %-12s%-20s\n",
             ep[0],ep[1],ep[2],ep[3],ep[4],ep[5],tsys,"TIME OF FIRST OBS");
     
     time2epoch(opt->tend,ep);
-    fprintf(fp,"  %04.0f    %02.0f    %02.0f    %02.0f    %02.0f   %010.7f     %-12s%-20s\n",
+    fprintf(fp,"  %04.0f    %2.0f    %2.0f    %2.0f    %2.0f   %010.7f     %-12s%-20s\n",
             ep[0],ep[1],ep[2],ep[3],ep[4],ep[5],tsys,"TIME OF LAST OBS");
     
     if (opt->rnxver>=301) {
@@ -2222,7 +2222,7 @@ extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
     if (ns<=0) return 1;
 
     if (opt->rnxver<=299) { /* ver.2 */
-        fprintf(fp," %02d %02.0f %02.0f %02.0f %02.0f %010.7f  %d%3d",
+        fprintf(fp," %02d %2.0f %2.0f %2.0f %2.0f %11.7f  %d%3d",
                 (int)ep[0]%100,ep[1],ep[2],ep[3],ep[4],ep[5],flag,ns);
         for (i=0;i<ns;i++) {
             if (i>0&&i%12==0) fprintf(fp,"\n%32s","");
@@ -2230,7 +2230,7 @@ extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
         }
     }
     else { /* ver.3 */
-        fprintf(fp,"> %04.0f %02.0f %02.0f %02.0f %02.0f %010.7f  %d%3d%6s%15.12f\n",
+        fprintf(fp,"> %04.0f %2.0f %2.0f %2.0f %2.0f%11.7f  %d%3d%6s%15.12f\n",
                 ep[0],ep[1],ep[2],ep[3],ep[4],ep[5],flag,ns,"",_dClockBias);
     }
     for (i=0;i<ns;i++) {
@@ -2482,12 +2482,12 @@ extern int outrnxnavb(FILE *fp, const rnxopt_t *opt, const eph_t *eph)
         (opt->rnxver>=302&&sys==SYS_QZS)||(opt->rnxver>=302&&sys==SYS_CMP)||
         (opt->rnxver>=303&&sys==SYS_IRN)) {
         if (!sat2code(eph->sat,code)) return 0;
-        fprintf(fp,"%-3s %04.0f %02.0f %02.0f %02.0f %02.0f %02.0f",code,ep[0],
+        fprintf(fp,"%-3s %04.0f %2.0f %2.0f %2.0f %2.0f %2.0f",code,ep[0],
                 ep[1],ep[2],ep[3],ep[4],ep[5]);
         sep="    ";
     }
     else if (opt->rnxver<=299&&sys==SYS_GPS) {
-        fprintf(fp,"%2d %02d %02.0f %02.0f %02.0f %02.0f %04.1f",prn,
+        fprintf(fp,"%2d %02d %2.0f %2.0f %2.0f %2.0f %4.1f",prn,
                 (int)ep[0]%100,ep[1],ep[2],ep[3],ep[4],ep[5]);
         sep="   ";
     }
@@ -2636,13 +2636,13 @@ extern int outrnxgnavb(FILE *fp, const rnxopt_t *opt, const geph_t *geph)
     time2epoch(toe,ep);
     
     if (opt->rnxver<=299) { /* ver.2 */
-        fprintf(fp,"%2d %02d %02.0f %02.0f %02.0f %02.0f %04.1f",prn,
+        fprintf(fp,"%2d %02d %2.0f %2.0f %2.0f %2.0f %4.1f",prn,
                 (int)ep[0]%100,ep[1],ep[2],ep[3],ep[4],ep[5]);
         sep="   ";
     }
     else { /* ver.3 */
         if (!sat2code(geph->sat,code)) return 0;
-        fprintf(fp,"%-3s %04.0f %02.0f %02.0f %02.0f %02.0f %02.0f",code,ep[0],
+        fprintf(fp,"%-3s %04.0f %2.0f %2.0f %2.0f %2.0f %2.0f",code,ep[0],
                 ep[1],ep[2],ep[3],ep[4],ep[5]);
         sep="    ";
     }

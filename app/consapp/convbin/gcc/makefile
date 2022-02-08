@@ -151,9 +151,9 @@ test5: test1 test4  # make sure JSON with no spaces are bit exact minus first tw
 test6: # BDS + GAL + GLO + GPS
 	@echo -e "\n\n****** Test6: BDS + GAL + GLO + GPS ********\n"
 	./sbp2rinex $(DATDIR)$(SEP)2018-06-15-v1.4.0-develop-2018061321-3-g734bd4b9.sbp.json -o 2018-06-15-json.obs -n 2018-06-15-json.nav
-	tail -n +8 ./2018-06-15-json.obs > 2018-06-15-json.trunc.obs
-	#diff --strip-trailing-cr ./2018-06-15-json.trunc.obs $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json.obs
-	tail -n +8 ./2018-06-15-json.nav > 2018-06-15-json.trunc.nav
-	#diff --strip-trailing-cr ./2018-06-15-json.trunc.nav $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json.nav
+	tail -n +4 ./2018-06-15-json.obs > 2018-06-15-json.trunc.obs
+	diff --strip-trailing-cr ./2018-06-15-json.trunc.obs $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json.obs
+	tail -n +4 ./2018-06-15-json.nav > 2018-06-15-json.trunc.nav
+	diff --strip-trailing-cr ./2018-06-15-json.trunc.nav $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json.nav
 testclean:
 	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs
