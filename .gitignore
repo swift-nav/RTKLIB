@@ -22,3 +22,9 @@ Debug
 Debug_Build
 __history
 __astcache
+app/consapp/convbin/gcc/sbp2rinex
+app/consapp/pos2kml/gcc/pos2kml
+app/consapp/rnx2rtkp/gcc/rnx2rtkp
+app/consapp/rtkrcv/gcc/rtkrcv
+app/consapp/str2str/gcc/str2str
+lib/iers/gcc/iers.a
