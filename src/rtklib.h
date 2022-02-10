@@ -1156,11 +1156,6 @@ typedef struct half_cyc_tag {  /* half-cycle correction list type */
     struct half_cyc_tag *next; /* pointer to next correction */
 } half_cyc_t;
 
-typedef struct {
-    int staid;          /* station id */
-    sta_t sta;          /* station parameters */
-} sbp_t;
-
 typedef struct {        /* receiver raw data control type */
     gtime_t time;       /* message time */
     gtime_t tobs[MAXSAT][NFREQ+NEXOBS]; /* observation data time */
@@ -1191,7 +1186,7 @@ typedef struct {        /* receiver raw data control type */
     void *rcv_data;     /* receiver dependent data */
 
     /* only used for STRFMT_SBP and STRFMT_SBPJSON */
-    sbp_t sbp;          /* Swift Binary Protocol stream data */
+    int staid;          /* station id */
 } raw_t;
 
 typedef struct {        /* stream type */

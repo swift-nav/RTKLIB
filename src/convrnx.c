@@ -104,17 +104,8 @@ static const char vercode[][MAXCODE]={ /* supported obs-type by RINEX version */
     ".4...4...4.4.....1.......41114..1.....41111............444..44444...", /* BDS */
     ".........................3......................3333333............."  /* IRN */
 };
-/* initialise a sbp_t --------------------------------------------------------*/
-static int init_sbp(sbp_t *sbp)
-{
-    trace(3,"init_sbp:\n");
-
-    memset(sbp, 0, sizeof(sbp_t));
-
-    return 1;
-}
-/* convert rinex obs type ver.3 -> ver.2 -------------------------------------*/
-static void convcode(double rnxver, int sys, char *type)
+/* convert RINEX obs-type ver.3 -> ver.2 -------------------------------------*/
+static void convcode(int rnxver, int sys, char *type)
 {
     if (rnxver>=212&&(sys==SYS_GPS||sys==SYS_QZS||sys==SYS_SBS)&&
         !strcmp(type+1,"1C")) { /* L1C/A */
@@ -151,187 +142,6 @@ static void convcode(double rnxver, int sys, char *type)
     else {
         type[2]='\0';
     }
-}
-static const sta_t* get_first_station(const stas_t *stas, rnxopt_t *opt)
-{
-    const sta_t *sta=NULL;
-    int staid=-1;
-    const stas_t *p;
-
-    /* search first epoch station info */
-    for (p=stas;p;p=p->next) {
-        sta=&p->sta;
-        staid=p->staid;
-        if (timediff(p->ts,opt->tstart)<DTTOL) break;
-    }
-    /* comment */
-    if (staid>=0) {
-        if (!*opt->marker) sprintf(opt->marker,"%04d",staid);
-        sprintf(opt->comment[1]+strlen(opt->comment[1]),", station ID: %d",
-                staid);
-    }
-    return sta;
-}
-/* set rinex station and receiver info to options ----------------------------*/
-static void rnx2opt(const rnxctr_t *rnx, rnxopt_t *opt)
-{
-    double pos[3],enu[3];
-    int i;
-
-    trace(3,"rnx2opt:\n");
-
-    /* receiver and antenna info */
-    if (!*opt->marker&&!*opt->markerno) {
-        strcpy(opt->marker,rnx->sta.name);
-        strcpy(opt->markerno,rnx->sta.marker);
-    }
-    if (!*opt->rec[0]&&!*opt->rec[1]&&!*opt->rec[2]) {
-        strcpy(opt->rec[0],rnx->sta.recsno);
-        strcpy(opt->rec[1],rnx->sta.rectype);
-        strcpy(opt->rec[2],rnx->sta.recver);
-    }
-    if (!*opt->ant[0]&&!*opt->ant[1]) {
-        strcpy(opt->ant[0],rnx->sta.antsno);
-        strcpy(opt->ant[1],rnx->sta.antdes);
-    }
-    /* antenna approx position */
-    if (!opt->autopos&&norm(rnx->sta.pos,3)>0.0) {
-        for (i=0;i<3;i++) opt->apppos[i]=rnx->sta.pos[i];
-    }
-    /* antenna delta */
-    if (norm(opt->antdel,3)>0.0) {
-        ;
-    }
-    else if (norm(rnx->sta.del,3)>0.0) {
-        if (!rnx->sta.deltype) { /* enu */
-            opt->antdel[0]=rnx->sta.del[2]; /* h */
-            opt->antdel[1]=rnx->sta.del[0]; /* e */
-            opt->antdel[2]=rnx->sta.del[1]; /* n */
-        }
-        else if (norm(opt->apppos,3)>0.0) { /* xyz */
-            ecef2pos(opt->apppos,pos);
-            ecef2enu(pos,rnx->sta.del,enu);
-            opt->antdel[0]=enu[2];
-            opt->antdel[1]=enu[0];
-            opt->antdel[2]=enu[1];
-        }
-    }
-}
-/* set rtcm antenna and receiver info to options -----------------------------*/
-static void rtcm2opt(const rtcm_t *rtcm, const stas_t *stas, rnxopt_t *opt)
-{
-    const sta_t *sta;
-    double pos[3],enu[3];
-    int i;
-
-    trace(3,"rtcm2opt:\n");
-
-    sta = get_first_station(stas, opt);
-    if (!sta) {
-        sta=&rtcm->sta;
-    }
-    /* receiver and antenna info */
-    if (!*opt->rec[0]&&!*opt->rec[1]&&!*opt->rec[2]) {
-        strcpy(opt->rec[0],sta->recsno);
-        strcpy(opt->rec[1],sta->rectype);
-        strcpy(opt->rec[2],sta->recver);
-    }
-    if (!*opt->ant[0]&&!*opt->ant[1]&&!*opt->ant[2]) {
-        strcpy(opt->ant[0],sta->antsno);
-        strcpy(opt->ant[1],sta->antdes);
-        if (sta->antsetup) {
-            sprintf(opt->ant[2],"%d",sta->antsetup);
-        }
-        else *opt->ant[2]='\0';
-    }
-    /* antenna approx position */
-    if (!opt->autopos&&norm(sta->pos,3)>0.0) {
-        for (i=0;i<3;i++) opt->apppos[i]=sta->pos[i];
-    }
-    /* antenna delta */
-    if (norm(opt->antdel,3)>0.0) {
-        ;
-    }
-    else if (norm(sta->del,3)>0.0) {
-        if (!sta->deltype&&norm(sta->del,3)>0.0) { /* enu */
-            opt->antdel[0]=sta->del[2]; /* h */
-            opt->antdel[1]=sta->del[0]; /* e */
-            opt->antdel[2]=sta->del[1]; /* n */
-        }
-        else if (norm(sta->pos,3)>0.0) { /* xyz */
-            ecef2pos(sta->pos,pos);
-            ecef2enu(pos,sta->del,enu);
-            opt->antdel[0]=enu[2]; /* h */
-            opt->antdel[1]=enu[0]; /* e */
-            opt->antdel[2]=enu[1]; /* n */
-        }
-    }
-    else {
-        opt->antdel[0]=sta->hgt;
-        opt->antdel[1]=0.0;
-        opt->antdel[2]=0.0;
-    }
-}
-/* set raw antenna and receiver info to options ------------------------------*/
-static void raw2opt(const raw_t *raw, rnxopt_t *opt)
-{
-    double pos[3],enu[3];
-    int i;
-
-    trace(3,"raw2opt:\n");
-
-    /* receiver and antenna info */
-    if (!*opt->rec[0]&&!*opt->rec[1]&&!*opt->rec[2]) {
-        strcpy(opt->rec[0],raw->sta.recsno);
-        strcpy(opt->rec[1],raw->sta.rectype);
-        strcpy(opt->rec[2],raw->sta.recver);
-    }
-    if (!*opt->ant[0]&&!*opt->ant[1]&&!*opt->ant[2]) {
-        strcpy(opt->ant[0],raw->sta.antsno);
-        strcpy(opt->ant[1],raw->sta.antdes);
-        if (raw->sta.antsetup) {
-            sprintf(opt->ant[2],"%d",raw->sta.antsetup);
-        }
-        else *opt->ant[2]='\0';
-    }
-    /* antenna approx position */
-    if (!opt->autopos&&norm(raw->sta.pos,3)>0.0) {
-        for (i=0;i<3;i++) opt->apppos[i]=raw->sta.pos[i];
-    }
-    /* antenna delta */
-    if (norm(raw->sta.del,3)>0.0) {
-        if (!raw->sta.deltype&&norm(raw->sta.del,3)>0.0) { /* enu */
-            opt->antdel[0]=raw->sta.del[2]; /* h */
-            opt->antdel[1]=raw->sta.del[0]; /* e */
-            opt->antdel[2]=raw->sta.del[1]; /* n */
-        }
-        else if (norm(raw->sta.pos,3)>0.0) { /* xyz */
-            ecef2pos(raw->sta.pos,pos);
-            ecef2enu(pos,raw->sta.del,enu);
-            opt->antdel[0]=enu[2]; /* h */
-            opt->antdel[1]=enu[0]; /* e */
-            opt->antdel[2]=enu[1]; /* n */
-        }
-    }
-    else {
-        opt->antdel[0]=raw->sta.hgt;
-        opt->antdel[1]=0.0;
-        opt->antdel[2]=0.0;
-    }
-}
-/* set rinex station and SBP antenna and receiver info -----------------------*/
-static void sbp2opt(strfile_t *str, const stas_t *stas, rnxopt_t *opt)
-{
-    const sta_t *sta;
-
-    trace(3,"sbp2opt:\n");
-
-    sta = get_first_station(stas, opt);
-    if (!sta) {
-        sta=&str->raw.sbp.sta;
-    }
-    str->raw.sta = *sta;
-    raw2opt(&str->raw, opt);
 }
 /* generate stream file ------------------------------------------------------*/
 static strfile_t *gen_strfile(int format, const char *opt)
@@ -371,10 +181,7 @@ static strfile_t *gen_strfile(int format, const char *opt)
         str->sta=&str->raw.sta;
         strcpy(str->raw.opt,opt);
         if (format==STRFMT_SBP||format==STRFMT_SBPJSON) {
-            if (!init_sbp(&str->raw.sbp)) {
-                showmsg("init sbp error");
-                return 0;
-            }
+          str->raw.staid = -1;
         }
     }
     else if (format==STRFMT_RINEX) {
@@ -456,7 +263,11 @@ static int input_strfile(strfile_t *str)
             str->time=str->raw.time;
             str->ephsat=str->raw.ephsat;
             str->ephset=str->raw.ephset;
-            str->staid=0;
+            if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
+              str->staid=str->raw.staid;
+            } else {
+              str->staid=0;
+            }
         }
     }
     else if (str->format==STRFMT_RINEX) {
@@ -622,27 +433,7 @@ static void setopt_obstype(const uint8_t *codes, const uint8_t *types, int sys,
         }
     }
 }
-/* add station to station list -----------------------------------------------*/
-static void add_station(stas_t **stas, int staid, const gtime_t *time, const sta_t *sta)
-{
-    stas_t *p;
-
-    for (p=*stas;p;p=p->next) {
-        if (p->staid==staid) {
-            p->sta=*sta;
-            return;
-        }
-    }
-    if (!(p=(stas_t *)calloc(sizeof(stas_t),1))) return;
-    p->staid=staid;
-    p->ts=*time,
-    p->sta=*sta;
-    p->next=*stas;
-    *stas=p;
-    trace(2,"add_station: staid=%d time=%s\n",staid,
-          time_str(*time,0));
-}
-
+/* set phase shift in RINEX options (RINEX 3.04 A23) -------------------------*/
 static void setopt_phshift(rnxopt_t *opt)
 {
     uint8_t code;
@@ -789,16 +580,6 @@ static void setopt_sta(const strfile_t *str, rnxopt_t *opt)
         opt->antdel[2]=0.0;
     }
 }
-/* update sbp station list----------------------------------------------------*/
-static void update_stas_sbp(stas_t **stas, strfile_t *str)
-{
-    if (str->format==STRFMT_RTCM2||str->format==STRFMT_RTCM3) {
-        add_station(stas, str->rtcm.staid, &str->rtcm.time, &str->rtcm.sta);
-    }
-    if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
-        add_station(stas, str->raw.sbp.staid, &str->raw.time, &str->raw.sbp.sta);
-    }
-}
 /* update station list -------------------------------------------------------*/
 static void update_stas(strfile_t *str)
 {
@@ -942,7 +723,7 @@ static void resolve_halfc(const strfile_t *str, obsd_t *data, int n)
 }
 /* scan input files ----------------------------------------------------------*/
 static int scan_file(char **files, int nf, rnxopt_t *opt, strfile_t *str,
-                     int *mask, stas_t **stas)
+                     int *mask)
 {
     eph_t  eph0 ={0,-1,-1};
     geph_t geph0={0,-1};
@@ -959,10 +740,6 @@ static int scan_file(char **files, int nf, rnxopt_t *opt, strfile_t *str,
         if (!open_strfile(str,files[m])) {
             continue;
         }
-        if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
-            if(str->raw.sbp.staid!=0) update_stas_sbp(stas,str);
-        }
-        /* scan codes and station info in input file */
         while ((type=input_strfile(str))>=-1) {
             if (opt->ts.time&&timediff(str->time,opt->ts)<-opt->ttol) continue;
             if (opt->te.time&&timediff(str->time,opt->te)>-opt->ttol) break;
@@ -1001,11 +778,15 @@ static int scan_file(char **files, int nf, rnxopt_t *opt, strfile_t *str,
                 update_stas(str);
             }
             else if (type==5) { /* station info */
+                  if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
+                    /* update station list */
+                    if(str->raw.staid>=0) update_stas(str);
+                 }
                 /* update station info */
                 update_stainf(str);
             }
 
-            if (++c%11) continue;
+            if (++c%256) continue;
             
             sprintf(msg,"scanning: %s %s%s%s%s%s%s%s",time_str(str->time,0),
                     n[0]?"G":"",n[1]?"R":"",n[2]?"E":"",n[3]?"J":"",
@@ -1126,7 +907,7 @@ static void outrnxevent(FILE *fp, const rnxopt_t *opt, gtime_t time, int event,
                         const stas_t *stas, int staid)
 {
     const stas_t *p=NULL,*q;
-    double ep[6],pos[3],enu[3],del[3];
+    double ep[6],pos[3]={0},enu[3]={0},del[3]={0};
 
     trace(3,"outrnxevent: event=%d\n",event);
     
@@ -1253,13 +1034,6 @@ static void convobs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n,
                 str->obs->data[i].LLI[j]|=LLI_SLIP;
             }
         }
-        *staid=str->rtcm.staid;
-    } else if ((str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON)&&
-        str->raw.sbp.staid!=*staid) {
-        if (*staid>=0) {
-            outrnxevent(ofp[0],opt,str->time,EVENT_NEWSITE,str->stas, str->raw.sbp.staid);
-        }
-        *staid=str->raw.sbp.staid;
     }
     /* resolve half-cycle ambiguity */
     if (opt->halfcyc) {
@@ -1466,7 +1240,6 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
 {
     FILE *ofp[NOUTFILE]={NULL};
     strfile_t *str;
-    stas_t *stas=NULL;
     gtime_t tend[3]={{0}};
     int i,j,nf,type,n[NOUTFILE+1]={0},mask[MAXEXFILE]={0},staid=-1,abort=0;
     char path[1024],*paths[NOUTFILE],s[NOUTFILE][1024];
@@ -1508,10 +1281,18 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
         str->nav->glo_fcn[i]=opt->glofcn[i]; /* FCN+8 */
     }
     /* scan input files */
-    if (!scan_file(epath,nf,opt,str,mask,&stas)) {
+    if (!scan_file(epath,nf,opt,str,mask)) {
         for (i=0;i<MAXEXFILE;i++) free(epath[i]);
         free_strfile(str);
         return 0;
+    }
+
+    /* set format and file in RINEX options comments */
+    setopt_file(format,epath,nf,mask,opt);
+
+    if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
+      str->staid = -1;
+      str->raw.staid = -1;
     }
     
     /* replace keywords in output file */
@@ -1532,8 +1313,6 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
         return 0;
     }
     str->time=str->tstart;
-    for (i=0;i<MAXSAT;i++)
-        for (j=0;j<NFREQ+NEXOBS;j++) str->raw.halfc[i][j]=0;
 
     for (i=0;i<nf&&!abort;i++) {
         if (!mask[i]) continue;
@@ -1562,16 +1341,6 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
         }
         /* close stream file */
         close_strfile(str);
-    }
-    /* set receiver and antenna information to option */
-    if (format==STRFMT_RTCM2||format==STRFMT_RTCM3) {
-        rtcm2opt(&str->rtcm,stas,opt);
-    }
-    else if (format==STRFMT_SBP||format==STRFMT_SBPJSON) {
-        sbp2opt(str,stas,opt);
-    }
-    else if (format==STRFMT_RINEX) {
-        rnx2opt(&str->rnx,opt);
     }
     /* close output files */
     closefile(ofp,opt,str->nav);

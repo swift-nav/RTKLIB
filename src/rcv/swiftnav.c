@@ -1425,20 +1425,21 @@ static int decode_base_pos_ecef(raw_t *raw) {
   rr[1] = R8(puiTmp + 8);
   rr[2] = R8(puiTmp + 16);
 
-  if (rr[0] == raw->sbp.sta.pos[0] &&
-      rr[1] == raw->sbp.sta.pos[1] &&
-      rr[2] == raw->sbp.sta.pos[2]) {
+  if (rr[0] == raw->sta.pos[0] &&
+      rr[1] == raw->sta.pos[1] &&
+      rr[2] == raw->sta.pos[2]) {
     /* no change in position */
     return 0;
   }
 
-  raw->sbp.staid++;
-  raw->sbp.sta.deltype=0; /* xyz */
+  raw->staid++;
+  sprintf(raw->sta.name,"SBP %04d",raw->staid);
+  raw->sta.deltype=0; /* xyz */
   for (j=0;j<3;j++) {
-    raw->sbp.sta.pos[j]=rr[j];
-    raw->sbp.sta.del[j]=0.0;
+    raw->sta.pos[j]=rr[j];
+    raw->sta.del[j]=0.0;
   }
-  raw->sbp.sta.hgt=0.0;
+  raw->sta.hgt=0.0;
   return 5;
 }
 
