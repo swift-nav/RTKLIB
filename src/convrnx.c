@@ -343,7 +343,12 @@ static void setopt_file(int format, char **paths, int n, const int *mask,
         if (!*opt->comment[i]) break;
     }
     if (i<MAXCOMMENT) {
-        sprintf(opt->comment[i++],"format: %.55s",formatstrs[format]);
+        sprintf(opt->comment[i],"format: %s",formatstrs[format]);
+        if (opt->rcvopt) {
+          strcat(opt->comment[i],", option: ");
+          strcat(opt->comment[i],opt->rcvopt);
+        }
+        i++;
     }
     for (j=0;j<n&&i<MAXCOMMENT;j++) {
         if (!mask[j]) continue;
