@@ -341,12 +341,6 @@ static uint8_t puPayloadTmp[256];
 
 static const gtime_t time0 = {0};
 
-#ifdef WIN32
-static inline float rintf(float x) {
-  return floor(x + 0.5);
-}
-#endif /* WIN32 */
-
 /* ura value (m) to ura index ------------------------------------------------*/
 static int uraindex(double value) {
   int i;
