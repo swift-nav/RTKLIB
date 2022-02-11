@@ -823,8 +823,8 @@ static int decode_gpsnav_dep_e(raw_t *raw) {
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 193) {
-	trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
-	return -1;
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
+    return -1;
   }
 
   prn = U2(puiTmp) + 1; /* GPS coded as PRN-1 */
@@ -996,14 +996,14 @@ static int decode_qzssnav(raw_t *raw) {
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
   if ((raw->len) < 147) {
-	trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
-	return -1;
+    trace(2, "%s: frame length error: len=%d\n", __FUNCTION__, raw->len);
+    return -1;
   }
 
   prn = puiTmp[0];
   if ((prn < MINPRNQZS) || (prn > MAXPRNQZS)) {
-	trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
-	return -1;
+    trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
+    return -1;
   }
 
   sat = satno(SYS_QZS, prn);
