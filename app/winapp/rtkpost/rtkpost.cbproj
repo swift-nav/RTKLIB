@@ -121,7 +121,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <ILINK_LibraryPath>D:\share\RTKLIB\lib\openblas\;D:\share\RTKLIB\lib\OpenBLAS-v0.2.14-Win64-int32\lib\;D:\share\RTKLIB\lib\omf\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_LibraryPath>..\..\..\lib\openblas\;D:\share\RTKLIB\lib\OpenBLAS-v0.2.14-Win64-int32\lib\;D:\share\RTKLIB\lib\omf\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <BCC_PCHUsage>None</BCC_PCHUsage>
