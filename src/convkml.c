@@ -205,10 +205,10 @@ static int savekml(const char *file, const solbuf_t *solbuf, int tcolor,
           if (radius_m < 1e-6) {
             continue;
           }
-          //~ printf("solbuf->data[i].qr %.1f %.1f %.1f  %.1f %.1f %.1f radius_m %.3f\n",
-             //~ solbuf->data[i].qr[0], solbuf->data[i].qr[1], solbuf->data[i].qr[2],
-             //~ solbuf->data[i].qr[3], solbuf->data[i].qr[4], solbuf->data[i].qr[5],
-             //~ radius_m);
+          /* printf("solbuf->data[i].qr %.1f %.1f %.1f  %.1f %.1f %.1f radius_m %.3f\n",
+            solbuf->data[i].qr[0], solbuf->data[i].qr[1], solbuf->data[i].qr[2],
+            solbuf->data[i].qr[3], solbuf->data[i].qr[4], solbuf->data[i].qr[5],
+            radius_m); */
           outcircle(
             fp,
             solbuf->data[i].rr,
