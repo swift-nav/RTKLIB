@@ -511,12 +511,12 @@ static uint8_t calculate_loss_of_lock(double dt,
 /* decode SBF measurements message (observables) -----------------------------*/
 static int decode_msgobs(raw_t *raw) {
   gtime_t time;
-  double tow, dResTow, pseudorange, carr_phase, freq_doppler, delta_time;
+  double tow, dResTow, pseudorange, carr_phase, freq_doppler, delta_time, cn0;
   int16_t i, ii, sat, n, week;
   uint8_t *p = (raw->buff) + 6; /* jump to TOW location */
   uint8_t num_obs, lock_info;
   uint32_t prev_lockt = 0, curr_lockt = 0;
-  uint8_t flags, sat_id, cn0_int, slip, half_cycle_amb;
+  uint8_t flags, sat_id, slip, half_cycle_amb;
   int8_t band_code;
   uint32_t code = 0, sys = 0, freq = 0;
   int iDidFlush = 0, iSatFound = 0;
@@ -553,7 +553,7 @@ static int decode_msgobs(raw_t *raw) {
     carr_phase += p[8] / 256.0;    /* carrier phase fractional cycles */
     freq_doppler = I2(p + 9);      /* Doppler shift in integer Hz */
     freq_doppler += p[11] / 256.0; /* fractional part of Doppler shift */
-    cn0_int = p[12];               /* C/N0 */
+    cn0 = (double)p[12] / 4.0;     /* C/N0 in dBHz */
     lock_info = p[13] & 0xf;       /* lock time */
     flags = p[14];                 /* observation flags */
     sat_id = p[15];
@@ -598,7 +598,7 @@ static int decode_msgobs(raw_t *raw) {
       raw->obuf.data[ii].P[freq] = (flags & 0x1) ? pseudorange : 0.0;
       raw->obuf.data[ii].L[freq] = (flags & 0x2) ? carr_phase : 0.0;
       raw->obuf.data[ii].D[freq] = (flags & 0x8) ? (float)freq_doppler : 0.0f;
-      raw->obuf.data[ii].SNR[freq] = cn0_int;
+      raw->obuf.data[ii].SNR[freq] = cn0 / SNR_UNIT;
       raw->obuf.data[ii].code[freq] = code;
 
       if (flags & 0x2) {
