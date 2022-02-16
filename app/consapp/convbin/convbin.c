@@ -559,12 +559,6 @@ int main(int argc, char **argv)
         fprintf(stderr,"input format can not be recognized\n");
         return -1;
     }
-    sprintf(opt.comment[0],"log: %-55.55s",ifile);
-    sprintf(opt.comment[1],"format: %s",formatstrs[format]);
-    if (*opt.rcvopt) {
-        strcat(opt.comment[1],", option: ");
-        strcat(opt.comment[1],opt.rcvopt);
-    }
     if (trace>0) {
         traceopen(TRACEFILE);
         tracelevel(trace);
