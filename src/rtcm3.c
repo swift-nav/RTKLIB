@@ -2021,7 +2021,7 @@ static void save_msm_obs(rtcm_t *rtcm, int sys, msm_h_t *h, const double *r,
         /* signal to rinex obs type */
         code[i]=obs2code(sig[i]);
         idx[i]=code2idx(sys,code[i]);
-
+        
         if (code[i]!=CODE_NONE) {
             if (q) q+=sprintf(q,"L%s%s",sig[i],i<h->nsig-1?",":"");
         }
@@ -2089,7 +2089,7 @@ static void save_msm_obs(rtcm_t *rtcm, int sys, msm_h_t *h, const double *r,
                 }
                 rtcm->obs.data[index].LLI[idx[k]]=
                     lossoflock(rtcm,sat,idx[k],lock[j])+(half[j]?2:0);
-                rtcm->obs.data[index].SNR [idx[k]]=(unsigned char)(cnr[j]*4.0);
+                rtcm->obs.data[index].SNR [idx[k]]=(uint16_t)(cnr[j]/SNR_UNIT+0.5);
                 rtcm->obs.data[index].code[idx[k]]=code[k];
             }
             j++;

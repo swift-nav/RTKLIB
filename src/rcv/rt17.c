@@ -1793,7 +1793,7 @@ static int DecodeType17(raw_t *Raw, uint32_t rif)
                 p += 8;
 
                 /* L1 Doppler (Hz) */
-                obs->D[0] = (float)R8(p);
+                obs->D[0] = R8(p);
                 p += 8;
 
                 /* Reserved 8 bytes */
@@ -1829,7 +1829,7 @@ static int DecodeType17(raw_t *Raw, uint32_t rif)
                 p++; /* U1 Reserved byte */
 
                 /* L2 Doppler (Hz) */
-                obs->D[1] = (float)R8(p);
+                obs->D[1] = R8(p);
                 p += 8;
             }
         }
