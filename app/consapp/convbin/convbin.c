@@ -12,7 +12,7 @@
 *                          fix bug on inproper header for rtcm2 and rtcm3
 *           2010/07/18 1.3 add option -v, -t, -h, -x
 *           2011/01/15 1.4 add option -ro, -hc, -hm, -hn, -ht, -ho, -hr, -ha,
-*                            -hp, -hd, -y, -c, -q
+*                            -hp, -hd, -y, -c, -q 
 *                          support gw10 and javad receiver, galileo, qzss
 *                          support rinex file name convention
 *           2012/10/22 1.5 add option -scan, -oi, -ot, -ol
@@ -58,70 +58,70 @@
 
 /* help text -----------------------------------------------------------------*/
 static const char *help[]={
-    "",
-    " Converts Swift Navigation receiver SBP binary and SBP JSON raw data logs to RINEX files.",
-    "",
-    " Usage:",
-    "",
-    "     sbp2rinex [option ...] file",
-    "",
-    " SBAS message file complies with RTKLIB SBAS/LEX message format.",
-    "",
-    " Options [default]:",
-    "",
-    "     file         receiver log file",
-    "     -ts y/m/d h:m:s  start time [all]",
-    "     -te y/m/d h:m:s  end time [all]",
-    "     -tr y/m/d h:m:s  approximated time for RTCM/CMR/CMR+ messages",
-    "     -ti tint     observation data interval (s) [all]",
-    "     -span span   time span (h) [all]",
-    "     -r format    log format type:",
-    "                  sbp       - Swift Navigation SBP",
-    "                  json      - Swift Navigation SBP-JSON",
-    "     -ro opt,opt  receiver option(s) (use comma between multiple opt):",
-    "                  CONVBASE  - convert base station observations",
-    "                  BASEPOS   - determine base station location from input file",
-    "                  EPHALL    - include all ephemeris",
-    "                  INVCP     - invert carrier phase polarity",
-    "                  OBSALL    - include observations with RAIM flag set",
-    "     -f freq      number of frequencies [2]",
-    "     -hc comment  rinex header: comment line",
-    "     -hm marker   rinex header: marker name",
-    "     -hn markno   rinex header: marker number",
-    "     -ht marktype rinex header: marker type",
-    "     -ho observ   rinex header: oberver name and agency separated by /",
-    "     -hr rec      rinex header: receiver number, type and version separated by /",
-    "     -ha ant      rinex header: antenna number and type separated by /",
-    "     -hp pos      rinex header: approx position x/y/z separated by /",
-    "     -hd delta    rinex header: antenna delta h/e/n separated by /",
-    "     -v ver       rinex version [3.00]",
-    "     -oi          include iono correction in rinex nav header [off]",
-    "     -ot          include time correction in rinex nav header [off]",
-    "     -ol          include leap seconds in rinex nav header [off]",
-    "     -halfc       half-cycle ambiguity correction [off]",
-    "     -mask   [sig[,...]] signal mask(s) (sig={G|R|E|J|S|C|I}L{1C|1P|1W|...})",
-    "     -nomask [sig[,...]] signal no mask (same as above)",
-    "     -x sat       exclude satellite",
-    "     -y sys       exclude systems (G:GPS,R:GLO,E:GAL,J:QZS,S:SBS,C:BDS,I:IRN)",
-    "     -d dir       output directory [same as input file]",
-    "     -c staid     use RINEX file name convention with staid [off]",
-    "     -o ofile     output RINEX OBS file",
-    "     -n nfile     output RINEX NAV file",
-    "     -g gfile     output RINEX GNAV file",
-    "     -h hfile     output RINEX HNAV file",
-    "     -q qfile     output RINEX QNAV file",
-    "     -l lfile     output RINEX LNAV file",
-    "     -s sfile     output SBAS message file",
-    "     -trace level output trace level [off]",
-    "",
-    " If not any output file is specified, default output files <file>.obs,",
-    " <file>.nav, <file>.gnav, <file>.hnav, <file>.qnav, <file>.lnav and",
-    " <file>.sbs are used. Empty output files are deleted after processing.",
-    "",
-    " If log format type is not specified, format type is recognized by the input",
-    " file extension as following:",
-    "     *.sbp        Swift Navigation SBP",
-    "     *.json       Swift Navigation SBP-JSON",
+"",
+" Converts Swift Navigation receiver SBP binary and SBP JSON raw data logs to RINEX files.",
+"",
+" Usage:",
+"",
+"     sbp2rinex [option ...] file",
+"",
+" SBAS message file complies with RTKLIB SBAS/LEX message format.",
+"",
+" Options [default]:",
+"",
+"     file         receiver log file",
+"     -ts y/m/d h:m:s  start time [all]",
+"     -te y/m/d h:m:s  end time [all]",
+"     -tr y/m/d h:m:s  approximated time for RTCM/CMR/CMR+ messages",
+"     -ti tint     observation data interval (s) [all]",
+"     -span span   time span (h) [all]",
+"     -r format    log format type:",
+"                  sbp       - Swift Navigation SBP",
+"                  json      - Swift Navigation SBP-JSON",
+"     -ro opt,opt  receiver option(s) (use comma between multiple opt):",
+"                  CONVBASE  - convert base station observations",
+"                  BASEPOS   - determine base station location from input file",
+"                  EPHALL    - include all ephemeris",
+"                  INVCP     - invert carrier phase polarity",
+"                  OBSALL    - include observations with RAIM flag set",
+"     -f freq      number of frequencies [2]",
+"     -hc comment  rinex header: comment line",
+"     -hm marker   rinex header: marker name",
+"     -hn markno   rinex header: marker number",
+"     -ht marktype rinex header: marker type",
+"     -ho observ   rinex header: oberver name and agency separated by /",
+"     -hr rec      rinex header: receiver number, type and version separated by /",
+"     -ha ant      rinex header: antenna number and type separated by /",
+"     -hp pos      rinex header: approx position x/y/z separated by /",
+"     -hd delta    rinex header: antenna delta h/e/n separated by /",
+"     -v ver       rinex version [3.04]",
+"     -oi          include iono correction in rinex nav header [off]",
+"     -ot          include time correction in rinex nav header [off]",
+"     -ol          include leap seconds in rinex nav header [off]",
+"     -halfc       half-cycle ambiguity correction [off]",
+"     -mask   [sig[,...]] signal mask(s) (sig={G|R|E|J|S|C|I}L{1C|1P|1W|...})",
+"     -nomask [sig[,...]] signal no mask (same as above)",
+"     -x sat       exclude satellite",
+"     -y sys       exclude systems (G:GPS,R:GLO,E:GAL,J:QZS,S:SBS,C:BDS,I:IRN)",
+"     -d dir       output directory [same as input file]",
+"     -c staid     use RINEX file name convention with staid [off]",
+"     -o ofile     output RINEX OBS file",
+"     -n nfile     output RINEX NAV file",
+"     -g gfile     output RINEX GNAV file",
+"     -h hfile     output RINEX HNAV file",
+"     -q qfile     output RINEX QNAV file",
+"     -l lfile     output RINEX LNAV file",
+"     -s sfile     output SBAS message file",
+"     -trace level output trace level [off]",
+"",
+" If not any output file is specified, default output files <file>.obs,",
+" <file>.nav, <file>.gnav, <file>.hnav, <file>.qnav, <file>.lnav and",
+" <file>.sbs are used. Empty output files are deleted after processing.",
+"",
+" If log format type is not specified, format type is recognized by the input",
+" file extension as following:",
+"     *.sbp        Swift Navigation SBP",
+"     *.json       Swift Navigation SBP-JSON",
 };
 
 void settspan(gtime_t ts, gtime_t te) {}
@@ -159,9 +159,9 @@ static int convbin(int format, rnxopt_t *opt, const char *ifile, char **file,
 
     def=!file[0]&&!file[1]&&!file[2]&&!file[3]&&!file[4]&&!file[5]&&!file[6]&&
         !file[7]&&!file[8];
-
+    
     for (i=0;i<NOUTFILE;i++) ofile[i]=ofile_[i];
-
+    
     if (file[0]) strcpy(ofile[0],file[0]);
     else if (*opt->staid) {
         strcpy(ofile[0],"%r%n0.%yO");
@@ -254,7 +254,7 @@ static int convbin(int format, rnxopt_t *opt, const char *ifile, char **file,
     }
     fprintf(stderr, "%s\n", opt->prog);
     fprintf(stderr,"input file  : %s (%s)\n",ifile,formatstrs[format]);
-
+    
     if (*ofile[0]) fprintf(stderr,"->rinex obs : %s\n",ofile[0]);
     if (*ofile[1]) fprintf(stderr,"->rinex nav : %s\n",ofile[1]);
     if (*ofile[2]) fprintf(stderr,"->rinex gnav: %s\n",ofile[2]);
@@ -264,7 +264,7 @@ static int convbin(int format, rnxopt_t *opt, const char *ifile, char **file,
     if (*ofile[6]) fprintf(stderr,"->rinex cnav: %s\n",ofile[6]);
     if (*ofile[7]) fprintf(stderr,"->rinex inav: %s\n",ofile[7]);
     if (*ofile[8]) fprintf(stderr,"->sbas log  : %s\n",ofile[8]);
-
+    
     if (!convrnx(format,opt,ifile,ofile)) {
         fprintf(stderr,"\n");
         return -1;
@@ -277,7 +277,7 @@ static void setmask(const char *argv, rnxopt_t *opt, int mask)
 {
     char buff[1024],*p;
     int i,code;
-
+    
     strcpy(buff,argv);
     for (p=strtok(buff,",");p;p=strtok(NULL,",")) {
         if (strlen(p)<4||p[1]!='L') continue;
@@ -346,9 +346,9 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
     opt->rnxver=304;
     opt->obstype=OBSTYPE_PR|OBSTYPE_CP|OBSTYPE_DOP|OBSTYPE_SNR;
     opt->navsys=SYS_GPS|SYS_GLO|SYS_GAL|SYS_QZS|SYS_SBS|SYS_CMP|SYS_IRN;
-
+    
     for (i=0;i<6;i++) for (j=0;j<64;j++) opt->mask[i][j]='1';
-
+    
     for (i=1;i<argc;i++) {
         if (!strcmp(argv[i],"-ts")&&i+2<argc) {
             sscanf(argv[++i],"%lf/%lf/%lf",eps,eps+1,eps+2);
@@ -482,7 +482,7 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
             *trace=atoi(argv[++i]);
         }
         else if (!strncmp(argv[i],"-",1)) printhelp(opt);
-
+        
         else *ifile=argv[i];
     }
     if (span>0.0&&opt->ts.time) {
@@ -497,22 +497,21 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
     if (!opt->trtcm.time) {
         get_filetime(*ifile,&opt->trtcm);
     }
-
     if (*fmt) {
-        if      (!strcmp(fmt,"rtcm2"))  format=STRFMT_RTCM2;
-        else if (!strcmp(fmt,"rtcm3"))  format=STRFMT_RTCM3;
-        else if (!strcmp(fmt,"nov"  ))  format=STRFMT_OEM4;
-        else if (!strcmp(fmt,"oem3" ))  format=STRFMT_OEM3;
-        else if (!strcmp(fmt,"ubx"  ))  format=STRFMT_UBX;
-        else if (!strcmp(fmt,"sbp"  ))  format=STRFMT_SBP;
-        else if (!strcmp(fmt,"json"))   format=STRFMT_SBPJSON;
-        else if (!strcmp(fmt,"stq"  ))  format=STRFMT_STQ;
-        else if (!strcmp(fmt,"javad"))  format=STRFMT_JAVAD;
-        else if (!strcmp(fmt,"nvs"  ))  format=STRFMT_NVS;
-        else if (!strcmp(fmt,"binex"))  format=STRFMT_BINEX;
-        else if (!strcmp(fmt,"rt17" ))  format=STRFMT_RT17;
-        else if (!strcmp(fmt,"sbf"  ))  format=STRFMT_SEPT;
-        else if (!strcmp(fmt,"rinex"))  format=STRFMT_RINEX;
+        if      (!strcmp(fmt,"rtcm2")) format=STRFMT_RTCM2;
+        else if (!strcmp(fmt,"rtcm3")) format=STRFMT_RTCM3;
+        else if (!strcmp(fmt,"nov"  )) format=STRFMT_OEM4;
+        else if (!strcmp(fmt,"oem3" )) format=STRFMT_OEM3;
+        else if (!strcmp(fmt,"ubx"  )) format=STRFMT_UBX;
+        else if (!strcmp(fmt,"sbp"  )) format=STRFMT_SBP;
+        else if (!strcmp(fmt,"json"))  format=STRFMT_SBPJSON;
+        else if (!strcmp(fmt,"stq"  )) format=STRFMT_STQ;
+        else if (!strcmp(fmt,"javad")) format=STRFMT_JAVAD;
+        else if (!strcmp(fmt,"nvs"  )) format=STRFMT_NVS;
+        else if (!strcmp(fmt,"binex")) format=STRFMT_BINEX;
+        else if (!strcmp(fmt,"rt17" )) format=STRFMT_RT17;
+        else if (!strcmp(fmt,"sbf"  )) format=STRFMT_SEPT;
+        else if (!strcmp(fmt,"rinex")) format=STRFMT_RINEX;
     }
     else {
         paths[0]=path;
@@ -545,12 +544,12 @@ int main(int argc, char **argv)
     rnxopt_t opt={{0}};
     int format,trace=0,stat;
     char *ifile="",*ofile[NOUTFILE]={0},*dir="";
-
+    
     sprintf(opt.prog,"%s %s (RTKLIB %s%s)",PRGNAME,SWIFT_VER_RTKLIB,VER_RTKLIB,PATCH_LEVEL);
 
     /* parse command line options */
     format=cmdopts(argc,argv,&opt,&ifile,ofile,&dir,&trace);
-
+    
     if (!*ifile) {
         fprintf(stderr,"no input file\n");
         return -1;
@@ -559,13 +558,14 @@ int main(int argc, char **argv)
         fprintf(stderr,"input format can not be recognized\n");
         return -1;
     }
+    
     if (trace>0) {
         traceopen(TRACEFILE);
         tracelevel(trace);
     }
     stat=convbin(format,&opt,ifile,ofile,dir);
-
+    
     traceclose();
-
+    
     return stat;
 }

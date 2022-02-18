@@ -917,8 +917,8 @@ typedef struct {        /* RTCM control struct type */
     uint16_t lock[MAXSAT][NFREQ+NEXOBS]; /* lock time */
     uint16_t loss[MAXSAT][NFREQ+NEXOBS]; /* loss of lock count */
     gtime_t lltime[MAXSAT][NFREQ+NEXOBS]; /* last lock time */
-    int nbyte;          /* number of bytes in message buffer */
-    int nbit;           /* number of bits in word buffer */
+    int nbyte;          /* number of bytes in message buffer */ 
+    int nbit;           /* number of bits in word buffer */ 
     int len;            /* message length (bytes) */
     uint8_t buff[1200]; /* message buffer */
     uint32_t word;      /* word buffer for rtcm 2 */
@@ -1107,11 +1107,11 @@ typedef struct {        /* satellite status type */
     double azel[2];     /* azimuth/elevation angles {az,el} (rad) */
     double resp[NFREQ]; /* residuals of pseudorange (m) */
     double resc[NFREQ]; /* residuals of carrier-phase (m) */
-    unsigned char vsat[NFREQ]; /* valid satellite flag */
-    unsigned char snr [NFREQ]; /* signal strength (0.25 dBHz) */
-    unsigned char fix [NFREQ]; /* ambiguity fix flag (1:float,2:fix,3:hold) */
-    unsigned char slip[NFREQ]; /* cycle-slip flag */
-    unsigned char half[NFREQ]; /* half-cycle valid flag */
+    uint8_t vsat[NFREQ]; /* valid satellite flag */
+    uint16_t snr[NFREQ]; /* signal strength (*SNR_UNIT dBHz) */
+    uint8_t fix [NFREQ]; /* ambiguity fix flag (1:float,2:fix,3:hold) */
+    uint8_t slip[NFREQ]; /* cycle-slip flag */
+    uint8_t half[NFREQ]; /* half-cycle valid flag */
     int lock [NFREQ];   /* lock counter of phase */
     uint32_t outc [NFREQ]; /* obs outage counter of phase */
     uint32_t slipc[NFREQ]; /* cycle-slip counter */
@@ -1147,15 +1147,6 @@ typedef struct {        /* RTK control/result type */
     prcopt_t opt;       /* processing options */
 } rtk_t;
 
-typedef struct half_cyc_tag {  /* half-cycle correction list type */
-    unsigned char sat;  /* satellite number */
-    unsigned char freq; /* frequency number (0:L1,1:L2,2:L5) */
-    unsigned char valid; /* half-cycle valid flag */
-    char corr;          /* half-cycle corrected (x 0.5 cyc) */
-    gtime_t ts,te;      /* time start, time end */
-    struct half_cyc_tag *next; /* pointer to next correction */
-} half_cyc_t;
-
 typedef struct {        /* receiver raw data control type */
     gtime_t time;       /* message time */
     gtime_t tobs[MAXSAT][NFREQ+NEXOBS]; /* observation data time */
@@ -1173,7 +1164,7 @@ typedef struct {        /* receiver raw data control type */
     double prCA[MAXSAT],dpCA[MAXSAT]; /* L1/CA pseudrange/doppler for javad */
     uint8_t halfc[MAXSAT][NFREQ+NEXOBS]; /* half-cycle add flag */
     char freqn[MAXOBS]; /* frequency number for javad */
-    int nbyte;          /* number of bytes in message buffer */
+    int nbyte;          /* number of bytes in message buffer */ 
     int len;            /* message length (bytes) */
     int iod;            /* issue of data */
     int tod;            /* time of day (ms) */
