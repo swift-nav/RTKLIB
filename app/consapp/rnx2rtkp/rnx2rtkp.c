@@ -194,6 +194,9 @@ int main(int argc, char **argv)
     if (!prcopt.navsys) {
         prcopt.navsys=SYS_GPS|SYS_GLO;
     }
+    if (prcopt.modear==ARMODE_WL&&(prcopt.navsys&SYS_CMP)) {
+        prcopt.bdsmodear=0;
+    }
     if (n<=0) {
         showmsg("error : no input file");
         return -2;
