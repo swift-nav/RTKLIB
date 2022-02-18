@@ -1261,7 +1261,7 @@ object OptDialog: TOptDialog
           Caption = 'Delta-E/N/U (m)'
         end
         object Label24: TLabel
-          Left = 149
+          Left = 231
           Top = 17
           Width = 31
           Height = 13
@@ -1352,7 +1352,7 @@ object OptDialog: TOptDialog
         object RefPosType: TComboBox
           Left = 6
           Top = 14
-          Width = 137
+          Width = 219
           Height = 21
           Style = csDropDownList
           ItemIndex = 0
@@ -1369,7 +1369,7 @@ object OptDialog: TOptDialog
             'RINEX Header Position and Site Occupation Events')
         end
         object DatumRef: TComboBox
-          Left = 186
+          Left = 268
           Top = 14
           Width = 76
           Height = 21
