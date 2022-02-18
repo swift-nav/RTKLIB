@@ -171,70 +171,71 @@ typedef struct {
 } bandcode_t;
 
 static const bandcode_t rtklib_bandcode_map[CODE_COUNT] = {
-    [CODE_GPS_L1CA] = {CODE_L1C, SYS_GPS, 0},
-    [CODE_AUX_GPS] = {CODE_L1C, SYS_GPS, 0},
-    [CODE_GPS_L1P] = {CODE_L1P, SYS_GPS, 0},
-    [CODE_GPS_L1CI] = {CODE_L1C, SYS_GPS, 0},
-    [CODE_GPS_L1CQ] = {CODE_L1C, SYS_GPS, 0},
-    [CODE_GPS_L1CX] = {CODE_L1C, SYS_GPS, 0},
-    [CODE_GPS_L2CM] = {CODE_L2S, SYS_GPS, 1},
-    [CODE_GPS_L2CL] = {CODE_L2L, SYS_GPS, 1},
-    [CODE_GPS_L2CX] = {CODE_L2X, SYS_GPS, 1},
-    [CODE_GPS_L2P] = {CODE_L2P, SYS_GPS, 1},
-    [CODE_GPS_L5I] = {CODE_L5I, SYS_GPS, 2},
-    [CODE_GPS_L5Q] = {CODE_L5Q, SYS_GPS, 2},
-    [CODE_GPS_L5X] = {CODE_L5X, SYS_GPS, 2},
-    [CODE_SBAS_L1CA] = {CODE_L1C, SYS_SBS, 0},
-    [CODE_AUX_SBAS] = {CODE_L1C, SYS_SBS, 0},
-    [CODE_SBAS_L5I] = {CODE_L5I, SYS_SBS, 0},
-    [CODE_SBAS_L5Q] = {CODE_L5Q, SYS_SBS, 0},
-    [CODE_SBAS_L5X] = {CODE_L5X, SYS_SBS, 0},
-    [CODE_GLO_L1OF] = {CODE_L1C, SYS_GLO, 0},
-    [CODE_GLO_L1P] = {CODE_L1P, SYS_GLO, 0},
-    [CODE_GLO_L2OF] = {CODE_L2C, SYS_GLO, 1},
-    [CODE_GLO_L2P] = {CODE_L2P, SYS_GLO, 1},
-    [CODE_BDS2_B1] = {CODE_L2I, SYS_CMP, 0},
-    [CODE_AUX_BDS] = {CODE_L2I, SYS_CMP, 0},
-    [CODE_BDS2_B2] = {CODE_L7I, SYS_CMP, 1},
-    [CODE_BDS3_B1CI] = {CODE_L1I, SYS_CMP, 0},
-    [CODE_BDS3_B1CQ] = {CODE_L1Q, SYS_CMP, 0},
-    [CODE_BDS3_B1CX] = {CODE_L1X, SYS_CMP, 0},
-    [CODE_BDS3_B3I] = {CODE_L6I, SYS_CMP, 2},
-    [CODE_BDS3_B3Q] = {CODE_L6Q, SYS_CMP, 2},
-    [CODE_BDS3_B3X] = {CODE_L6X, SYS_CMP, 2},
-    [CODE_BDS3_B5I] = {CODE_L5D, SYS_CMP, 2},
-    [CODE_BDS3_B5Q] = {CODE_L5P, SYS_CMP, 2},
-    [CODE_BDS3_B5X] = {CODE_L5X, SYS_CMP, 2},
-    [CODE_BDS3_B7I] = {CODE_L7I, SYS_CMP, 1},
-    [CODE_BDS3_B7Q] = {CODE_L7Q, SYS_CMP, 1},
-    [CODE_BDS3_B7X] = {CODE_L7X, SYS_CMP, 1},
-    [CODE_GAL_E1B] = {CODE_L1B, SYS_GAL, 0},
-    [CODE_GAL_E1C] = {CODE_L1C, SYS_GAL, 0},
-    [CODE_GAL_E1X] = {CODE_L1X, SYS_GAL, 0},
-    [CODE_AUX_GAL] = {CODE_L1B, SYS_GAL, 0},
-    [CODE_GAL_E6B] = {CODE_L6B, SYS_GAL, 3},
-    [CODE_GAL_E6C] = {CODE_L6C, SYS_GAL, 3},
-    [CODE_GAL_E6X] = {CODE_L6X, SYS_GAL, 3},
-    [CODE_GAL_E7I] = {CODE_L7I, SYS_GAL, 1},
-    [CODE_GAL_E7Q] = {CODE_L7Q, SYS_GAL, 1},
-    [CODE_GAL_E7X] = {CODE_L7X, SYS_GAL, 1},
-    [CODE_GAL_E8I] = {CODE_L8I, SYS_GAL, 4},
-    [CODE_GAL_E8Q] = {CODE_L8Q, SYS_GAL, 4},
-    [CODE_GAL_E8X] = {CODE_L8X, SYS_GAL, 4},
-    [CODE_GAL_E5I] = {CODE_L5I, SYS_GAL, 2},
-    [CODE_GAL_E5Q] = {CODE_L5Q, SYS_GAL, 2},
-    [CODE_GAL_E5X] = {CODE_L5X, SYS_GAL, 2},
-    [CODE_QZS_L1CA] = {CODE_L1C, SYS_QZS, 0},
-    [CODE_AUX_QZS] = {CODE_L1C, SYS_QZS, 0},
-    [CODE_QZS_L1CI] = {CODE_L1I, SYS_QZS, 0},
-    [CODE_QZS_L1CQ] = {CODE_L1Q, SYS_QZS, 0},
-    [CODE_QZS_L1CX] = {CODE_L1X, SYS_QZS, 0},
-    [CODE_QZS_L2CM] = {CODE_L2S, SYS_QZS, 1},
-    [CODE_QZS_L2CL] = {CODE_L2L, SYS_QZS, 1},
-    [CODE_QZS_L2CX] = {CODE_L2X, SYS_QZS, 1},
-    [CODE_QZS_L5I] = {CODE_L5I, SYS_QZS, 2},
-    [CODE_QZS_L5Q] = {CODE_L5Q, SYS_QZS, 2},
-    [CODE_QZS_L5X] = {CODE_L5X, SYS_QZS, 2}};
+    {CODE_L1C, SYS_GPS, 0}, /* 0 = CODE_GPS_L1CA */
+    {CODE_L2S, SYS_GPS, 1}, /* 1 = CODE_GPS_L2CM */
+    {CODE_L1C, SYS_SBS, 0}, /* 2 = CODE_SBAS_L1CA */
+    {CODE_L1C, SYS_GLO, 0}, /* 3 = CODE_GLO_L1OF */
+    {CODE_L2C, SYS_GLO, 1}, /* 4 = CODE_GLO_L2OF */
+    {CODE_L1P, SYS_GPS, 0}, /* 5 = CODE_GPS_L1P */
+    {CODE_L2P, SYS_GPS, 1}, /* 6 = CODE_GPS_L2P */
+    {CODE_L2L, SYS_GPS, 1}, /* 7 = CODE_GPS_L2CL */
+    {CODE_L2X, SYS_GPS, 1}, /* 8 = CODE_GPS_L2CX */
+    {CODE_L5I, SYS_GPS, 2}, /* 9 = CODE_GPS_L5I */
+    {CODE_L5Q, SYS_GPS, 2}, /* 10 = CODE_GPS_L5Q */
+    {CODE_L5X, SYS_GPS, 2}, /* 11 = CODE_GPS_L5X */
+    {CODE_L2I, SYS_CMP, 0}, /* 12 = CODE_BDS2_B1 */
+    {CODE_L7I, SYS_CMP, 1}, /* 13 = CODE_BDS2_B2 */
+    {CODE_L1B, SYS_GAL, 0}, /* 14 = CODE_GAL_E1B */
+    {CODE_L1C, SYS_GAL, 0}, /* 15 = CODE_GAL_E1C */
+    {CODE_L1X, SYS_GAL, 0}, /* 16 = CODE_GAL_E1X */
+    {CODE_L6B, SYS_GAL, 3}, /* 17 = CODE_GAL_E6B */
+    {CODE_L6C, SYS_GAL, 3}, /* 18 = CODE_GAL_E6C */
+    {CODE_L6X, SYS_GAL, 3}, /* 19 = CODE_GAL_E6X */
+    {CODE_L7I, SYS_GAL, 1}, /* 20 = CODE_GAL_E7I */
+    {CODE_L7Q, SYS_GAL, 1}, /* 21 = CODE_GAL_E7Q */
+    {CODE_L7X, SYS_GAL, 1}, /* 22 = CODE_GAL_E7X */
+    {CODE_L8I, SYS_GAL, 4}, /* 23 = CODE_GAL_E8I */
+    {CODE_L8Q, SYS_GAL, 4}, /* 24 = CODE_GAL_E8Q */
+    {CODE_L8X, SYS_GAL, 4}, /* 25 = CODE_GAL_E8X */
+    {CODE_L5I, SYS_GAL, 2}, /* 26 = CODE_GAL_E5I */
+    {CODE_L5Q, SYS_GAL, 2}, /* 27 = CODE_GAL_E5Q */
+    {CODE_L5X, SYS_GAL, 2}, /* 28 = CODE_GAL_E5X */
+    {CODE_L1P, SYS_GLO, 0}, /* 29 = CODE_GLO_L1P */
+    {CODE_L2P, SYS_GLO, 1}, /* 30 = CODE_GLO_L2P */
+    {CODE_L1C, SYS_QZS, 0}, /* 31 = CODE_QZS_L1CA */
+    {CODE_L1I, SYS_QZS, 0}, /* 32 = CODE_QZS_L1CI */
+    {CODE_L1Q, SYS_QZS, 0}, /* 33 = CODE_QZS_L1CQ */
+    {CODE_L1X, SYS_QZS, 0}, /* 34 = CODE_QZS_L1CX */
+    {CODE_L2S, SYS_QZS, 1}, /* 35 = CODE_QZS_L2CM */
+    {CODE_L2L, SYS_QZS, 1}, /* 36 = CODE_QZS_L2CL */
+    {CODE_L2X, SYS_QZS, 1}, /* 37 = CODE_QZS_L2CX */
+    {CODE_L5I, SYS_QZS, 2}, /* 38 = CODE_QZS_L5I */
+    {CODE_L5Q, SYS_QZS, 2}, /* 39 = CODE_QZS_L5Q */
+    {CODE_L5X, SYS_QZS, 2}, /* 40 = CODE_QZS_L5X */
+    {CODE_L5I, SYS_SBS, 0}, /* 41 = CODE_SBAS_L5I */
+    {CODE_L5Q, SYS_SBS, 0}, /* 42 = CODE_SBAS_L5Q */
+    {CODE_L5X, SYS_SBS, 0}, /* 43 = CODE_SBAS_L5X */
+    {CODE_L1I, SYS_CMP, 0}, /* 44 = CODE_BDS3_B1CI */
+    {CODE_L1Q, SYS_CMP, 0}, /* 45 = CODE_BDS3_B1CQ */
+    {CODE_L1X, SYS_CMP, 0}, /* 46 = CODE_BDS3_B1CX */
+    {CODE_L5D, SYS_CMP, 2}, /* 47 = CODE_BDS3_B5I */
+    {CODE_L5P, SYS_CMP, 2}, /* 48 = CODE_BDS3_B5Q */
+    {CODE_L5X, SYS_CMP, 2}, /* 49 = CODE_BDS3_B5X */
+    {CODE_L7I, SYS_CMP, 1}, /* 50 = CODE_BDS3_B7I */
+    {CODE_L7Q, SYS_CMP, 1}, /* 51 = CODE_BDS3_B7Q */
+    {CODE_L7X, SYS_CMP, 1}, /* 52 = CODE_BDS3_B7X */
+    {CODE_L6I, SYS_CMP, 2}, /* 53 = CODE_BDS3_B3I */
+    {CODE_L6Q, SYS_CMP, 2}, /* 54 = CODE_BDS3_B3Q */
+    {CODE_L6X, SYS_CMP, 2}, /* 55 = CODE_BDS3_B3X */
+    {CODE_L1C, SYS_GPS, 0}, /* 56 = CODE_GPS_L1CI */
+    {CODE_L1C, SYS_GPS, 0}, /* 57 = CODE_GPS_L1CQ */
+    {CODE_L1C, SYS_GPS, 0}, /* 58 = CODE_GPS_L1CX */
+    {CODE_L1C, SYS_GPS, 0}, /* 59 = CODE_AUX_GPS */
+    {CODE_L1C, SYS_SBS, 0}, /* 60 = CODE_AUX_SBAS */
+    {CODE_L1B, SYS_GAL, 0}, /* 61 = CODE_AUX_GAL */
+    {CODE_L1C, SYS_QZS, 0}, /* 62 = CODE_AUX_QZS */
+    {CODE_L2I, SYS_CMP, 0}  /* 63 = CODE_AUX_BDS */
+};
 
 #define IS_GPS(c) (SYS_GPS == rtklib_bandcode_map[(c)].sys)
 #define IS_QZSS(c) (SYS_QZS == rtklib_bandcode_map[(c)].sys)
@@ -811,6 +812,7 @@ static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
 static int decode_gpsnav_dep_e(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
+  uint8_t prn, sat;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -819,13 +821,14 @@ static int decode_gpsnav_dep_e(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = U2(puiTmp) + 1; /* GPS coded as PRN-1 */
+  prn = U2(puiTmp) + 1; /* GPS coded as PRN-1 */
+
   if ((prn < MINPRNGPS) || (prn > MAXPRNGPS)) {
     trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_GPS, prn);
+  sat = satno(SYS_GPS, prn);
   if (sat == 0) return -1;
 
   eph.code = U1(puiTmp + 2);
@@ -865,6 +868,7 @@ static int decode_gpsnav_dep_e(raw_t *raw) {
 static int decode_gpsnav_dep_f(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
+  uint8_t prn, sat;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -873,13 +877,13 @@ static int decode_gpsnav_dep_f(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = puiTmp[0];
+  prn = puiTmp[0];
   if ((prn < MINPRNGPS) || (prn > MAXPRNGPS)) {
     trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_GPS, prn);
+  sat = satno(SYS_GPS, prn);
   if (sat == 0) {
     return -1;
   }
@@ -918,6 +922,7 @@ static int decode_gpsnav_dep_f(raw_t *raw) {
 static int decode_gpsnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
+  uint8_t prn, sat;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -926,13 +931,13 @@ static int decode_gpsnav(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = puiTmp[0];
+  prn = puiTmp[0];
   if ((prn < MINPRNGPS) || (prn > MAXPRNGPS)) {
     trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_GPS, prn);
+  sat = satno(SYS_GPS, prn);
   if (sat == 0) {
     trace(2, "%s: can't work out GPS sat for PRN %02d\n", __FUNCTION__, prn);
     return -1;
@@ -980,6 +985,7 @@ static int decode_gpsnav(raw_t *raw) {
 static int decode_qzssnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
+  uint8_t prn, sat;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -988,13 +994,13 @@ static int decode_qzssnav(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = puiTmp[0];
+  prn = puiTmp[0];
   if ((prn < MINPRNQZS) || (prn > MAXPRNQZS)) {
     trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_QZS, prn);
+  sat = satno(SYS_QZS, prn);
   if (sat == 0) {
     trace(2, "%s: can't work out QZSS sat for PRN %02d\n", __FUNCTION__, prn);
     return -1;
@@ -1042,6 +1048,7 @@ static int decode_qzssnav(raw_t *raw) {
 static int decode_bdsnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
+  uint8_t prn, sat;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -1050,13 +1057,13 @@ static int decode_bdsnav(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = puiTmp[0];
+  prn = puiTmp[0];
   if ((prn < MINPRNCMP) || (prn > MAXPRNCMP)) {
     trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_CMP, prn);
+  sat = satno(SYS_CMP, prn);
   if (sat == 0) {
     trace(2, "%s: can't work out Beidou sat for PRN %02d\n", __FUNCTION__, prn);
     return -1;
@@ -1092,6 +1099,7 @@ static int decode_bdsnav(raw_t *raw) {
 static int decode_galnav_dep_a(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
+  uint8_t prn, sat;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -1100,13 +1108,13 @@ static int decode_galnav_dep_a(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = puiTmp[0];
+  prn = puiTmp[0];
   if ((prn < MINPRNGAL) || (prn > MAXPRNGAL)) {
     trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_GAL, prn);
+  sat = satno(SYS_GAL, prn);
   if (sat == 0) {
     trace(
         2, "%s: can't work out Galileo sat for PRN %02d\n", __FUNCTION__, prn);
@@ -1143,6 +1151,7 @@ static int decode_galnav_dep_a(raw_t *raw) {
 static int decode_galnav(raw_t *raw) {
   uint8_t *puiTmp = (raw->buff) + 6;
   eph_t eph = {0};
+  uint8_t prn, sat, source;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -1151,13 +1160,13 @@ static int decode_galnav(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = puiTmp[0];
+  prn = puiTmp[0];
   if ((prn < MINPRNGAL) || (prn > MAXPRNGAL)) {
     trace(2, "%s: prn error: sat=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_GAL, prn);
+  sat = satno(SYS_GAL, prn);
   if (sat == 0) {
     trace(
         2, "%s: can't work out Galileo sat for PRN %02d\n", __FUNCTION__, prn);
@@ -1182,7 +1191,7 @@ static int decode_galnav(raw_t *raw) {
     }
   }
 
-  const uint8_t source = puiTmp[156];
+  source = puiTmp[156];
   eph.code = (source == 1) ? (GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5A) :
           (GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B | GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5B);
 
@@ -1201,6 +1210,7 @@ static int decode_glonav_dep_d(raw_t *raw) {
   geph_t geph = {0};
   uint16_t uWeekE;
   double dSeconds;
+  uint8_t prn, sat, code;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -1209,17 +1219,17 @@ static int decode_glonav_dep_d(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = puiTmp[0]; /* Glonass sid.sat */
+  prn = puiTmp[0]; /* Glonass sid.sat */
   if ((prn < MINPRNGLO) || (prn > MAXPRNGLO)) {
     trace(2, "%s: prn error: prn=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_GLO, prn);
+  sat = satno(SYS_GLO, prn);
   if (sat == 0) return -1;
 
   geph.sat = sat;
-  const uint8_t code = puiTmp[1];
+  code = puiTmp[1];
   if (!IS_GLO(code)) {
     trace(2, "%s: code error: code=%d\n", __FUNCTION__, code);
   }
@@ -1272,6 +1282,7 @@ static int decode_glonav(raw_t *raw) {
   geph_t geph = {0};
   uint16_t uWeekE;
   double dSeconds;
+  uint8_t prn, sat, code;
 
   trace(4, "%s: len=%d\n", __FUNCTION__, raw->len);
 
@@ -1280,19 +1291,19 @@ static int decode_glonav(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t prn = puiTmp[0]; /* Glonass sid.sat */
+  prn = puiTmp[0]; /* Glonass sid.sat */
   if ((prn < MINPRNGLO) || (prn > MAXPRNGLO)) {
     trace(2, "%s: prn error: prn=%d\n", __FUNCTION__, prn);
     return -1;
   }
 
-  const uint8_t sat = satno(SYS_GLO, prn);
+  sat = satno(SYS_GLO, prn);
   if (sat == 0) {
     return -1;
   }
 
   geph.sat = sat;
-  const uint8_t code = puiTmp[1];
+  code = puiTmp[1];
   if (!IS_GLO(code)) {
     trace(2, "%s: code error: code=%d\n", __FUNCTION__, code);
   }
@@ -1368,6 +1379,8 @@ static int decode_snav(raw_t *raw) {
   int32_t week;
   uint32_t tow_ms, k;
   uint8_t uSbasPream[3] = {0x53, 0x9A, 0xC6};
+  uint8_t sat, code;
+
   time2gpst(timeadd(raw->time, -1.0), &week);
 
   trace(4, "MSG_SBAS_RAW: len=%d\n", raw->len);
@@ -1377,13 +1390,13 @@ static int decode_snav(raw_t *raw) {
     return -1;
   }
 
-  const uint8_t sat = puiTmp[0];
+  sat = puiTmp[0];
   if ((sat < MINPRNSBS) || (sat > MAXPRNSBS)) {
     trace(2, "MSG_SBAS_RAW PRN error: sat=%d\n", sat);
     return -1;
   }
 
-  const uint8_t code = puiTmp[1];
+  code = puiTmp[1];
   if (!IS_SBAS(code)) {
     trace(2, "MSG_SBAS_RAW PRN error: code=%d\n", code);
     return -1;

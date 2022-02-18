@@ -416,6 +416,9 @@
         <CppCompile Include="..\..\..\src\rcv\ss2.c">
             <BuildOrder>33</BuildOrder>
         </CppCompile>
+        <CppCompile Include="..\..\..\src\rcv\swiftnav.c">
+            <BuildOrder>59</BuildOrder>
+        </CppCompile>
         <CppCompile Include="..\..\..\src\rcv\ublox.c">
             <BuildOrder>31</BuildOrder>
         </CppCompile>
