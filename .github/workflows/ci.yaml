@@ -7,33 +7,80 @@ on:
       - 'master'
     tags:
       - 'v*'
-
 jobs:
-
-  ubuntu-gcc6:
-    runs-on: ubuntu-18.04
+  build:
+    name: Run Checks and Build
+    strategy:
+      matrix:
+        os:
+        - ubuntu-18.04
+        - macos-10.15
+    runs-on: ${{ matrix.os }}
     steps:
-
       - name: Checkout source
         uses: actions/checkout@v2
         with:
           submodules: recursive
           ssh-key: ${{ secrets.SSH_KEY }}
-
-      - name: Install gcc-6
+      - name: Run convbin build
+        working-directory: app/consapp/convbin/gcc
         run: |
-          sudo apt-get update && \
-          sudo apt-get install \
-            build-essential software-properties-common -y && \
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
-          sudo apt-get update && \
-          sudo apt-get install gcc-6 g++-6 -y && \
-          gcc -v
-
-      - name: Run build
+          make clean all test
+      - name: Run str2str build
+        working-directory: app/consapp/str2str/gcc
+        run: |
+          make clean all
+      - name: Archive ${{ runner.os }} Binaries.
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF##*/}"
+          DATE="$(date '+%Y-%m-%d')"
+          BUILD_TRIPLET="$(gcc -dumpmachine)"
+          cp ./app/consapp/convbin/gcc/sbp2rinex sbp2rinex
+          cp ./app/consapp/str2str/gcc/str2str str2str
+          RELEASE_ARCHIVE="swiftnav_rtklib-${VERSION}-${BUILD_TRIPLET}.zip"
+          7z a -tzip $RELEASE_ARCHIVE sbp2rinex str2str LICENSE.txt;
+          echo $RELEASE_ARCHIVE >release-archive.filename
+          echo "RELEASE_ARCHIVE=$(cat release-archive.filename)" >>$GITHUB_ENV
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ runner.os }}-artifacts
+          path: |
+            ${{ env.RELEASE_ARCHIVE }}
+            release-archive.filename
+  release:
+    name: Create Release
+    needs:
+      - build
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Store git tag and date vars.
+        run: |
+          DATE="$(date '+%Y-%m-%d')";
+          echo "DATE=${DATE}" >> $GITHUB_ENV
+          echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - name: Pull macOS Installer
+        uses: actions/download-artifact@v2
+        with:
+          name: macOS-artifacts
+          path: macOS
+      - name: Pull Linux Installer
+        uses: actions/download-artifact@v2
+        with:
+          name: Linux-artifacts
+          path: Linux
+      - name: Prepare Release
+        shell: bash
+        run: |
+          echo "LINUX_ARCHIVE=$(cat Linux/release-archive.filename)" >>$GITHUB_ENV
+          echo "MACOS_ARCHIVE=$(cat macOS/release-archive.filename)" >>$GITHUB_ENV
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "${{ env.VERSION }}-${{ env.DATE }}"
+          files: |
+            Linux/${{ env.LINUX_ARCHIVE }}
+            macOS/${{ env.MACOS_ARCHIVE }}
         env:
-          CC: gcc-6
-          CXX: g++-6
-        run: |
-          (cd ./app/consapp/convbin/gcc; ls -l; make clean all test);
-          (cd ./app/consapp/str2str/gcc; ls -l; make clean all)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
