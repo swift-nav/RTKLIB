@@ -33,6 +33,13 @@
 #include <unistd.h>
 #include "rtklib.h"
 
+#ifndef SIGHUP
+#define SIGHUP 1
+#endif
+#ifndef SIGPIPE
+#define SIGPIPE 13
+#endif
+
 #define PRGNAME "str2str"      /* program name */
 #define MAXSTR 9               /* max number of streams */
 #define TRFILE "str2str.trace" /* trace file */
