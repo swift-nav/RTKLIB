@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         os:
+        - windows-2019
         - ubuntu-18.04
         - macos-10.15
     runs-on: ${{ matrix.os }}
@@ -22,24 +23,39 @@ jobs:
         with:
           submodules: recursive
           ssh-key: ${{ secrets.SSH_KEY }}
+
       - name: Run convbin build
         working-directory: app/consapp/convbin/gcc
         run: |
           make clean all test
+        if: runner.os != 'Windows'
+
+      - name: Run convbin build
+        working-directory: app/consapp/convbin/gcc
+        run: |
+          make clean all
+        if: runner.os == 'Windows'
+
       - name: Run str2str build
         working-directory: app/consapp/str2str/gcc
         run: |
           make clean all
+
       - name: Archive ${{ runner.os }} Binaries.
         shell: bash
         run: |
+          POSTFIX="";
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            POSTFIX=".exe";
+          fi
           VERSION="${GITHUB_REF##*/}"
           DATE="$(date '+%Y-%m-%d')"
-          BUILD_TRIPLET="$(gcc -dumpmachine)"
-          cp ./app/consapp/convbin/gcc/sbp2rinex sbp2rinex
-          cp ./app/consapp/str2str/gcc/str2str str2str
-          RELEASE_ARCHIVE="swiftnav_rtklib-${VERSION}-${BUILD_TRIPLET}.zip"
-          7z a -tzip $RELEASE_ARCHIVE sbp2rinex str2str LICENSE.txt;
+          SBP2RINEX="sbp2rinex${POSTFIX}"
+          STR2STR="str2str${POSTFIX}"
+          cp ./app/consapp/convbin/gcc/$SBP2RINEX $SBP2RINEX
+          cp ./app/consapp/str2str/gcc/$STR2STR $STR2STR
+          RELEASE_ARCHIVE="swiftnav_rtklib-${VERSION}-${{ runner.os }}.zip"
+          7z a -tzip $RELEASE_ARCHIVE $SBP2RINEX $STR2STR LICENSE.txt;
           echo $RELEASE_ARCHIVE >release-archive.filename
           echo "RELEASE_ARCHIVE=$(cat release-archive.filename)" >>$GITHUB_ENV
       - uses: actions/upload-artifact@v2
@@ -60,6 +76,11 @@ jobs:
           DATE="$(date '+%Y-%m-%d')";
           echo "DATE=${DATE}" >> $GITHUB_ENV
           echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - name: Pull Windows Installer
+        uses: actions/download-artifact@v2
+        with:
+          name: Windows-artifacts
+          path: Windows
       - name: Pull macOS Installer
         uses: actions/download-artifact@v2
         with:
@@ -73,6 +94,7 @@ jobs:
       - name: Prepare Release
         shell: bash
         run: |
+          echo "WINDOWS_ARCHIVE=$(cat Windows/release-archive.filename)" >>$GITHUB_ENV
           echo "LINUX_ARCHIVE=$(cat Linux/release-archive.filename)" >>$GITHUB_ENV
           echo "MACOS_ARCHIVE=$(cat macOS/release-archive.filename)" >>$GITHUB_ENV
       - name: Release
@@ -80,6 +102,7 @@ jobs:
         with:
           name: "${{ env.VERSION }}-${{ env.DATE }}"
           files: |
+            Windows/${{ env.WINDOWS_ARCHIVE }}
             Linux/${{ env.LINUX_ARCHIVE }}
             macOS/${{ env.MACOS_ARCHIVE }}
         env:
