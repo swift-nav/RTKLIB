@@ -26,7 +26,7 @@ Windows
 
 Linux and OSX
   1. Decompress (untar) distribution file to a temporary folder
-       e.g. tar -xzvf sbp2rinex-1.0.tar.gz
+       e.g. tar -xzvf sbp2rinex-2.3.tar.gz
   2. Create a tools directory if it doesn't exist yet
        e.g. sudo mkdir /usr/local/bin
   3. Copy sbp2rinex file to the tools directory  
