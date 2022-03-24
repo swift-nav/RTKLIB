@@ -40,6 +40,7 @@ Options [default value]
                   json      - Swift Navigation SBP-JSON
      -ro opt,opt  receiver option(s) (use comma between multiple opt):
                   CONVBASE  - convert base station observations
+                  BASEPOS   - determine base station location from input file
                   EPHALL    - include all ephemeris
                   INVCP     - invert carrier phase polarity
                   OBSALL    - include observations with RAIM flag set
@@ -53,7 +54,7 @@ Options [default value]
      -ha ant      rinex header: antenna number and type separated by /
      -hp pos      rinex header: approx position x/y/z separated by /
      -hd delta    rinex header: antenna delta h/e/n separated by /
-     -v ver       rinex version [3.00]
+     -v ver       rinex version [3.04]
      -oi          include iono correction in rinex nav header [off]
      -ot          include time correction in rinex nav header [off]
      -ol          include leap seconds in rinex nav header [off]
