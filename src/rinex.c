@@ -783,7 +783,12 @@ static int decode_obsdata(FILE *fp, char *buff, double ver, int mask,
         }
         if (stat) {
             val[i]=str2num(buff,j,14)+ind->shift[i];
-            lli[i]=(uint8_t)str2num(buff,j+14,1)&3;
+            /* backwards compatibility with older broken versions of rtklib */
+            if(strlen(buff) > j+15 && buff[j+14] != ' ' && buff[j+15] == ' ') {
+                lli[i]=(uint8_t)str2num(buff,j+14,1)&3;
+            } else {
+                lli[i]=(uint8_t)str2num(buff,j+15,1)&3;
+            }
         }
     }
     if (!stat) return 0;
@@ -2117,7 +2122,7 @@ static void outrnxobsf(FILE *fp, double obs, int lli)
         fprintf(fp,"  ");
     }
     else {
-        fprintf(fp,"%1.1d ",lli&(LLI_SLIP|LLI_HALFC|LLI_BOCTRK));
+        fprintf(fp," %1.1d",lli&(LLI_SLIP|LLI_HALFC|LLI_BOCTRK));
     }
 }
 /* search obsservattion data index -------------------------------------------*/
