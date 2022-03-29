@@ -20,33 +20,34 @@ Find Developer ID / Key ID / Issuer ID on LastPass and run these commands.
  export APPLE_DEVELOPER_ID="<Get Developer ID from LastPass, make sure to use quotes>"
  export APPLE_KEY_ID=<Get key id from LastPass>
  export APPLE_ISSUER_ID=<Get Issuer ID from LastPass>
+ export VERSION=v2.3
 ```
 
 Download the existing zip file from the release page. Unzip contents.
 ```
-unzip swiftnav_rtklib-v2.3-macOS.zip -d swiftnav_rtklib-v2.3-macOS
+unzip swiftnav_rtklib-$VERSION-macOS.zip -d swiftnav_rtklib-$VERSION-macOS
 ```
 
 Sign zip innards.
 ```
-cd swiftnav_rtklib-v2.3-macOS
+cd swiftnav_rtklib-$VERSION-macOS
 codesign -s "$APPLE_DEVELOPER_ID" \
   --options=runtime --force \
   --deep --timestamp --options=runtime *
-7z a -tzip ../swiftnav_rtklib-v2.3-macOS.zip LICENSE.txt str2str sbp2rinex
+7z a -tzip ../swiftnav_rtklib-$VERSION-macOS.zip LICENSE.txt str2str sbp2rinex
 cd ..
 ```
 
 Sign zip file.
 ```
-codesign -s "$APPLE_DEVELOPER_ID" --timestamp swiftnav_rtklib-v2.3-macOS.zip
+codesign -s "$APPLE_DEVELOPER_ID" --timestamp swiftnav_rtklib-$VERSION-macOS.zip
 ```
 
 Notarize zip file.
 ```
 xcrun altool \
             --notarize-app \
-            --file swiftnav_rtklib-v2.3-macOS.zip \
+            --file swiftnav_rtklib-$VERSION-macOS.zip \
             --primary-bundle-id "$APP_BUNDLE_ID" \
             --apiKey "$APPLE_KEY_ID" \
             --apiIssuer "$APPLE_ISSUER_ID"
