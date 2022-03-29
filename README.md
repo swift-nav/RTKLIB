@@ -13,5 +13,6 @@ RTKLIB post-processing results will likely differ from Swift Navigation receiver
 
 
 ## Code Sign on Mac
+For Swift developers see this wiki page on how to digitally sign a release of sbp2rinex and str2str.
 
 https://swift-nav.atlassian.net/wiki/spaces/ENG/pages/2175140134/Mac+Signing+RTKLIB+Example+Signing+Zip+of+Binaries
