@@ -5,26 +5,23 @@
 #include <QShowEvent>
 
 //---------------------------------------------------------------------------
-RcvOptDialog::RcvOptDialog(QWidget* parent)
-    : QDialog(parent)
-{
-    setupUi(this);
+RcvOptDialog::RcvOptDialog(QWidget *parent) : QDialog(parent) {
+  setupUi(this);
 
-    connect(BtnOk,SIGNAL(clicked(bool)),this,SLOT(BtnOkClick()));
-    connect(BtnCancel,SIGNAL(clicked(bool)),this,SLOT(reject()));
+  connect(BtnOk, SIGNAL(clicked(bool)), this, SLOT(BtnOkClick()));
+  connect(BtnCancel, SIGNAL(clicked(bool)), this, SLOT(reject()));
 }
 //---------------------------------------------------------------------------
-void RcvOptDialog::showEvent(QShowEvent *event)
-{
-    if (event->spontaneous()) return;
+void RcvOptDialog::showEvent(QShowEvent *event) {
+  if (event->spontaneous())
+    return;
 
-    OptionE->setText(Option);
+  OptionE->setText(Option);
 }
 //---------------------------------------------------------------------------
-void RcvOptDialog::BtnOkClick()
-{
-    Option=OptionE->text();
+void RcvOptDialog::BtnOkClick() {
+  Option = OptionE->text();
 
-    accept();
+  accept();
 }
 //---------------------------------------------------------------------------

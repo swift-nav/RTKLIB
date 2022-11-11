@@ -2,45 +2,44 @@
 #ifndef viewerH
 #define viewerH
 //---------------------------------------------------------------------------
-#define MAXLINE		20000
+#define MAXLINE 20000
 
-#include <QDialog>
 #include "ui_viewer.h"
+#include <QDialog>
 
 class ViewerOptDialog;
 
 //---------------------------------------------------------------------------
-class TextViewer : public QDialog, private Ui::TextViewer
-{
-    Q_OBJECT
+class TextViewer : public QDialog, private Ui::TextViewer {
+  Q_OBJECT
 
 protected:
-    void showEvent(QShowEvent*);
+  void showEvent(QShowEvent *);
 
-    ViewerOptDialog *viewerOptDialog;
+  ViewerOptDialog *viewerOptDialog;
 public slots:
-    void BtnCloseClick();
-    void BtnReadClick();
-    void BtnOptClick();
-    void BtnReloadClick();
-    void BtnFindClick();
+  void BtnCloseClick();
+  void BtnReadClick();
+  void BtnOptClick();
+  void BtnReloadClick();
+  void BtnFindClick();
 
 private:
-    QString File;
-    QString TextStr;
-	
-    void ReadText(const QString &file);
-    void UpdateText(void);
+  QString File;
+  QString TextStr;
+
+  void ReadText(const QString &file);
+  void UpdateText(void);
 
 public:
-	int Option;
-    static QColor Color1,Color2;
-    static QFont FontD;
+  int Option;
+  static QColor Color1, Color2;
+  static QFont FontD;
 
-    bool Read(const QString &file);
-    bool Save(const QString &file);
+  bool Read(const QString &file);
+  bool Save(const QString &file);
 
-    explicit TextViewer(QWidget* parent);
+  explicit TextViewer(QWidget *parent);
 };
 //---------------------------------------------------------------------------
 #endif

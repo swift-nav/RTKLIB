@@ -3,34 +3,32 @@
 #ifndef markdlgH
 #define markdlgH
 //---------------------------------------------------------------------------
-#include <QDialog>
 #include "ui_markdlg.h"
+#include <QDialog>
 
 class KeyDialog;
 
 //---------------------------------------------------------------------------
-class QMarkDialog : public QDialog, private Ui::MarkDialog
-{
-    Q_OBJECT
+class QMarkDialog : public QDialog, private Ui::MarkDialog {
+  Q_OBJECT
 public slots:
-    void BtnCancelClick();
-    void BtnOkClick();
-    void ChkMarkerNameClick();
-    void BtnRepDlgClick();
+  void BtnCancelClick();
+  void BtnOkClick();
+  void ChkMarkerNameClick();
+  void BtnRepDlgClick();
 
 protected:
-    void showEvent(QShowEvent *);
+  void showEvent(QShowEvent *);
 
 private:
-    void UpdateEnable(void);
-    KeyDialog *keyDialog;
+  void UpdateEnable(void);
+  KeyDialog *keyDialog;
 
 public:
-    QString Marker,Comment;
-    int PosMode,NMark;
-	
-    explicit QMarkDialog(QWidget *parent);
-	
+  QString Marker, Comment;
+  int PosMode, NMark;
+
+  explicit QMarkDialog(QWidget *parent);
 };
 //---------------------------------------------------------------------------
 #endif

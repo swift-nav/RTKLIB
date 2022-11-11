@@ -9,21 +9,23 @@
 class QShowEvent;
 class ConvOptDialog;
 //---------------------------------------------------------------------------
-class CodeOptDialog : public QDialog, private Ui::CodeOptDialog
-{
-    Q_OBJECT
+class CodeOptDialog : public QDialog, private Ui::CodeOptDialog {
+  Q_OBJECT
 public slots:
-    void BtnOkClick();
-    void BtnSetAllClick();
-protected:
-    void showEvent(QShowEvent*);
-private:
-    void UpdateEnable(void);
+  void BtnOkClick();
+  void BtnSetAllClick();
 
-    ConvOptDialog* convOptDialog;
+protected:
+  void showEvent(QShowEvent *);
+
+private:
+  void UpdateEnable(void);
+
+  ConvOptDialog *convOptDialog;
+
 public:
-	int NavSys,FreqType;
-    CodeOptDialog(QWidget *parent, ConvOptDialog *);
+  int NavSys, FreqType;
+  CodeOptDialog(QWidget *parent, ConvOptDialog *);
 };
 //----------------------------------------------------------------------
 #endif

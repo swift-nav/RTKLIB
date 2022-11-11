@@ -8,19 +8,18 @@
 #include "ui_keydlg.h"
 
 //---------------------------------------------------------------------------
-class KeyDialog : public QDialog, private Ui::KeyDialog
-{
-    Q_OBJECT
+class KeyDialog : public QDialog, private Ui::KeyDialog {
+  Q_OBJECT
 
 public slots:
-    void  BtnOkClick();
+  void BtnOkClick();
 
 protected:
-    void showEvent(QShowEvent*);
+  void showEvent(QShowEvent *);
 
 public:
-	int Flag;
-    explicit KeyDialog(QWidget* parent);
+  int Flag;
+  explicit KeyDialog(QWidget *parent);
 };
 //---------------------------------------------------------------------------
 #endif

@@ -11,17 +11,16 @@
 class QShowEvent;
 
 //---------------------------------------------------------------------------
-class TimeDialog : public QDialog, public Ui::TimeDialog
-{
-    Q_OBJECT
+class TimeDialog : public QDialog, public Ui::TimeDialog {
+  Q_OBJECT
 
 protected:
-    void showEvent(QShowEvent *);
+  void showEvent(QShowEvent *);
 
 public:
-	gtime_t Time;
+  gtime_t Time;
 
-    explicit TimeDialog(QWidget *parent);
+  explicit TimeDialog(QWidget *parent);
 };
 //---------------------------------------------------------------------------
 #endif

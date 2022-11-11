@@ -2,32 +2,31 @@
 #ifndef extoptH
 #define extoptH
 //---------------------------------------------------------------------------
-#include <QDialog>
 #include "ui_extopt.h"
+#include <QDialog>
 
 class OptDialog;
 //---------------------------------------------------------------------------
-class ExtOptDialog : public QDialog, public Ui::ExtOptDialog
-{
-    Q_OBJECT
+class ExtOptDialog : public QDialog, public Ui::ExtOptDialog {
+  Q_OBJECT
 
 public slots:
-    void BtnOkClick();
-    void ExtEna0Click();
-    void ExtEna1Click();
-    void ExtEna2Click();
-    void ExtEna3Click();
-    void showEvent(QShowEvent*);
+  void BtnOkClick();
+  void ExtEna0Click();
+  void ExtEna1Click();
+  void ExtEna2Click();
+  void ExtEna3Click();
+  void showEvent(QShowEvent *);
 
 private:
-    void GetExtErrOpt(void);
-    void SetExtErrOpt(void);
-    void UpdateEnable(void);
+  void GetExtErrOpt(void);
+  void SetExtErrOpt(void);
+  void UpdateEnable(void);
 
 public:
-    explicit ExtOptDialog(QWidget *parent);
+  explicit ExtOptDialog(QWidget *parent);
 
-    OptDialog *optDialog;
+  OptDialog *optDialog;
 };
 //---------------------------------------------------------------------------
 #endif

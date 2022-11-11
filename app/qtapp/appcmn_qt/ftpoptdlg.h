@@ -6,28 +6,29 @@
 
 #include <QDialog>
 
-#define MAXHIST		10
+#define MAXHIST 10
 
 class KeyDialog;
 
 //---------------------------------------------------------------------------
-class FtpOptDialog : public QDialog, private Ui::FtpOptDialog
-{
-    Q_OBJECT
+class FtpOptDialog : public QDialog, private Ui::FtpOptDialog {
+  Q_OBJECT
 protected:
-    void  showEvent(QShowEvent *);
+  void showEvent(QShowEvent *);
 public slots:
-    void  BtnOkClick();
-    void  BtnKeyClick();
-private:
-    void  AddHist(QComboBox *list, QString *hist);
-    void  UpdateEnable(void);
+  void BtnOkClick();
+  void BtnKeyClick();
 
-    KeyDialog *keyDlg;
+private:
+  void AddHist(QComboBox *list, QString *hist);
+  void UpdateEnable(void);
+
+  KeyDialog *keyDlg;
+
 public:
-	int Opt;
-    QString Path,History[MAXHIST],MntpHist[MAXHIST];
-    explicit FtpOptDialog(QWidget *parent);
+  int Opt;
+  QString Path, History[MAXHIST], MntpHist[MAXHIST];
+  explicit FtpOptDialog(QWidget *parent);
 };
 //---------------------------------------------------------------------------
 #endif

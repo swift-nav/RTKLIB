@@ -10,10 +10,10 @@
  *
  * history : 2017/01/30  1.0  begin writing
  *-----------------------------------------------------------------------------*/
-#include "rtklib.h"
-
 #include <math.h>
 #include <stdint.h>
+
+#include "rtklib.h"
 
 #define SBP_SYNC1 0x55 /* SBP message header sync */
 
@@ -49,16 +49,15 @@
 
 /** from https://files.igs.org/pub/data/format/rinex303.pdf Appendix A8 **/
 /* Data source: I/NAV E1-B */
-#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B  (1<<0)
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B (1 << 0)
 /* Data source F/NAV E5a-I */
-#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I (1<<1)
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I (1 << 1)
 /* Data source I/NAV E5b-I */
-#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I (1<<2)
+#define GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I (1 << 2)
 /* af0-af2, Toc, SISA are for E5a,E1 */
-#define GAL_BROADCAST_ORBIT5_TOC_SISA_E5A           (1<<8)
+#define GAL_BROADCAST_ORBIT5_TOC_SISA_E5A (1 << 8)
 /* af0-af2, Toc, SISA are for E5b,E1 */
-#define GAL_BROADCAST_ORBIT5_TOC_SISA_E5B           (1<<9)
-
+#define GAL_BROADCAST_ORBIT5_TOC_SISA_E5B (1 << 9)
 
 /* get fields (little-endian) ------------------------------------------------*/
 #define U1(p) (*((uint8_t *)(p)))
@@ -1192,8 +1191,11 @@ static int decode_galnav(raw_t *raw) {
   }
 
   source = puiTmp[156];
-  eph.code = (source == 1) ? (GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5A) :
-          (GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B | GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5B);
+  eph.code = (source == 1) ? (GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I |
+                              GAL_BROADCAST_ORBIT5_TOC_SISA_E5A)
+                           : (GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B |
+                              GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I |
+                              GAL_BROADCAST_ORBIT5_TOC_SISA_E5B);
 
   trace(3, "%s: decoded eph for E%02d\n", __FUNCTION__, prn);
 
@@ -1438,21 +1440,20 @@ static int decode_base_pos_ecef(raw_t *raw) {
   rr[1] = R8(puiTmp + 8);
   rr[2] = R8(puiTmp + 16);
 
-  if (rr[0] == raw->sta.pos[0] &&
-      rr[1] == raw->sta.pos[1] &&
+  if (rr[0] == raw->sta.pos[0] && rr[1] == raw->sta.pos[1] &&
       rr[2] == raw->sta.pos[2]) {
     /* no change in position */
     return 0;
   }
 
   raw->staid++;
-  sprintf(raw->sta.name,"SBP %04d",raw->staid);
-  raw->sta.deltype=0; /* xyz */
-  for (j=0;j<3;j++) {
-    raw->sta.pos[j]=rr[j];
-    raw->sta.del[j]=0.0;
+  sprintf(raw->sta.name, "SBP %04d", raw->staid);
+  raw->sta.deltype = 0; /* xyz */
+  for (j = 0; j < 3; j++) {
+    raw->sta.pos[j] = rr[j];
+    raw->sta.del[j] = 0.0;
   }
-  raw->sta.hgt=0.0;
+  raw->sta.hgt = 0.0;
   return 5;
 }
 

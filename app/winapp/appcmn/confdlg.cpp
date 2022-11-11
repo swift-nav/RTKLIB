@@ -8,8 +8,5 @@
 #pragma resource "*.dfm"
 TConfDialog *ConfDialog;
 //---------------------------------------------------------------------------
-__fastcall TConfDialog::TConfDialog(TComponent* Owner)
-	: TForm(Owner)
-{
-}
+__fastcall TConfDialog::TConfDialog(TComponent *Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------

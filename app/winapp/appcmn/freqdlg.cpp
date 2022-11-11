@@ -9,8 +9,5 @@
 #pragma resource "*.dfm"
 TFreqDialog *FreqDialog;
 //---------------------------------------------------------------------------
-__fastcall TFreqDialog::TFreqDialog(TComponent* Owner)
-	: TForm(Owner)
-{
-}
+__fastcall TFreqDialog::TFreqDialog(TComponent *Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
