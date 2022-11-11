@@ -1,0 +1,9 @@
+add_executable(
+  str2str
+  str2str.c
+  )
+target_link_libraries(
+  str2str
+  RTKLIB
+  m
+  )

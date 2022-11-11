@@ -28,3 +28,4 @@ app/consapp/rnx2rtkp/gcc/rnx2rtkp
 app/consapp/rtkrcv/gcc/rtkrcv
 app/consapp/str2str/gcc/str2str
 lib/iers/gcc/iers.a
+build*/

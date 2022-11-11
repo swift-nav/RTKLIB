@@ -1,0 +1,3864 @@
+3     0.000: strsetdir: dir=
+3     0.000: strsetproxy: addr=
+3     0.000: strsvrstart:
+3     0.000: strinitcom:
+3     0.000: strsetopt: opt=10000 10000 2000 32768 30 0 1 0
+3     0.000: stropen: type=1 mode=3 path=ttyprintk
+3     0.000: openserial: path=ttyprintk mode=3
+3     0.000: openserial: dev=4
+3     0.000: stropen: type=3 mode=3 path=:52302
+3     0.000: opentcpsvr: path=:52302
+4     0.000: decodetcpepath: path=:52302
+3     0.000: gentcp: type=0
+3     0.000: setsock: sock=5
+5     0.000: gentcp: exit sock=5
+3     0.000: stropen: type=0 mode=3 path=
+4     0.000: strwrite: n=0
+3     0.000: writeserial: dev=4 n=0
+5     0.000: writeserial: exit dev=4 ns=0
+3     0.101: strsendcmd: cmd=
+4     0.101: strwrite: n=0
+4     0.101: writetcpsvr: state=1 n=0
+4     0.101: waittcpsvr: sock=5 state=1
+4     0.101: accsock: sock=5
+4     0.101: updatetcpsvr: state=1
+3     0.201: strsendcmd: cmd=
+4     0.201: strwrite: n=0
+3     0.301: strsendcmd: cmd=
+4     0.302: strsvrstat:
+4     0.302: strsum:
+4     0.302: strstat:
+4     0.302: strstat:
+4     0.302: strsum:
+4     0.302: strstat:
+4     0.302: strstat:
+4     0.302: strsum:
+4     0.302: strstat:
+4     0.302: strstat:
+3     0.302: strsvrthread:
+4     0.302: strread: n=32768
+4     0.302: readserial: dev=4 n=32768
+5     0.302: readserial: exit dev=4 nr=0
+4     0.302: strread: n=1024
+4     0.302: readtcpsvr: state=1
+4     0.302: waittcpsvr: sock=5 state=1
+4     0.302: accsock: sock=5
+4     0.302: updatetcpsvr: state=1
+4     0.302: strread: n=1024
+4     0.312: strread: n=32768
+4     0.312: readserial: dev=4 n=32768
+5     0.312: readserial: exit dev=4 nr=0
+4     0.312: strread: n=1024
+4     0.312: readtcpsvr: state=1
+4     0.312: waittcpsvr: sock=5 state=1
+4     0.312: accsock: sock=5
+4     0.312: updatetcpsvr: state=1
+4     0.312: strread: n=1024
+4     0.322: strread: n=32768
+4     0.322: readserial: dev=4 n=32768
+5     0.322: readserial: exit dev=4 nr=0
+4     0.322: strread: n=1024
+4     0.322: readtcpsvr: state=1
+4     0.322: waittcpsvr: sock=5 state=1
+4     0.322: accsock: sock=5
+4     0.323: updatetcpsvr: state=1
+4     0.323: strread: n=1024
+4     0.332: strread: n=32768
+4     0.332: readserial: dev=4 n=32768
+5     0.332: readserial: exit dev=4 nr=0
+4     0.332: strread: n=1024
+4     0.332: readtcpsvr: state=1
+4     0.332: waittcpsvr: sock=5 state=1
+4     0.332: accsock: sock=5
+4     0.332: updatetcpsvr: state=1
+4     0.332: strread: n=1024
+4     0.342: strread: n=32768
+4     0.342: readserial: dev=4 n=32768
+5     0.342: readserial: exit dev=4 nr=0
+4     0.342: strread: n=1024
+4     0.342: readtcpsvr: state=1
+4     0.342: waittcpsvr: sock=5 state=1
+4     0.342: accsock: sock=5
+4     0.342: updatetcpsvr: state=1
+4     0.342: strread: n=1024
+4     0.352: strread: n=32768
+4     0.352: readserial: dev=4 n=32768
+5     0.352: readserial: exit dev=4 nr=0
+4     0.352: strread: n=1024
+4     0.352: readtcpsvr: state=1
+4     0.352: waittcpsvr: sock=5 state=1
+4     0.352: accsock: sock=5
+4     0.352: updatetcpsvr: state=1
+4     0.352: strread: n=1024
+4     0.363: strread: n=32768
+4     0.363: readserial: dev=4 n=32768
+5     0.363: readserial: exit dev=4 nr=0
+4     0.363: strread: n=1024
+4     0.363: readtcpsvr: state=1
+4     0.363: waittcpsvr: sock=5 state=1
+4     0.363: accsock: sock=5
+4     0.363: updatetcpsvr: state=1
+4     0.363: strread: n=1024
+4     0.373: strread: n=32768
+4     0.373: readserial: dev=4 n=32768
+5     0.373: readserial: exit dev=4 nr=0
+4     0.373: strread: n=1024
+4     0.373: readtcpsvr: state=1
+4     0.373: waittcpsvr: sock=5 state=1
+4     0.373: accsock: sock=5
+4     0.373: updatetcpsvr: state=1
+4     0.373: strread: n=1024
+4     0.383: strread: n=32768
+4     0.383: readserial: dev=4 n=32768
+5     0.383: readserial: exit dev=4 nr=0
+4     0.383: strread: n=1024
+4     0.383: readtcpsvr: state=1
+4     0.383: waittcpsvr: sock=5 state=1
+4     0.383: accsock: sock=5
+4     0.383: updatetcpsvr: state=1
+4     0.383: strread: n=1024
+4     0.393: strread: n=32768
+4     0.393: readserial: dev=4 n=32768
+5     0.393: readserial: exit dev=4 nr=0
+4     0.393: strread: n=1024
+4     0.393: readtcpsvr: state=1
+4     0.394: waittcpsvr: sock=5 state=1
+4     0.394: accsock: sock=5
+4     0.394: updatetcpsvr: state=1
+4     0.394: strread: n=1024
+4     0.403: strread: n=32768
+4     0.403: readserial: dev=4 n=32768
+5     0.403: readserial: exit dev=4 nr=0
+4     0.403: strread: n=1024
+4     0.403: readtcpsvr: state=1
+4     0.403: waittcpsvr: sock=5 state=1
+4     0.403: accsock: sock=5
+4     0.403: updatetcpsvr: state=1
+4     0.403: strread: n=1024
+4     0.413: strread: n=32768
+4     0.413: readserial: dev=4 n=32768
+5     0.413: readserial: exit dev=4 nr=0
+4     0.413: strread: n=1024
+4     0.413: readtcpsvr: state=1
+4     0.413: waittcpsvr: sock=5 state=1
+4     0.413: accsock: sock=5
+4     0.413: updatetcpsvr: state=1
+4     0.413: strread: n=1024
+4     0.424: strread: n=32768
+4     0.424: readserial: dev=4 n=32768
+5     0.424: readserial: exit dev=4 nr=0
+4     0.424: strread: n=1024
+4     0.424: readtcpsvr: state=1
+4     0.424: waittcpsvr: sock=5 state=1
+4     0.424: accsock: sock=5
+4     0.424: updatetcpsvr: state=1
+4     0.424: strread: n=1024
+4     0.434: strread: n=32768
+4     0.434: readserial: dev=4 n=32768
+5     0.434: readserial: exit dev=4 nr=0
+4     0.434: strread: n=1024
+4     0.434: readtcpsvr: state=1
+4     0.434: waittcpsvr: sock=5 state=1
+4     0.434: accsock: sock=5
+4     0.434: updatetcpsvr: state=1
+4     0.434: strread: n=1024
+4     0.444: strread: n=32768
+4     0.444: readserial: dev=4 n=32768
+5     0.444: readserial: exit dev=4 nr=0
+4     0.444: strread: n=1024
+4     0.444: readtcpsvr: state=1
+4     0.444: waittcpsvr: sock=5 state=1
+4     0.444: accsock: sock=5
+4     0.444: updatetcpsvr: state=1
+4     0.444: strread: n=1024
+4     0.454: strread: n=32768
+4     0.455: readserial: dev=4 n=32768
+5     0.455: readserial: exit dev=4 nr=0
+4     0.455: strread: n=1024
+4     0.455: readtcpsvr: state=1
+4     0.455: waittcpsvr: sock=5 state=1
+4     0.455: accsock: sock=5
+4     0.455: updatetcpsvr: state=1
+4     0.455: strread: n=1024
+4     0.464: strread: n=32768
+4     0.464: readserial: dev=4 n=32768
+5     0.464: readserial: exit dev=4 nr=0
+4     0.464: strread: n=1024
+4     0.464: readtcpsvr: state=1
+4     0.464: waittcpsvr: sock=5 state=1
+4     0.464: accsock: sock=5
+4     0.464: updatetcpsvr: state=1
+4     0.464: strread: n=1024
+4     0.474: strread: n=32768
+4     0.474: readserial: dev=4 n=32768
+5     0.474: readserial: exit dev=4 nr=0
+4     0.474: strread: n=1024
+4     0.474: readtcpsvr: state=1
+4     0.474: waittcpsvr: sock=5 state=1
+4     0.474: accsock: sock=5
+4     0.474: updatetcpsvr: state=1
+4     0.474: strread: n=1024
+4     0.485: strread: n=32768
+4     0.485: readserial: dev=4 n=32768
+5     0.485: readserial: exit dev=4 nr=0
+4     0.485: strread: n=1024
+4     0.485: readtcpsvr: state=1
+4     0.485: waittcpsvr: sock=5 state=1
+4     0.485: accsock: sock=5
+4     0.485: updatetcpsvr: state=1
+4     0.485: strread: n=1024
+4     0.495: strread: n=32768
+4     0.495: readserial: dev=4 n=32768
+5     0.495: readserial: exit dev=4 nr=0
+4     0.495: strread: n=1024
+4     0.495: readtcpsvr: state=1
+4     0.495: waittcpsvr: sock=5 state=1
+4     0.495: accsock: sock=5
+4     0.495: updatetcpsvr: state=1
+4     0.495: strread: n=1024
+4     0.505: strread: n=32768
+4     0.506: readserial: dev=4 n=32768
+5     0.506: readserial: exit dev=4 nr=0
+4     0.506: strread: n=1024
+4     0.506: readtcpsvr: state=1
+4     0.506: waittcpsvr: sock=5 state=1
+4     0.506: accsock: sock=5
+4     0.506: updatetcpsvr: state=1
+4     0.506: strread: n=1024
+4     0.515: strread: n=32768
+4     0.515: readserial: dev=4 n=32768
+5     0.515: readserial: exit dev=4 nr=0
+4     0.515: strread: n=1024
+4     0.515: readtcpsvr: state=1
+4     0.515: waittcpsvr: sock=5 state=1
+4     0.515: accsock: sock=5
+4     0.515: updatetcpsvr: state=1
+4     0.515: strread: n=1024
+4     0.525: strread: n=32768
+4     0.525: readserial: dev=4 n=32768
+5     0.525: readserial: exit dev=4 nr=0
+4     0.525: strread: n=1024
+4     0.525: readtcpsvr: state=1
+4     0.525: waittcpsvr: sock=5 state=1
+4     0.525: accsock: sock=5
+4     0.525: updatetcpsvr: state=1
+4     0.525: strread: n=1024
+4     0.536: strread: n=32768
+4     0.536: readserial: dev=4 n=32768
+5     0.536: readserial: exit dev=4 nr=0
+4     0.536: strread: n=1024
+4     0.536: readtcpsvr: state=1
+4     0.536: waittcpsvr: sock=5 state=1
+4     0.536: accsock: sock=5
+4     0.536: updatetcpsvr: state=1
+4     0.536: strread: n=1024
+4     0.546: strread: n=32768
+4     0.546: readserial: dev=4 n=32768
+5     0.546: readserial: exit dev=4 nr=0
+4     0.546: strread: n=1024
+4     0.546: readtcpsvr: state=1
+4     0.546: waittcpsvr: sock=5 state=1
+4     0.546: accsock: sock=5
+4     0.546: updatetcpsvr: state=1
+4     0.546: strread: n=1024
+4     0.556: strread: n=32768
+4     0.556: readserial: dev=4 n=32768
+5     0.556: readserial: exit dev=4 nr=0
+4     0.556: strread: n=1024
+4     0.556: readtcpsvr: state=1
+4     0.556: waittcpsvr: sock=5 state=1
+4     0.556: accsock: sock=5
+4     0.556: updatetcpsvr: state=1
+4     0.556: strread: n=1024
+4     0.566: strread: n=32768
+4     0.567: readserial: dev=4 n=32768
+5     0.567: readserial: exit dev=4 nr=0
+4     0.567: strread: n=1024
+4     0.567: readtcpsvr: state=1
+4     0.567: waittcpsvr: sock=5 state=1
+4     0.567: accsock: sock=5
+4     0.567: updatetcpsvr: state=1
+4     0.567: strread: n=1024
+4     0.576: strread: n=32768
+4     0.576: readserial: dev=4 n=32768
+5     0.576: readserial: exit dev=4 nr=0
+4     0.576: strread: n=1024
+4     0.576: readtcpsvr: state=1
+4     0.576: waittcpsvr: sock=5 state=1
+4     0.576: accsock: sock=5
+4     0.576: updatetcpsvr: state=1
+4     0.576: strread: n=1024
+4     0.586: strread: n=32768
+4     0.586: readserial: dev=4 n=32768
+5     0.586: readserial: exit dev=4 nr=0
+4     0.586: strread: n=1024
+4     0.586: readtcpsvr: state=1
+4     0.586: waittcpsvr: sock=5 state=1
+4     0.586: accsock: sock=5
+4     0.586: updatetcpsvr: state=1
+4     0.586: strread: n=1024
+4     0.596: strread: n=32768
+4     0.597: readserial: dev=4 n=32768
+5     0.597: readserial: exit dev=4 nr=0
+4     0.597: strread: n=1024
+4     0.597: readtcpsvr: state=1
+4     0.597: waittcpsvr: sock=5 state=1
+4     0.597: accsock: sock=5
+4     0.597: updatetcpsvr: state=1
+4     0.597: strread: n=1024
+4     0.606: strread: n=32768
+4     0.606: readserial: dev=4 n=32768
+5     0.606: readserial: exit dev=4 nr=0
+4     0.606: strread: n=1024
+4     0.606: readtcpsvr: state=1
+4     0.606: waittcpsvr: sock=5 state=1
+4     0.606: accsock: sock=5
+4     0.606: updatetcpsvr: state=1
+4     0.606: strread: n=1024
+4     0.616: strread: n=32768
+4     0.616: readserial: dev=4 n=32768
+5     0.616: readserial: exit dev=4 nr=0
+4     0.616: strread: n=1024
+4     0.616: readtcpsvr: state=1
+4     0.616: waittcpsvr: sock=5 state=1
+4     0.616: accsock: sock=5
+4     0.616: updatetcpsvr: state=1
+4     0.616: strread: n=1024
+4     0.626: strread: n=32768
+4     0.626: readserial: dev=4 n=32768
+5     0.626: readserial: exit dev=4 nr=0
+4     0.626: strread: n=1024
+4     0.626: readtcpsvr: state=1
+4     0.626: waittcpsvr: sock=5 state=1
+4     0.626: accsock: sock=5
+4     0.626: updatetcpsvr: state=1
+4     0.626: strread: n=1024
+4     0.637: strread: n=32768
+4     0.637: readserial: dev=4 n=32768
+5     0.637: readserial: exit dev=4 nr=0
+4     0.637: strread: n=1024
+4     0.637: readtcpsvr: state=1
+4     0.637: waittcpsvr: sock=5 state=1
+4     0.637: accsock: sock=5
+4     0.637: updatetcpsvr: state=1
+4     0.637: strread: n=1024
+4     0.647: strread: n=32768
+4     0.647: readserial: dev=4 n=32768
+5     0.647: readserial: exit dev=4 nr=0
+4     0.647: strread: n=1024
+4     0.647: readtcpsvr: state=1
+4     0.647: waittcpsvr: sock=5 state=1
+4     0.647: accsock: sock=5
+4     0.648: updatetcpsvr: state=1
+4     0.648: strread: n=1024
+4     0.657: strread: n=32768
+4     0.657: readserial: dev=4 n=32768
+5     0.657: readserial: exit dev=4 nr=0
+4     0.657: strread: n=1024
+4     0.657: readtcpsvr: state=1
+4     0.657: waittcpsvr: sock=5 state=1
+4     0.657: accsock: sock=5
+4     0.657: updatetcpsvr: state=1
+4     0.657: strread: n=1024
+4     0.667: strread: n=32768
+4     0.667: readserial: dev=4 n=32768
+5     0.667: readserial: exit dev=4 nr=0
+4     0.667: strread: n=1024
+4     0.667: readtcpsvr: state=1
+4     0.667: waittcpsvr: sock=5 state=1
+4     0.667: accsock: sock=5
+4     0.667: updatetcpsvr: state=1
+4     0.667: strread: n=1024
+4     0.678: strread: n=32768
+4     0.678: readserial: dev=4 n=32768
+5     0.678: readserial: exit dev=4 nr=0
+4     0.678: strread: n=1024
+4     0.678: readtcpsvr: state=1
+4     0.678: waittcpsvr: sock=5 state=1
+4     0.678: accsock: sock=5
+4     0.678: updatetcpsvr: state=1
+4     0.678: strread: n=1024
+4     0.688: strread: n=32768
+4     0.688: readserial: dev=4 n=32768
+5     0.688: readserial: exit dev=4 nr=0
+4     0.688: strread: n=1024
+4     0.688: readtcpsvr: state=1
+4     0.688: waittcpsvr: sock=5 state=1
+4     0.688: accsock: sock=5
+4     0.688: updatetcpsvr: state=1
+4     0.688: strread: n=1024
+4     0.698: strread: n=32768
+4     0.698: readserial: dev=4 n=32768
+5     0.698: readserial: exit dev=4 nr=0
+4     0.698: strread: n=1024
+4     0.698: readtcpsvr: state=1
+4     0.698: waittcpsvr: sock=5 state=1
+4     0.698: accsock: sock=5
+4     0.698: updatetcpsvr: state=1
+4     0.698: strread: n=1024
+4     0.709: strread: n=32768
+4     0.709: readserial: dev=4 n=32768
+5     0.709: readserial: exit dev=4 nr=0
+4     0.709: strread: n=1024
+4     0.709: readtcpsvr: state=1
+4     0.709: waittcpsvr: sock=5 state=1
+4     0.709: accsock: sock=5
+4     0.709: updatetcpsvr: state=1
+4     0.709: strread: n=1024
+4     0.719: strread: n=32768
+4     0.719: readserial: dev=4 n=32768
+5     0.719: readserial: exit dev=4 nr=0
+4     0.719: strread: n=1024
+4     0.719: readtcpsvr: state=1
+4     0.719: waittcpsvr: sock=5 state=1
+4     0.719: accsock: sock=5
+4     0.719: updatetcpsvr: state=1
+4     0.719: strread: n=1024
+4     0.729: strread: n=32768
+4     0.729: readserial: dev=4 n=32768
+5     0.729: readserial: exit dev=4 nr=0
+4     0.729: strread: n=1024
+4     0.729: readtcpsvr: state=1
+4     0.729: waittcpsvr: sock=5 state=1
+4     0.729: accsock: sock=5
+4     0.729: updatetcpsvr: state=1
+4     0.729: strread: n=1024
+4     0.739: strread: n=32768
+4     0.740: readserial: dev=4 n=32768
+5     0.740: readserial: exit dev=4 nr=0
+4     0.740: strread: n=1024
+4     0.740: readtcpsvr: state=1
+4     0.740: waittcpsvr: sock=5 state=1
+4     0.740: accsock: sock=5
+4     0.740: updatetcpsvr: state=1
+4     0.740: strread: n=1024
+4     0.749: strread: n=32768
+4     0.749: readserial: dev=4 n=32768
+5     0.749: readserial: exit dev=4 nr=0
+4     0.749: strread: n=1024
+4     0.749: readtcpsvr: state=1
+4     0.749: waittcpsvr: sock=5 state=1
+4     0.749: accsock: sock=5
+4     0.749: updatetcpsvr: state=1
+4     0.749: strread: n=1024
+4     0.759: strread: n=32768
+4     0.759: readserial: dev=4 n=32768
+5     0.759: readserial: exit dev=4 nr=0
+4     0.759: strread: n=1024
+4     0.759: readtcpsvr: state=1
+4     0.759: waittcpsvr: sock=5 state=1
+4     0.759: accsock: sock=5
+4     0.759: updatetcpsvr: state=1
+4     0.759: strread: n=1024
+4     0.770: strread: n=32768
+4     0.770: readserial: dev=4 n=32768
+5     0.770: readserial: exit dev=4 nr=0
+4     0.770: strread: n=1024
+4     0.770: readtcpsvr: state=1
+4     0.770: waittcpsvr: sock=5 state=1
+4     0.770: accsock: sock=5
+4     0.770: updatetcpsvr: state=1
+4     0.770: strread: n=1024
+4     0.780: strread: n=32768
+4     0.780: readserial: dev=4 n=32768
+5     0.780: readserial: exit dev=4 nr=0
+4     0.780: strread: n=1024
+4     0.780: readtcpsvr: state=1
+4     0.780: waittcpsvr: sock=5 state=1
+4     0.780: accsock: sock=5
+4     0.780: updatetcpsvr: state=1
+4     0.780: strread: n=1024
+4     0.790: strread: n=32768
+4     0.790: readserial: dev=4 n=32768
+5     0.790: readserial: exit dev=4 nr=0
+4     0.790: strread: n=1024
+4     0.790: readtcpsvr: state=1
+4     0.790: waittcpsvr: sock=5 state=1
+4     0.790: accsock: sock=5
+4     0.790: updatetcpsvr: state=1
+4     0.790: strread: n=1024
+4     0.800: strread: n=32768
+4     0.800: readserial: dev=4 n=32768
+5     0.800: readserial: exit dev=4 nr=0
+4     0.800: strread: n=1024
+4     0.800: readtcpsvr: state=1
+4     0.800: waittcpsvr: sock=5 state=1
+4     0.800: accsock: sock=5
+4     0.800: updatetcpsvr: state=1
+4     0.800: strread: n=1024
+4     0.811: strread: n=32768
+4     0.811: readserial: dev=4 n=32768
+5     0.811: readserial: exit dev=4 nr=0
+4     0.811: strread: n=1024
+4     0.811: readtcpsvr: state=1
+4     0.811: waittcpsvr: sock=5 state=1
+4     0.811: accsock: sock=5
+4     0.811: updatetcpsvr: state=1
+4     0.811: strread: n=1024
+4     0.821: strread: n=32768
+4     0.821: readserial: dev=4 n=32768
+5     0.821: readserial: exit dev=4 nr=0
+4     0.821: strread: n=1024
+4     0.821: readtcpsvr: state=1
+4     0.821: waittcpsvr: sock=5 state=1
+4     0.821: accsock: sock=5
+4     0.821: updatetcpsvr: state=1
+4     0.821: strread: n=1024
+4     0.831: strread: n=32768
+4     0.831: readserial: dev=4 n=32768
+5     0.831: readserial: exit dev=4 nr=0
+4     0.831: strread: n=1024
+4     0.831: readtcpsvr: state=1
+4     0.831: waittcpsvr: sock=5 state=1
+4     0.831: accsock: sock=5
+4     0.831: updatetcpsvr: state=1
+4     0.831: strread: n=1024
+4     0.841: strread: n=32768
+4     0.841: readserial: dev=4 n=32768
+5     0.841: readserial: exit dev=4 nr=0
+4     0.841: strread: n=1024
+4     0.841: readtcpsvr: state=1
+4     0.841: waittcpsvr: sock=5 state=1
+4     0.841: accsock: sock=5
+4     0.841: updatetcpsvr: state=1
+4     0.841: strread: n=1024
+4     0.852: strread: n=32768
+4     0.852: readserial: dev=4 n=32768
+5     0.852: readserial: exit dev=4 nr=0
+4     0.852: strread: n=1024
+4     0.852: readtcpsvr: state=1
+4     0.852: waittcpsvr: sock=5 state=1
+4     0.852: accsock: sock=5
+4     0.852: updatetcpsvr: state=1
+4     0.852: strread: n=1024
+4     0.862: strread: n=32768
+4     0.862: readserial: dev=4 n=32768
+5     0.862: readserial: exit dev=4 nr=0
+4     0.862: strread: n=1024
+4     0.862: readtcpsvr: state=1
+4     0.862: waittcpsvr: sock=5 state=1
+4     0.862: accsock: sock=5
+4     0.862: updatetcpsvr: state=1
+4     0.862: strread: n=1024
+4     0.872: strread: n=32768
+4     0.872: readserial: dev=4 n=32768
+5     0.872: readserial: exit dev=4 nr=0
+4     0.872: strread: n=1024
+4     0.872: readtcpsvr: state=1
+4     0.872: waittcpsvr: sock=5 state=1
+4     0.872: accsock: sock=5
+4     0.872: updatetcpsvr: state=1
+4     0.872: strread: n=1024
+4     0.883: strread: n=32768
+4     0.883: readserial: dev=4 n=32768
+5     0.883: readserial: exit dev=4 nr=0
+4     0.883: strread: n=1024
+4     0.883: readtcpsvr: state=1
+4     0.883: waittcpsvr: sock=5 state=1
+4     0.883: accsock: sock=5
+4     0.883: updatetcpsvr: state=1
+4     0.883: strread: n=1024
+4     0.893: strread: n=32768
+4     0.893: readserial: dev=4 n=32768
+5     0.893: readserial: exit dev=4 nr=0
+4     0.893: strread: n=1024
+4     0.893: readtcpsvr: state=1
+4     0.893: waittcpsvr: sock=5 state=1
+4     0.893: accsock: sock=5
+4     0.893: updatetcpsvr: state=1
+4     0.893: strread: n=1024
+4     0.903: strread: n=32768
+4     0.903: readserial: dev=4 n=32768
+5     0.903: readserial: exit dev=4 nr=0
+4     0.903: strread: n=1024
+4     0.903: readtcpsvr: state=1
+4     0.903: waittcpsvr: sock=5 state=1
+4     0.903: accsock: sock=5
+4     0.903: updatetcpsvr: state=1
+4     0.903: strread: n=1024
+4     0.913: strread: n=32768
+4     0.913: readserial: dev=4 n=32768
+5     0.913: readserial: exit dev=4 nr=0
+4     0.913: strread: n=1024
+4     0.913: readtcpsvr: state=1
+4     0.913: waittcpsvr: sock=5 state=1
+4     0.914: accsock: sock=5
+4     0.914: updatetcpsvr: state=1
+4     0.914: strread: n=1024
+4     0.923: strread: n=32768
+4     0.923: readserial: dev=4 n=32768
+5     0.923: readserial: exit dev=4 nr=0
+4     0.923: strread: n=1024
+4     0.923: readtcpsvr: state=1
+4     0.923: waittcpsvr: sock=5 state=1
+4     0.923: accsock: sock=5
+4     0.923: updatetcpsvr: state=1
+4     0.923: strread: n=1024
+4     0.933: strread: n=32768
+4     0.933: readserial: dev=4 n=32768
+5     0.933: readserial: exit dev=4 nr=0
+4     0.933: strread: n=1024
+4     0.933: readtcpsvr: state=1
+4     0.933: waittcpsvr: sock=5 state=1
+4     0.933: accsock: sock=5
+4     0.933: updatetcpsvr: state=1
+4     0.933: strread: n=1024
+4     0.943: strread: n=32768
+4     0.943: readserial: dev=4 n=32768
+5     0.943: readserial: exit dev=4 nr=0
+4     0.943: strread: n=1024
+4     0.943: readtcpsvr: state=1
+4     0.943: waittcpsvr: sock=5 state=1
+4     0.943: accsock: sock=5
+4     0.944: updatetcpsvr: state=1
+4     0.944: strread: n=1024
+4     0.953: strread: n=32768
+4     0.953: readserial: dev=4 n=32768
+5     0.953: readserial: exit dev=4 nr=0
+4     0.953: strread: n=1024
+4     0.953: readtcpsvr: state=1
+4     0.953: waittcpsvr: sock=5 state=1
+4     0.953: accsock: sock=5
+4     0.953: updatetcpsvr: state=1
+4     0.953: strread: n=1024
+4     0.963: strread: n=32768
+4     0.963: readserial: dev=4 n=32768
+5     0.963: readserial: exit dev=4 nr=0
+4     0.963: strread: n=1024
+4     0.963: readtcpsvr: state=1
+4     0.963: waittcpsvr: sock=5 state=1
+4     0.963: accsock: sock=5
+4     0.963: updatetcpsvr: state=1
+4     0.963: strread: n=1024
+4     0.974: strread: n=32768
+4     0.974: readserial: dev=4 n=32768
+5     0.974: readserial: exit dev=4 nr=0
+4     0.974: strread: n=1024
+4     0.974: readtcpsvr: state=1
+4     0.974: waittcpsvr: sock=5 state=1
+4     0.974: accsock: sock=5
+4     0.974: updatetcpsvr: state=1
+4     0.974: strread: n=1024
+4     0.984: strread: n=32768
+4     0.984: readserial: dev=4 n=32768
+5     0.984: readserial: exit dev=4 nr=0
+4     0.984: strread: n=1024
+4     0.984: readtcpsvr: state=1
+4     0.984: waittcpsvr: sock=5 state=1
+4     0.984: accsock: sock=5
+4     0.984: updatetcpsvr: state=1
+4     0.984: strread: n=1024
+4     0.994: strread: n=32768
+4     0.994: readserial: dev=4 n=32768
+5     0.994: readserial: exit dev=4 nr=0
+4     0.994: strread: n=1024
+4     0.994: readtcpsvr: state=1
+4     0.994: waittcpsvr: sock=5 state=1
+4     0.994: accsock: sock=5
+4     0.994: updatetcpsvr: state=1
+4     0.994: strread: n=1024
+4     1.004: strread: n=32768
+4     1.004: readserial: dev=4 n=32768
+5     1.004: readserial: exit dev=4 nr=0
+4     1.004: strread: n=1024
+4     1.004: readtcpsvr: state=1
+4     1.004: waittcpsvr: sock=5 state=1
+4     1.004: accsock: sock=5
+4     1.004: updatetcpsvr: state=1
+4     1.005: strread: n=1024
+4     1.014: strread: n=32768
+4     1.014: readserial: dev=4 n=32768
+5     1.014: readserial: exit dev=4 nr=0
+4     1.014: strread: n=1024
+4     1.014: readtcpsvr: state=1
+4     1.014: waittcpsvr: sock=5 state=1
+4     1.014: accsock: sock=5
+4     1.014: updatetcpsvr: state=1
+4     1.014: strread: n=1024
+4     1.024: strread: n=32768
+4     1.024: readserial: dev=4 n=32768
+5     1.024: readserial: exit dev=4 nr=0
+4     1.024: strread: n=1024
+4     1.024: readtcpsvr: state=1
+4     1.024: waittcpsvr: sock=5 state=1
+4     1.024: accsock: sock=5
+4     1.024: updatetcpsvr: state=1
+4     1.024: strread: n=1024
+4     1.034: strread: n=32768
+4     1.034: readserial: dev=4 n=32768
+5     1.034: readserial: exit dev=4 nr=0
+4     1.034: strread: n=1024
+4     1.034: readtcpsvr: state=1
+4     1.035: waittcpsvr: sock=5 state=1
+4     1.035: accsock: sock=5
+4     1.035: updatetcpsvr: state=1
+4     1.035: strread: n=1024
+4     1.044: strread: n=32768
+4     1.044: readserial: dev=4 n=32768
+5     1.044: readserial: exit dev=4 nr=0
+4     1.044: strread: n=1024
+4     1.044: readtcpsvr: state=1
+4     1.044: waittcpsvr: sock=5 state=1
+4     1.044: accsock: sock=5
+4     1.044: updatetcpsvr: state=1
+4     1.044: strread: n=1024
+4     1.054: strread: n=32768
+4     1.054: readserial: dev=4 n=32768
+5     1.054: readserial: exit dev=4 nr=0
+4     1.054: strread: n=1024
+4     1.054: readtcpsvr: state=1
+4     1.054: waittcpsvr: sock=5 state=1
+4     1.054: accsock: sock=5
+4     1.054: updatetcpsvr: state=1
+4     1.054: strread: n=1024
+4     1.065: strread: n=32768
+4     1.065: readserial: dev=4 n=32768
+5     1.065: readserial: exit dev=4 nr=0
+4     1.065: strread: n=1024
+4     1.065: readtcpsvr: state=1
+4     1.065: waittcpsvr: sock=5 state=1
+4     1.065: accsock: sock=5
+4     1.065: updatetcpsvr: state=1
+4     1.065: strread: n=1024
+4     1.075: strread: n=32768
+4     1.075: readserial: dev=4 n=32768
+5     1.075: readserial: exit dev=4 nr=0
+4     1.075: strread: n=1024
+4     1.075: readtcpsvr: state=1
+4     1.075: waittcpsvr: sock=5 state=1
+4     1.075: accsock: sock=5
+4     1.075: updatetcpsvr: state=1
+4     1.075: strread: n=1024
+4     1.085: strread: n=32768
+4     1.085: readserial: dev=4 n=32768
+5     1.085: readserial: exit dev=4 nr=0
+4     1.085: strread: n=1024
+4     1.085: readtcpsvr: state=1
+4     1.085: waittcpsvr: sock=5 state=1
+4     1.085: accsock: sock=5
+4     1.085: updatetcpsvr: state=1
+4     1.085: strread: n=1024
+4     1.096: strread: n=32768
+4     1.096: readserial: dev=4 n=32768
+5     1.096: readserial: exit dev=4 nr=0
+4     1.096: strread: n=1024
+4     1.096: readtcpsvr: state=1
+4     1.096: waittcpsvr: sock=5 state=1
+4     1.096: accsock: sock=5
+4     1.096: updatetcpsvr: state=1
+4     1.096: strread: n=1024
+4     1.105: strread: n=32768
+4     1.105: readserial: dev=4 n=32768
+5     1.105: readserial: exit dev=4 nr=0
+4     1.105: strread: n=1024
+4     1.106: readtcpsvr: state=1
+4     1.106: waittcpsvr: sock=5 state=1
+4     1.106: accsock: sock=5
+4     1.106: updatetcpsvr: state=1
+4     1.106: strread: n=1024
+4     1.115: strread: n=32768
+4     1.115: readserial: dev=4 n=32768
+5     1.115: readserial: exit dev=4 nr=0
+4     1.115: strread: n=1024
+4     1.115: readtcpsvr: state=1
+4     1.115: waittcpsvr: sock=5 state=1
+4     1.115: accsock: sock=5
+4     1.115: updatetcpsvr: state=1
+4     1.115: strread: n=1024
+4     1.125: strread: n=32768
+4     1.125: readserial: dev=4 n=32768
+5     1.125: readserial: exit dev=4 nr=0
+4     1.125: strread: n=1024
+4     1.125: readtcpsvr: state=1
+4     1.125: waittcpsvr: sock=5 state=1
+4     1.125: accsock: sock=5
+4     1.125: updatetcpsvr: state=1
+4     1.125: strread: n=1024
+4     1.136: strread: n=32768
+4     1.136: readserial: dev=4 n=32768
+5     1.136: readserial: exit dev=4 nr=0
+4     1.136: strread: n=1024
+4     1.136: readtcpsvr: state=1
+4     1.136: waittcpsvr: sock=5 state=1
+4     1.136: accsock: sock=5
+4     1.136: updatetcpsvr: state=1
+4     1.136: strread: n=1024
+4     1.146: strread: n=32768
+4     1.146: readserial: dev=4 n=32768
+5     1.146: readserial: exit dev=4 nr=0
+4     1.146: strread: n=1024
+4     1.146: readtcpsvr: state=1
+4     1.146: waittcpsvr: sock=5 state=1
+4     1.146: accsock: sock=5
+4     1.146: updatetcpsvr: state=1
+4     1.146: strread: n=1024
+4     1.156: strread: n=32768
+4     1.156: readserial: dev=4 n=32768
+5     1.156: readserial: exit dev=4 nr=0
+4     1.156: strread: n=1024
+4     1.156: readtcpsvr: state=1
+4     1.156: waittcpsvr: sock=5 state=1
+4     1.156: accsock: sock=5
+4     1.156: updatetcpsvr: state=1
+4     1.156: strread: n=1024
+4     1.167: strread: n=32768
+4     1.167: readserial: dev=4 n=32768
+5     1.167: readserial: exit dev=4 nr=0
+4     1.167: strread: n=1024
+4     1.167: readtcpsvr: state=1
+4     1.167: waittcpsvr: sock=5 state=1
+4     1.167: accsock: sock=5
+4     1.167: updatetcpsvr: state=1
+4     1.167: strread: n=1024
+4     1.176: strread: n=32768
+4     1.176: readserial: dev=4 n=32768
+5     1.176: readserial: exit dev=4 nr=0
+4     1.176: strread: n=1024
+4     1.176: readtcpsvr: state=1
+4     1.176: waittcpsvr: sock=5 state=1
+4     1.176: accsock: sock=5
+4     1.176: updatetcpsvr: state=1
+4     1.176: strread: n=1024
+4     1.186: strread: n=32768
+4     1.186: readserial: dev=4 n=32768
+5     1.186: readserial: exit dev=4 nr=0
+4     1.186: strread: n=1024
+4     1.186: readtcpsvr: state=1
+4     1.186: waittcpsvr: sock=5 state=1
+4     1.186: accsock: sock=5
+4     1.186: updatetcpsvr: state=1
+4     1.186: strread: n=1024
+4     1.196: strread: n=32768
+4     1.196: readserial: dev=4 n=32768
+5     1.197: readserial: exit dev=4 nr=0
+4     1.197: strread: n=1024
+4     1.197: readtcpsvr: state=1
+4     1.197: waittcpsvr: sock=5 state=1
+4     1.197: accsock: sock=5
+4     1.197: updatetcpsvr: state=1
+4     1.197: strread: n=1024
+4     1.206: strread: n=32768
+4     1.206: readserial: dev=4 n=32768
+5     1.206: readserial: exit dev=4 nr=0
+4     1.206: strread: n=1024
+4     1.206: readtcpsvr: state=1
+4     1.206: waittcpsvr: sock=5 state=1
+4     1.206: accsock: sock=5
+4     1.206: updatetcpsvr: state=1
+4     1.206: strread: n=1024
+4     1.216: strread: n=32768
+4     1.216: readserial: dev=4 n=32768
+5     1.216: readserial: exit dev=4 nr=0
+4     1.216: strread: n=1024
+4     1.216: readtcpsvr: state=1
+4     1.216: waittcpsvr: sock=5 state=1
+4     1.216: accsock: sock=5
+4     1.216: updatetcpsvr: state=1
+4     1.216: strread: n=1024
+4     1.227: strread: n=32768
+4     1.227: readserial: dev=4 n=32768
+5     1.227: readserial: exit dev=4 nr=0
+4     1.227: strread: n=1024
+4     1.227: readtcpsvr: state=1
+4     1.227: waittcpsvr: sock=5 state=1
+4     1.227: accsock: sock=5
+4     1.227: updatetcpsvr: state=1
+4     1.227: strread: n=1024
+4     1.237: strread: n=32768
+4     1.237: readserial: dev=4 n=32768
+5     1.237: readserial: exit dev=4 nr=0
+4     1.237: strread: n=1024
+4     1.237: readtcpsvr: state=1
+4     1.237: waittcpsvr: sock=5 state=1
+4     1.237: accsock: sock=5
+4     1.237: updatetcpsvr: state=1
+4     1.237: strread: n=1024
+4     1.247: strread: n=32768
+4     1.247: readserial: dev=4 n=32768
+5     1.247: readserial: exit dev=4 nr=0
+4     1.247: strread: n=1024
+4     1.247: readtcpsvr: state=1
+4     1.247: waittcpsvr: sock=5 state=1
+4     1.247: accsock: sock=5
+4     1.248: updatetcpsvr: state=1
+4     1.248: strread: n=1024
+4     1.257: strread: n=32768
+4     1.257: readserial: dev=4 n=32768
+5     1.257: readserial: exit dev=4 nr=0
+4     1.257: strread: n=1024
+4     1.257: readtcpsvr: state=1
+4     1.257: waittcpsvr: sock=5 state=1
+4     1.257: accsock: sock=5
+4     1.257: updatetcpsvr: state=1
+4     1.257: strread: n=1024
+4     1.267: strread: n=32768
+4     1.267: readserial: dev=4 n=32768
+5     1.267: readserial: exit dev=4 nr=0
+4     1.267: strread: n=1024
+4     1.267: readtcpsvr: state=1
+4     1.267: waittcpsvr: sock=5 state=1
+4     1.267: accsock: sock=5
+4     1.267: updatetcpsvr: state=1
+4     1.267: strread: n=1024
+4     1.278: strread: n=32768
+4     1.278: readserial: dev=4 n=32768
+5     1.278: readserial: exit dev=4 nr=0
+4     1.278: strread: n=1024
+4     1.278: readtcpsvr: state=1
+4     1.278: waittcpsvr: sock=5 state=1
+4     1.278: accsock: sock=5
+4     1.278: updatetcpsvr: state=1
+4     1.278: strread: n=1024
+4     1.288: strread: n=32768
+4     1.288: readserial: dev=4 n=32768
+5     1.288: readserial: exit dev=4 nr=0
+4     1.288: strread: n=1024
+4     1.288: readtcpsvr: state=1
+4     1.288: waittcpsvr: sock=5 state=1
+4     1.288: accsock: sock=5
+4     1.288: updatetcpsvr: state=1
+4     1.288: strread: n=1024
+4     1.299: strread: n=32768
+4     1.299: readserial: dev=4 n=32768
+5     1.299: readserial: exit dev=4 nr=0
+4     1.299: strread: n=1024
+4     1.299: readtcpsvr: state=1
+4     1.299: waittcpsvr: sock=5 state=1
+4     1.299: accsock: sock=5
+4     1.299: updatetcpsvr: state=1
+4     1.299: strread: n=1024
+4     1.309: strread: n=32768
+4     1.309: readserial: dev=4 n=32768
+5     1.309: readserial: exit dev=4 nr=0
+4     1.309: strread: n=1024
+4     1.309: readtcpsvr: state=1
+4     1.309: waittcpsvr: sock=5 state=1
+4     1.309: accsock: sock=5
+4     1.309: updatetcpsvr: state=1
+4     1.309: strread: n=1024
+4     1.319: strread: n=32768
+4     1.319: readserial: dev=4 n=32768
+5     1.319: readserial: exit dev=4 nr=0
+4     1.319: strread: n=1024
+4     1.319: readtcpsvr: state=1
+4     1.319: waittcpsvr: sock=5 state=1
+4     1.319: accsock: sock=5
+4     1.319: updatetcpsvr: state=1
+4     1.319: strread: n=1024
+4     1.329: strread: n=32768
+4     1.330: readserial: dev=4 n=32768
+5     1.330: readserial: exit dev=4 nr=0
+4     1.330: strread: n=1024
+4     1.330: readtcpsvr: state=1
+4     1.330: waittcpsvr: sock=5 state=1
+4     1.330: accsock: sock=5
+4     1.330: updatetcpsvr: state=1
+4     1.330: strread: n=1024
+4     1.339: strread: n=32768
+4     1.339: readserial: dev=4 n=32768
+5     1.339: readserial: exit dev=4 nr=0
+4     1.339: strread: n=1024
+4     1.339: readtcpsvr: state=1
+4     1.339: waittcpsvr: sock=5 state=1
+4     1.339: accsock: sock=5
+4     1.339: updatetcpsvr: state=1
+4     1.339: strread: n=1024
+4     1.350: strread: n=32768
+4     1.350: readserial: dev=4 n=32768
+5     1.350: readserial: exit dev=4 nr=0
+4     1.350: strread: n=1024
+4     1.350: readtcpsvr: state=1
+4     1.350: waittcpsvr: sock=5 state=1
+4     1.350: accsock: sock=5
+4     1.350: updatetcpsvr: state=1
+4     1.350: strread: n=1024
+4     1.360: strread: n=32768
+4     1.360: readserial: dev=4 n=32768
+5     1.360: readserial: exit dev=4 nr=0
+4     1.360: strread: n=1024
+4     1.360: readtcpsvr: state=1
+4     1.360: waittcpsvr: sock=5 state=1
+4     1.360: accsock: sock=5
+4     1.360: updatetcpsvr: state=1
+4     1.360: strread: n=1024
+4     1.370: strread: n=32768
+4     1.370: readserial: dev=4 n=32768
+5     1.370: readserial: exit dev=4 nr=0
+4     1.370: strread: n=1024
+4     1.370: readtcpsvr: state=1
+4     1.370: waittcpsvr: sock=5 state=1
+4     1.370: accsock: sock=5
+4     1.370: updatetcpsvr: state=1
+4     1.370: strread: n=1024
+4     1.380: strread: n=32768
+4     1.380: readserial: dev=4 n=32768
+5     1.381: readserial: exit dev=4 nr=0
+4     1.381: strread: n=1024
+4     1.381: readtcpsvr: state=1
+4     1.381: waittcpsvr: sock=5 state=1
+4     1.381: accsock: sock=5
+4     1.381: updatetcpsvr: state=1
+4     1.381: strread: n=1024
+4     1.390: strread: n=32768
+4     1.390: readserial: dev=4 n=32768
+5     1.390: readserial: exit dev=4 nr=0
+4     1.390: strread: n=1024
+4     1.390: readtcpsvr: state=1
+4     1.390: waittcpsvr: sock=5 state=1
+4     1.390: accsock: sock=5
+4     1.390: updatetcpsvr: state=1
+4     1.390: strread: n=1024
+4     1.400: strread: n=32768
+4     1.400: readserial: dev=4 n=32768
+5     1.400: readserial: exit dev=4 nr=0
+4     1.400: strread: n=1024
+4     1.400: readtcpsvr: state=1
+4     1.400: waittcpsvr: sock=5 state=1
+4     1.400: accsock: sock=5
+4     1.400: updatetcpsvr: state=1
+4     1.400: strread: n=1024
+4     1.411: strread: n=32768
+4     1.411: readserial: dev=4 n=32768
+5     1.411: readserial: exit dev=4 nr=0
+4     1.411: strread: n=1024
+4     1.411: readtcpsvr: state=1
+4     1.411: waittcpsvr: sock=5 state=1
+4     1.411: accsock: sock=5
+4     1.411: updatetcpsvr: state=1
+4     1.411: strread: n=1024
+4     1.421: strread: n=32768
+4     1.421: readserial: dev=4 n=32768
+5     1.421: readserial: exit dev=4 nr=0
+4     1.421: strread: n=1024
+4     1.421: readtcpsvr: state=1
+4     1.421: waittcpsvr: sock=5 state=1
+4     1.421: accsock: sock=5
+4     1.421: updatetcpsvr: state=1
+4     1.421: strread: n=1024
+4     1.431: strread: n=32768
+4     1.431: readserial: dev=4 n=32768
+5     1.431: readserial: exit dev=4 nr=0
+4     1.431: strread: n=1024
+4     1.431: readtcpsvr: state=1
+4     1.431: waittcpsvr: sock=5 state=1
+4     1.431: accsock: sock=5
+4     1.431: updatetcpsvr: state=1
+4     1.431: strread: n=1024
+4     1.441: strread: n=32768
+4     1.442: readserial: dev=4 n=32768
+5     1.442: readserial: exit dev=4 nr=0
+4     1.442: strread: n=1024
+4     1.442: readtcpsvr: state=1
+4     1.442: waittcpsvr: sock=5 state=1
+4     1.442: accsock: sock=5
+4     1.442: updatetcpsvr: state=1
+4     1.442: strread: n=1024
+4     1.451: strread: n=32768
+4     1.451: readserial: dev=4 n=32768
+5     1.451: readserial: exit dev=4 nr=0
+4     1.451: strread: n=1024
+4     1.451: readtcpsvr: state=1
+4     1.451: waittcpsvr: sock=5 state=1
+4     1.451: accsock: sock=5
+4     1.451: updatetcpsvr: state=1
+4     1.451: strread: n=1024
+4     1.462: strread: n=32768
+4     1.462: readserial: dev=4 n=32768
+5     1.462: readserial: exit dev=4 nr=0
+4     1.462: strread: n=1024
+4     1.462: readtcpsvr: state=1
+4     1.462: waittcpsvr: sock=5 state=1
+4     1.462: accsock: sock=5
+4     1.462: updatetcpsvr: state=1
+4     1.462: strread: n=1024
+4     1.471: strread: n=32768
+4     1.471: readserial: dev=4 n=32768
+5     1.471: readserial: exit dev=4 nr=0
+4     1.471: strread: n=1024
+4     1.471: readtcpsvr: state=1
+4     1.471: waittcpsvr: sock=5 state=1
+4     1.471: accsock: sock=5
+4     1.471: updatetcpsvr: state=1
+4     1.471: strread: n=1024
+4     1.481: strread: n=32768
+4     1.481: readserial: dev=4 n=32768
+5     1.481: readserial: exit dev=4 nr=0
+4     1.481: strread: n=1024
+4     1.481: readtcpsvr: state=1
+4     1.481: waittcpsvr: sock=5 state=1
+4     1.481: accsock: sock=5
+4     1.482: updatetcpsvr: state=1
+4     1.482: strread: n=1024
+4     1.491: strread: n=32768
+4     1.491: readserial: dev=4 n=32768
+5     1.491: readserial: exit dev=4 nr=0
+4     1.491: strread: n=1024
+4     1.491: readtcpsvr: state=1
+4     1.491: waittcpsvr: sock=5 state=1
+4     1.491: accsock: sock=5
+4     1.491: updatetcpsvr: state=1
+4     1.491: strread: n=1024
+4     1.501: strread: n=32768
+4     1.501: readserial: dev=4 n=32768
+5     1.501: readserial: exit dev=4 nr=0
+4     1.501: strread: n=1024
+4     1.501: readtcpsvr: state=1
+4     1.501: waittcpsvr: sock=5 state=1
+4     1.501: accsock: sock=5
+4     1.501: updatetcpsvr: state=1
+4     1.501: strread: n=1024
+4     1.512: strread: n=32768
+4     1.512: readserial: dev=4 n=32768
+5     1.512: readserial: exit dev=4 nr=0
+4     1.512: strread: n=1024
+4     1.512: readtcpsvr: state=1
+4     1.512: waittcpsvr: sock=5 state=1
+4     1.512: accsock: sock=5
+4     1.512: updatetcpsvr: state=1
+4     1.512: strread: n=1024
+4     1.522: strread: n=32768
+4     1.522: readserial: dev=4 n=32768
+5     1.522: readserial: exit dev=4 nr=0
+4     1.522: strread: n=1024
+4     1.522: readtcpsvr: state=1
+4     1.522: waittcpsvr: sock=5 state=1
+4     1.522: accsock: sock=5
+4     1.522: updatetcpsvr: state=1
+4     1.522: strread: n=1024
+4     1.532: strread: n=32768
+4     1.532: readserial: dev=4 n=32768
+5     1.532: readserial: exit dev=4 nr=0
+4     1.532: strread: n=1024
+4     1.532: readtcpsvr: state=1
+4     1.532: waittcpsvr: sock=5 state=1
+4     1.532: accsock: sock=5
+4     1.532: updatetcpsvr: state=1
+4     1.532: strread: n=1024
+4     1.542: strread: n=32768
+4     1.542: readserial: dev=4 n=32768
+5     1.542: readserial: exit dev=4 nr=0
+4     1.542: strread: n=1024
+4     1.542: readtcpsvr: state=1
+4     1.542: waittcpsvr: sock=5 state=1
+4     1.542: accsock: sock=5
+4     1.542: updatetcpsvr: state=1
+4     1.542: strread: n=1024
+4     1.552: strread: n=32768
+4     1.552: readserial: dev=4 n=32768
+5     1.552: readserial: exit dev=4 nr=0
+4     1.552: strread: n=1024
+4     1.552: readtcpsvr: state=1
+4     1.552: waittcpsvr: sock=5 state=1
+4     1.552: accsock: sock=5
+4     1.552: updatetcpsvr: state=1
+4     1.552: strread: n=1024
+4     1.563: strread: n=32768
+4     1.563: readserial: dev=4 n=32768
+5     1.563: readserial: exit dev=4 nr=0
+4     1.563: strread: n=1024
+4     1.563: readtcpsvr: state=1
+4     1.563: waittcpsvr: sock=5 state=1
+4     1.563: accsock: sock=5
+4     1.563: updatetcpsvr: state=1
+4     1.563: strread: n=1024
+4     1.573: strread: n=32768
+4     1.573: readserial: dev=4 n=32768
+5     1.573: readserial: exit dev=4 nr=0
+4     1.573: strread: n=1024
+4     1.573: readtcpsvr: state=1
+4     1.573: waittcpsvr: sock=5 state=1
+4     1.573: accsock: sock=5
+4     1.573: updatetcpsvr: state=1
+4     1.573: strread: n=1024
+4     1.583: strread: n=32768
+4     1.583: readserial: dev=4 n=32768
+5     1.583: readserial: exit dev=4 nr=0
+4     1.583: strread: n=1024
+4     1.584: readtcpsvr: state=1
+4     1.584: waittcpsvr: sock=5 state=1
+4     1.584: accsock: sock=5
+4     1.584: updatetcpsvr: state=1
+4     1.584: strread: n=1024
+4     1.593: strread: n=32768
+4     1.593: readserial: dev=4 n=32768
+5     1.593: readserial: exit dev=4 nr=0
+4     1.593: strread: n=1024
+4     1.593: readtcpsvr: state=1
+4     1.593: waittcpsvr: sock=5 state=1
+4     1.593: accsock: sock=5
+4     1.593: updatetcpsvr: state=1
+4     1.593: strread: n=1024
+4     1.603: strread: n=32768
+4     1.603: readserial: dev=4 n=32768
+5     1.603: readserial: exit dev=4 nr=0
+4     1.603: strread: n=1024
+4     1.603: readtcpsvr: state=1
+4     1.603: waittcpsvr: sock=5 state=1
+4     1.603: accsock: sock=5
+4     1.603: updatetcpsvr: state=1
+4     1.603: strread: n=1024
+4     1.614: strread: n=32768
+4     1.614: readserial: dev=4 n=32768
+5     1.614: readserial: exit dev=4 nr=0
+4     1.614: strread: n=1024
+4     1.614: readtcpsvr: state=1
+4     1.614: waittcpsvr: sock=5 state=1
+4     1.614: accsock: sock=5
+4     1.614: updatetcpsvr: state=1
+4     1.614: strread: n=1024
+4     1.624: strread: n=32768
+4     1.624: readserial: dev=4 n=32768
+5     1.624: readserial: exit dev=4 nr=0
+4     1.624: strread: n=1024
+4     1.624: readtcpsvr: state=1
+4     1.624: waittcpsvr: sock=5 state=1
+4     1.624: accsock: sock=5
+4     1.624: updatetcpsvr: state=1
+4     1.624: strread: n=1024
+4     1.634: strread: n=32768
+4     1.634: readserial: dev=4 n=32768
+5     1.634: readserial: exit dev=4 nr=0
+4     1.634: strread: n=1024
+4     1.634: readtcpsvr: state=1
+4     1.634: waittcpsvr: sock=5 state=1
+4     1.634: accsock: sock=5
+4     1.634: updatetcpsvr: state=1
+4     1.634: strread: n=1024
+4     1.644: strread: n=32768
+4     1.644: readserial: dev=4 n=32768
+5     1.644: readserial: exit dev=4 nr=0
+4     1.645: strread: n=1024
+4     1.645: readtcpsvr: state=1
+4     1.645: waittcpsvr: sock=5 state=1
+4     1.645: accsock: sock=5
+4     1.645: updatetcpsvr: state=1
+4     1.645: strread: n=1024
+4     1.654: strread: n=32768
+4     1.654: readserial: dev=4 n=32768
+5     1.654: readserial: exit dev=4 nr=0
+4     1.654: strread: n=1024
+4     1.654: readtcpsvr: state=1
+4     1.654: waittcpsvr: sock=5 state=1
+4     1.654: accsock: sock=5
+4     1.654: updatetcpsvr: state=1
+4     1.654: strread: n=1024
+4     1.664: strread: n=32768
+4     1.664: readserial: dev=4 n=32768
+5     1.664: readserial: exit dev=4 nr=0
+4     1.664: strread: n=1024
+4     1.664: readtcpsvr: state=1
+4     1.664: waittcpsvr: sock=5 state=1
+4     1.664: accsock: sock=5
+4     1.664: updatetcpsvr: state=1
+4     1.664: strread: n=1024
+4     1.674: strread: n=32768
+4     1.674: readserial: dev=4 n=32768
+5     1.674: readserial: exit dev=4 nr=0
+4     1.674: strread: n=1024
+4     1.674: readtcpsvr: state=1
+4     1.674: waittcpsvr: sock=5 state=1
+4     1.674: accsock: sock=5
+4     1.674: updatetcpsvr: state=1
+4     1.674: strread: n=1024
+4     1.684: strread: n=32768
+4     1.684: readserial: dev=4 n=32768
+5     1.684: readserial: exit dev=4 nr=0
+4     1.684: strread: n=1024
+4     1.684: readtcpsvr: state=1
+4     1.685: waittcpsvr: sock=5 state=1
+4     1.685: accsock: sock=5
+4     1.685: updatetcpsvr: state=1
+4     1.685: strread: n=1024
+4     1.694: strread: n=32768
+4     1.694: readserial: dev=4 n=32768
+5     1.694: readserial: exit dev=4 nr=0
+4     1.694: strread: n=1024
+4     1.694: readtcpsvr: state=1
+4     1.694: waittcpsvr: sock=5 state=1
+4     1.694: accsock: sock=5
+4     1.694: updatetcpsvr: state=1
+4     1.694: strread: n=1024
+4     1.704: strread: n=32768
+4     1.704: readserial: dev=4 n=32768
+5     1.704: readserial: exit dev=4 nr=0
+4     1.704: strread: n=1024
+4     1.704: readtcpsvr: state=1
+4     1.704: waittcpsvr: sock=5 state=1
+4     1.704: accsock: sock=5
+4     1.704: updatetcpsvr: state=1
+4     1.704: strread: n=1024
+4     1.714: strread: n=32768
+4     1.714: readserial: dev=4 n=32768
+5     1.714: readserial: exit dev=4 nr=0
+4     1.714: strread: n=1024
+4     1.714: readtcpsvr: state=1
+4     1.714: waittcpsvr: sock=5 state=1
+4     1.714: accsock: sock=5
+4     1.714: updatetcpsvr: state=1
+4     1.714: strread: n=1024
+4     1.724: strread: n=32768
+4     1.724: readserial: dev=4 n=32768
+5     1.724: readserial: exit dev=4 nr=0
+4     1.724: strread: n=1024
+4     1.724: readtcpsvr: state=1
+4     1.724: waittcpsvr: sock=5 state=1
+4     1.724: accsock: sock=5
+4     1.724: updatetcpsvr: state=1
+4     1.724: strread: n=1024
+4     1.735: strread: n=32768
+4     1.735: readserial: dev=4 n=32768
+5     1.735: readserial: exit dev=4 nr=0
+4     1.735: strread: n=1024
+4     1.735: readtcpsvr: state=1
+4     1.735: waittcpsvr: sock=5 state=1
+4     1.735: accsock: sock=5
+4     1.735: updatetcpsvr: state=1
+4     1.735: strread: n=1024
+4     1.745: strread: n=32768
+4     1.745: readserial: dev=4 n=32768
+5     1.745: readserial: exit dev=4 nr=0
+4     1.745: strread: n=1024
+4     1.745: readtcpsvr: state=1
+4     1.745: waittcpsvr: sock=5 state=1
+4     1.745: accsock: sock=5
+4     1.745: updatetcpsvr: state=1
+4     1.745: strread: n=1024
+4     1.755: strread: n=32768
+4     1.755: readserial: dev=4 n=32768
+5     1.755: readserial: exit dev=4 nr=0
+4     1.755: strread: n=1024
+4     1.755: readtcpsvr: state=1
+4     1.755: waittcpsvr: sock=5 state=1
+4     1.755: accsock: sock=5
+4     1.755: updatetcpsvr: state=1
+4     1.756: strread: n=1024
+4     1.765: strread: n=32768
+4     1.765: readserial: dev=4 n=32768
+5     1.765: readserial: exit dev=4 nr=0
+4     1.765: strread: n=1024
+4     1.765: readtcpsvr: state=1
+4     1.765: waittcpsvr: sock=5 state=1
+4     1.765: accsock: sock=5
+4     1.765: updatetcpsvr: state=1
+4     1.765: strread: n=1024
+4     1.775: strread: n=32768
+4     1.775: readserial: dev=4 n=32768
+5     1.775: readserial: exit dev=4 nr=0
+4     1.775: strread: n=1024
+4     1.775: readtcpsvr: state=1
+4     1.775: waittcpsvr: sock=5 state=1
+4     1.775: accsock: sock=5
+4     1.775: updatetcpsvr: state=1
+4     1.775: strread: n=1024
+4     1.786: strread: n=32768
+4     1.786: readserial: dev=4 n=32768
+5     1.786: readserial: exit dev=4 nr=0
+4     1.786: strread: n=1024
+4     1.786: readtcpsvr: state=1
+4     1.786: waittcpsvr: sock=5 state=1
+4     1.786: accsock: sock=5
+4     1.786: updatetcpsvr: state=1
+4     1.786: strread: n=1024
+4     1.796: strread: n=32768
+4     1.796: readserial: dev=4 n=32768
+5     1.796: readserial: exit dev=4 nr=0
+4     1.796: strread: n=1024
+4     1.796: readtcpsvr: state=1
+4     1.796: waittcpsvr: sock=5 state=1
+4     1.796: accsock: sock=5
+4     1.796: updatetcpsvr: state=1
+4     1.796: strread: n=1024
+4     1.806: strread: n=32768
+4     1.807: readserial: dev=4 n=32768
+5     1.807: readserial: exit dev=4 nr=0
+4     1.807: strread: n=1024
+4     1.807: readtcpsvr: state=1
+4     1.807: waittcpsvr: sock=5 state=1
+4     1.807: accsock: sock=5
+4     1.807: updatetcpsvr: state=1
+4     1.807: strread: n=1024
+4     1.816: strread: n=32768
+4     1.816: readserial: dev=4 n=32768
+5     1.816: readserial: exit dev=4 nr=0
+4     1.816: strread: n=1024
+4     1.816: readtcpsvr: state=1
+4     1.816: waittcpsvr: sock=5 state=1
+4     1.816: accsock: sock=5
+4     1.816: updatetcpsvr: state=1
+4     1.816: strread: n=1024
+4     1.826: strread: n=32768
+4     1.826: readserial: dev=4 n=32768
+5     1.826: readserial: exit dev=4 nr=0
+4     1.826: strread: n=1024
+4     1.826: readtcpsvr: state=1
+4     1.826: waittcpsvr: sock=5 state=1
+4     1.826: accsock: sock=5
+4     1.826: updatetcpsvr: state=1
+4     1.826: strread: n=1024
+4     1.837: strread: n=32768
+4     1.837: readserial: dev=4 n=32768
+5     1.837: readserial: exit dev=4 nr=0
+4     1.837: strread: n=1024
+4     1.837: readtcpsvr: state=1
+4     1.837: waittcpsvr: sock=5 state=1
+4     1.837: accsock: sock=5
+4     1.837: updatetcpsvr: state=1
+4     1.837: strread: n=1024
+4     1.847: strread: n=32768
+4     1.847: readserial: dev=4 n=32768
+5     1.847: readserial: exit dev=4 nr=0
+4     1.847: strread: n=1024
+4     1.847: readtcpsvr: state=1
+4     1.847: waittcpsvr: sock=5 state=1
+4     1.847: accsock: sock=5
+4     1.847: updatetcpsvr: state=1
+4     1.847: strread: n=1024
+4     1.858: strread: n=32768
+4     1.858: readserial: dev=4 n=32768
+5     1.858: readserial: exit dev=4 nr=0
+4     1.858: strread: n=1024
+4     1.858: readtcpsvr: state=1
+4     1.858: waittcpsvr: sock=5 state=1
+4     1.858: accsock: sock=5
+4     1.858: updatetcpsvr: state=1
+4     1.858: strread: n=1024
+4     1.868: strread: n=32768
+4     1.868: readserial: dev=4 n=32768
+5     1.868: readserial: exit dev=4 nr=0
+4     1.868: strread: n=1024
+4     1.868: readtcpsvr: state=1
+4     1.868: waittcpsvr: sock=5 state=1
+4     1.868: accsock: sock=5
+4     1.868: updatetcpsvr: state=1
+4     1.868: strread: n=1024
+4     1.878: strread: n=32768
+4     1.878: readserial: dev=4 n=32768
+5     1.878: readserial: exit dev=4 nr=0
+4     1.878: strread: n=1024
+4     1.878: readtcpsvr: state=1
+4     1.878: waittcpsvr: sock=5 state=1
+4     1.878: accsock: sock=5
+4     1.878: updatetcpsvr: state=1
+4     1.878: strread: n=1024
+4     1.889: strread: n=32768
+4     1.889: readserial: dev=4 n=32768
+5     1.889: readserial: exit dev=4 nr=0
+4     1.889: strread: n=1024
+4     1.889: readtcpsvr: state=1
+4     1.889: waittcpsvr: sock=5 state=1
+4     1.889: accsock: sock=5
+4     1.889: updatetcpsvr: state=1
+4     1.889: strread: n=1024
+4     1.899: strread: n=32768
+4     1.899: readserial: dev=4 n=32768
+5     1.899: readserial: exit dev=4 nr=0
+4     1.899: strread: n=1024
+4     1.899: readtcpsvr: state=1
+4     1.899: waittcpsvr: sock=5 state=1
+4     1.899: accsock: sock=5
+4     1.899: updatetcpsvr: state=1
+4     1.899: strread: n=1024
+4     1.909: strread: n=32768
+4     1.909: readserial: dev=4 n=32768
+5     1.909: readserial: exit dev=4 nr=0
+4     1.909: strread: n=1024
+4     1.909: readtcpsvr: state=1
+4     1.909: waittcpsvr: sock=5 state=1
+4     1.909: accsock: sock=5
+4     1.909: updatetcpsvr: state=1
+4     1.909: strread: n=1024
+4     1.919: strread: n=32768
+4     1.919: readserial: dev=4 n=32768
+5     1.919: readserial: exit dev=4 nr=0
+4     1.919: strread: n=1024
+4     1.919: readtcpsvr: state=1
+4     1.919: waittcpsvr: sock=5 state=1
+4     1.920: accsock: sock=5
+4     1.920: updatetcpsvr: state=1
+4     1.920: strread: n=1024
+4     1.929: strread: n=32768
+4     1.929: readserial: dev=4 n=32768
+5     1.929: readserial: exit dev=4 nr=0
+4     1.929: strread: n=1024
+4     1.929: readtcpsvr: state=1
+4     1.929: waittcpsvr: sock=5 state=1
+4     1.929: accsock: sock=5
+4     1.929: updatetcpsvr: state=1
+4     1.929: strread: n=1024
+4     1.939: strread: n=32768
+4     1.939: readserial: dev=4 n=32768
+5     1.939: readserial: exit dev=4 nr=0
+4     1.939: strread: n=1024
+4     1.939: readtcpsvr: state=1
+4     1.939: waittcpsvr: sock=5 state=1
+4     1.939: accsock: sock=5
+4     1.939: updatetcpsvr: state=1
+4     1.939: strread: n=1024
+4     1.950: strread: n=32768
+4     1.950: readserial: dev=4 n=32768
+5     1.950: readserial: exit dev=4 nr=0
+4     1.950: strread: n=1024
+4     1.950: readtcpsvr: state=1
+4     1.950: waittcpsvr: sock=5 state=1
+4     1.950: accsock: sock=5
+4     1.950: updatetcpsvr: state=1
+4     1.950: strread: n=1024
+4     1.960: strread: n=32768
+4     1.960: readserial: dev=4 n=32768
+5     1.960: readserial: exit dev=4 nr=0
+4     1.960: strread: n=1024
+4     1.960: readtcpsvr: state=1
+4     1.960: waittcpsvr: sock=5 state=1
+4     1.960: accsock: sock=5
+4     1.960: updatetcpsvr: state=1
+4     1.960: strread: n=1024
+4     1.970: strread: n=32768
+4     1.970: readserial: dev=4 n=32768
+5     1.970: readserial: exit dev=4 nr=0
+4     1.970: strread: n=1024
+4     1.970: readtcpsvr: state=1
+4     1.970: waittcpsvr: sock=5 state=1
+4     1.970: accsock: sock=5
+4     1.970: updatetcpsvr: state=1
+4     1.970: strread: n=1024
+4     1.981: strread: n=32768
+4     1.981: readserial: dev=4 n=32768
+5     1.981: readserial: exit dev=4 nr=0
+4     1.981: strread: n=1024
+4     1.981: readtcpsvr: state=1
+4     1.981: waittcpsvr: sock=5 state=1
+4     1.981: accsock: sock=5
+4     1.981: updatetcpsvr: state=1
+4     1.981: strread: n=1024
+4     1.991: strread: n=32768
+4     1.991: readserial: dev=4 n=32768
+5     1.991: readserial: exit dev=4 nr=0
+4     1.991: strread: n=1024
+4     1.991: readtcpsvr: state=1
+4     1.991: waittcpsvr: sock=5 state=1
+4     1.991: accsock: sock=5
+4     1.991: updatetcpsvr: state=1
+4     1.991: strread: n=1024
+4     2.001: strread: n=32768
+4     2.001: readserial: dev=4 n=32768
+5     2.001: readserial: exit dev=4 nr=0
+4     2.001: strread: n=1024
+4     2.001: readtcpsvr: state=1
+4     2.001: waittcpsvr: sock=5 state=1
+4     2.001: accsock: sock=5
+4     2.001: updatetcpsvr: state=1
+4     2.001: strread: n=1024
+4     2.011: strread: n=32768
+4     2.011: readserial: dev=4 n=32768
+5     2.011: readserial: exit dev=4 nr=0
+4     2.012: strread: n=1024
+4     2.012: readtcpsvr: state=1
+4     2.012: waittcpsvr: sock=5 state=1
+4     2.012: accsock: sock=5
+4     2.012: updatetcpsvr: state=1
+4     2.012: strread: n=1024
+4     2.021: strread: n=32768
+4     2.021: readserial: dev=4 n=32768
+5     2.021: readserial: exit dev=4 nr=0
+4     2.021: strread: n=1024
+4     2.021: readtcpsvr: state=1
+4     2.021: waittcpsvr: sock=5 state=1
+4     2.021: accsock: sock=5
+4     2.021: updatetcpsvr: state=1
+4     2.021: strread: n=1024
+4     2.031: strread: n=32768
+4     2.031: readserial: dev=4 n=32768
+5     2.031: readserial: exit dev=4 nr=0
+4     2.031: strread: n=1024
+4     2.031: readtcpsvr: state=1
+4     2.031: waittcpsvr: sock=5 state=1
+4     2.032: accsock: sock=5
+4     2.032: updatetcpsvr: state=1
+4     2.032: strread: n=1024
+4     2.041: strread: n=32768
+4     2.041: readserial: dev=4 n=32768
+5     2.041: readserial: exit dev=4 nr=0
+4     2.041: strread: n=1024
+4     2.041: readtcpsvr: state=1
+4     2.041: waittcpsvr: sock=5 state=1
+4     2.041: accsock: sock=5
+4     2.041: updatetcpsvr: state=1
+4     2.041: strread: n=1024
+4     2.051: strread: n=32768
+4     2.051: readserial: dev=4 n=32768
+5     2.051: readserial: exit dev=4 nr=0
+4     2.051: strread: n=1024
+4     2.051: readtcpsvr: state=1
+4     2.051: waittcpsvr: sock=5 state=1
+4     2.051: accsock: sock=5
+4     2.051: updatetcpsvr: state=1
+4     2.051: strread: n=1024
+4     2.062: strread: n=32768
+4     2.062: readserial: dev=4 n=32768
+5     2.062: readserial: exit dev=4 nr=0
+4     2.062: strread: n=1024
+4     2.062: readtcpsvr: state=1
+4     2.062: waittcpsvr: sock=5 state=1
+4     2.062: accsock: sock=5
+4     2.062: updatetcpsvr: state=1
+4     2.062: strread: n=1024
+4     2.072: strread: n=32768
+4     2.072: readserial: dev=4 n=32768
+5     2.072: readserial: exit dev=4 nr=0
+4     2.072: strread: n=1024
+4     2.072: readtcpsvr: state=1
+4     2.072: waittcpsvr: sock=5 state=1
+4     2.072: accsock: sock=5
+4     2.072: updatetcpsvr: state=1
+4     2.072: strread: n=1024
+4     2.082: strread: n=32768
+4     2.082: readserial: dev=4 n=32768
+5     2.082: readserial: exit dev=4 nr=0
+4     2.082: strread: n=1024
+4     2.082: readtcpsvr: state=1
+4     2.082: waittcpsvr: sock=5 state=1
+4     2.082: accsock: sock=5
+4     2.082: updatetcpsvr: state=1
+4     2.082: strread: n=1024
+4     2.092: strread: n=32768
+4     2.092: readserial: dev=4 n=32768
+5     2.093: readserial: exit dev=4 nr=0
+4     2.093: strread: n=1024
+4     2.093: readtcpsvr: state=1
+4     2.093: waittcpsvr: sock=5 state=1
+4     2.093: accsock: sock=5
+4     2.093: updatetcpsvr: state=1
+4     2.093: strread: n=1024
+4     2.102: strread: n=32768
+4     2.102: readserial: dev=4 n=32768
+5     2.102: readserial: exit dev=4 nr=0
+4     2.102: strread: n=1024
+4     2.102: readtcpsvr: state=1
+4     2.102: waittcpsvr: sock=5 state=1
+4     2.102: accsock: sock=5
+4     2.102: updatetcpsvr: state=1
+4     2.102: strread: n=1024
+4     2.112: strread: n=32768
+4     2.112: readserial: dev=4 n=32768
+5     2.112: readserial: exit dev=4 nr=0
+4     2.112: strread: n=1024
+4     2.112: readtcpsvr: state=1
+4     2.112: waittcpsvr: sock=5 state=1
+4     2.112: accsock: sock=5
+4     2.112: updatetcpsvr: state=1
+4     2.112: strread: n=1024
+4     2.123: strread: n=32768
+4     2.123: readserial: dev=4 n=32768
+5     2.123: readserial: exit dev=4 nr=0
+4     2.123: strread: n=1024
+4     2.123: readtcpsvr: state=1
+4     2.123: waittcpsvr: sock=5 state=1
+4     2.123: accsock: sock=5
+4     2.123: updatetcpsvr: state=1
+4     2.123: strread: n=1024
+4     2.133: strread: n=32768
+4     2.133: readserial: dev=4 n=32768
+5     2.133: readserial: exit dev=4 nr=0
+4     2.133: strread: n=1024
+4     2.133: readtcpsvr: state=1
+4     2.133: waittcpsvr: sock=5 state=1
+4     2.133: accsock: sock=5
+4     2.133: updatetcpsvr: state=1
+4     2.133: strread: n=1024
+4     2.143: strread: n=32768
+4     2.143: readserial: dev=4 n=32768
+5     2.143: readserial: exit dev=4 nr=0
+4     2.143: strread: n=1024
+4     2.143: readtcpsvr: state=1
+4     2.143: waittcpsvr: sock=5 state=1
+4     2.143: accsock: sock=5
+4     2.143: updatetcpsvr: state=1
+4     2.143: strread: n=1024
+4     2.154: strread: n=32768
+4     2.154: readserial: dev=4 n=32768
+5     2.154: readserial: exit dev=4 nr=0
+4     2.154: strread: n=1024
+4     2.154: readtcpsvr: state=1
+4     2.154: waittcpsvr: sock=5 state=1
+4     2.154: accsock: sock=5
+4     2.154: updatetcpsvr: state=1
+4     2.154: strread: n=1024
+4     2.164: strread: n=32768
+4     2.164: readserial: dev=4 n=32768
+5     2.164: readserial: exit dev=4 nr=0
+4     2.164: strread: n=1024
+4     2.164: readtcpsvr: state=1
+4     2.164: waittcpsvr: sock=5 state=1
+4     2.164: accsock: sock=5
+4     2.164: updatetcpsvr: state=1
+4     2.164: strread: n=1024
+4     2.174: strread: n=32768
+4     2.174: readserial: dev=4 n=32768
+5     2.174: readserial: exit dev=4 nr=0
+4     2.174: strread: n=1024
+4     2.174: readtcpsvr: state=1
+4     2.174: waittcpsvr: sock=5 state=1
+4     2.174: accsock: sock=5
+4     2.174: updatetcpsvr: state=1
+4     2.174: strread: n=1024
+4     2.184: strread: n=32768
+4     2.184: readserial: dev=4 n=32768
+5     2.185: readserial: exit dev=4 nr=0
+4     2.185: strread: n=1024
+4     2.185: readtcpsvr: state=1
+4     2.185: waittcpsvr: sock=5 state=1
+4     2.185: accsock: sock=5
+4     2.185: updatetcpsvr: state=1
+4     2.185: strread: n=1024
+4     2.194: strread: n=32768
+4     2.194: readserial: dev=4 n=32768
+5     2.194: readserial: exit dev=4 nr=0
+4     2.194: strread: n=1024
+4     2.194: readtcpsvr: state=1
+4     2.194: waittcpsvr: sock=5 state=1
+4     2.194: accsock: sock=5
+4     2.194: updatetcpsvr: state=1
+4     2.194: strread: n=1024
+4     2.204: strread: n=32768
+4     2.204: readserial: dev=4 n=32768
+5     2.204: readserial: exit dev=4 nr=0
+4     2.204: strread: n=1024
+4     2.204: readtcpsvr: state=1
+4     2.204: waittcpsvr: sock=5 state=1
+4     2.204: accsock: sock=5
+4     2.204: updatetcpsvr: state=1
+4     2.204: strread: n=1024
+4     2.215: strread: n=32768
+4     2.215: readserial: dev=4 n=32768
+5     2.215: readserial: exit dev=4 nr=0
+4     2.215: strread: n=1024
+4     2.215: readtcpsvr: state=1
+4     2.215: waittcpsvr: sock=5 state=1
+4     2.215: accsock: sock=5
+4     2.215: updatetcpsvr: state=1
+4     2.215: strread: n=1024
+4     2.225: strread: n=32768
+4     2.225: readserial: dev=4 n=32768
+5     2.225: readserial: exit dev=4 nr=0
+4     2.225: strread: n=1024
+4     2.225: readtcpsvr: state=1
+4     2.225: waittcpsvr: sock=5 state=1
+4     2.225: accsock: sock=5
+4     2.225: updatetcpsvr: state=1
+4     2.225: strread: n=1024
+4     2.235: strread: n=32768
+4     2.235: readserial: dev=4 n=32768
+5     2.235: readserial: exit dev=4 nr=0
+4     2.235: strread: n=1024
+4     2.235: readtcpsvr: state=1
+4     2.235: waittcpsvr: sock=5 state=1
+4     2.235: accsock: sock=5
+4     2.235: updatetcpsvr: state=1
+4     2.235: strread: n=1024
+4     2.246: strread: n=32768
+4     2.246: readserial: dev=4 n=32768
+5     2.246: readserial: exit dev=4 nr=0
+4     2.246: strread: n=1024
+4     2.246: readtcpsvr: state=1
+4     2.246: waittcpsvr: sock=5 state=1
+4     2.246: accsock: sock=5
+4     2.246: updatetcpsvr: state=1
+4     2.246: strread: n=1024
+4     2.256: strread: n=32768
+4     2.256: readserial: dev=4 n=32768
+5     2.256: readserial: exit dev=4 nr=0
+4     2.256: strread: n=1024
+4     2.256: readtcpsvr: state=1
+4     2.256: waittcpsvr: sock=5 state=1
+4     2.256: accsock: sock=5
+4     2.256: updatetcpsvr: state=1
+4     2.256: strread: n=1024
+4     2.266: strread: n=32768
+4     2.266: readserial: dev=4 n=32768
+5     2.266: readserial: exit dev=4 nr=0
+4     2.266: strread: n=1024
+4     2.266: readtcpsvr: state=1
+4     2.266: waittcpsvr: sock=5 state=1
+4     2.266: accsock: sock=5
+4     2.266: updatetcpsvr: state=1
+4     2.266: strread: n=1024
+4     2.276: strread: n=32768
+4     2.276: readserial: dev=4 n=32768
+5     2.276: readserial: exit dev=4 nr=0
+4     2.276: strread: n=1024
+4     2.276: readtcpsvr: state=1
+4     2.276: waittcpsvr: sock=5 state=1
+4     2.276: accsock: sock=5
+4     2.276: updatetcpsvr: state=1
+4     2.276: strread: n=1024
+4     2.287: strread: n=32768
+4     2.287: readserial: dev=4 n=32768
+5     2.287: readserial: exit dev=4 nr=0
+4     2.287: strread: n=1024
+4     2.287: readtcpsvr: state=1
+4     2.287: waittcpsvr: sock=5 state=1
+4     2.287: accsock: sock=5
+4     2.287: updatetcpsvr: state=1
+4     2.287: strread: n=1024
+4     2.296: strread: n=32768
+4     2.296: readserial: dev=4 n=32768
+5     2.296: readserial: exit dev=4 nr=0
+4     2.296: strread: n=1024
+4     2.296: readtcpsvr: state=1
+4     2.296: waittcpsvr: sock=5 state=1
+4     2.296: accsock: sock=5
+4     2.296: updatetcpsvr: state=1
+4     2.296: strread: n=1024
+4     2.306: strread: n=32768
+4     2.306: readserial: dev=4 n=32768
+5     2.306: readserial: exit dev=4 nr=0
+4     2.306: strread: n=1024
+4     2.306: readtcpsvr: state=1
+4     2.306: waittcpsvr: sock=5 state=1
+4     2.306: accsock: sock=5
+4     2.306: updatetcpsvr: state=1
+4     2.306: strread: n=1024
+4     2.317: strread: n=32768
+4     2.317: readserial: dev=4 n=32768
+5     2.317: readserial: exit dev=4 nr=0
+4     2.317: strread: n=1024
+4     2.317: readtcpsvr: state=1
+4     2.317: waittcpsvr: sock=5 state=1
+4     2.317: accsock: sock=5
+4     2.317: updatetcpsvr: state=1
+4     2.317: strread: n=1024
+4     2.326: strread: n=32768
+4     2.326: readserial: dev=4 n=32768
+5     2.326: readserial: exit dev=4 nr=0
+4     2.326: strread: n=1024
+4     2.326: readtcpsvr: state=1
+4     2.326: waittcpsvr: sock=5 state=1
+4     2.326: accsock: sock=5
+4     2.326: updatetcpsvr: state=1
+4     2.326: strread: n=1024
+4     2.336: strread: n=32768
+4     2.337: readserial: dev=4 n=32768
+5     2.337: readserial: exit dev=4 nr=0
+4     2.337: strread: n=1024
+4     2.337: readtcpsvr: state=1
+4     2.337: waittcpsvr: sock=5 state=1
+4     2.337: accsock: sock=5
+4     2.337: updatetcpsvr: state=1
+4     2.337: strread: n=1024
+4     2.346: strread: n=32768
+4     2.346: readserial: dev=4 n=32768
+5     2.346: readserial: exit dev=4 nr=0
+4     2.346: strread: n=1024
+4     2.346: readtcpsvr: state=1
+4     2.346: waittcpsvr: sock=5 state=1
+4     2.346: accsock: sock=5
+4     2.346: updatetcpsvr: state=1
+4     2.346: strread: n=1024
+4     2.356: strread: n=32768
+4     2.356: readserial: dev=4 n=32768
+5     2.356: readserial: exit dev=4 nr=0
+4     2.356: strread: n=1024
+4     2.356: readtcpsvr: state=1
+4     2.356: waittcpsvr: sock=5 state=1
+4     2.356: accsock: sock=5
+4     2.356: updatetcpsvr: state=1
+4     2.357: strread: n=1024
+4     2.366: strread: n=32768
+4     2.366: readserial: dev=4 n=32768
+5     2.366: readserial: exit dev=4 nr=0
+4     2.366: strread: n=1024
+4     2.366: readtcpsvr: state=1
+4     2.366: waittcpsvr: sock=5 state=1
+4     2.366: accsock: sock=5
+4     2.366: updatetcpsvr: state=1
+4     2.366: strread: n=1024
+4     2.376: strread: n=32768
+4     2.376: readserial: dev=4 n=32768
+5     2.376: readserial: exit dev=4 nr=0
+4     2.376: strread: n=1024
+4     2.376: readtcpsvr: state=1
+4     2.376: waittcpsvr: sock=5 state=1
+4     2.376: accsock: sock=5
+4     2.376: updatetcpsvr: state=1
+4     2.376: strread: n=1024
+4     2.387: strread: n=32768
+4     2.387: readserial: dev=4 n=32768
+5     2.387: readserial: exit dev=4 nr=0
+4     2.387: strread: n=1024
+4     2.387: readtcpsvr: state=1
+4     2.387: waittcpsvr: sock=5 state=1
+4     2.387: accsock: sock=5
+4     2.387: updatetcpsvr: state=1
+4     2.387: strread: n=1024
+4     2.397: strread: n=32768
+4     2.397: readserial: dev=4 n=32768
+5     2.397: readserial: exit dev=4 nr=0
+4     2.397: strread: n=1024
+4     2.397: readtcpsvr: state=1
+4     2.397: waittcpsvr: sock=5 state=1
+4     2.397: accsock: sock=5
+4     2.397: updatetcpsvr: state=1
+4     2.397: strread: n=1024
+4     2.407: strread: n=32768
+4     2.407: readserial: dev=4 n=32768
+5     2.408: readserial: exit dev=4 nr=0
+4     2.408: strread: n=1024
+4     2.408: readtcpsvr: state=1
+4     2.408: waittcpsvr: sock=5 state=1
+4     2.408: accsock: sock=5
+4     2.408: updatetcpsvr: state=1
+4     2.408: strread: n=1024
+4     2.417: strread: n=32768
+4     2.417: readserial: dev=4 n=32768
+5     2.417: readserial: exit dev=4 nr=0
+4     2.417: strread: n=1024
+4     2.417: readtcpsvr: state=1
+4     2.417: waittcpsvr: sock=5 state=1
+4     2.417: accsock: sock=5
+4     2.417: updatetcpsvr: state=1
+4     2.417: strread: n=1024
+4     2.427: strread: n=32768
+4     2.427: readserial: dev=4 n=32768
+5     2.427: readserial: exit dev=4 nr=0
+4     2.427: strread: n=1024
+4     2.427: readtcpsvr: state=1
+4     2.427: waittcpsvr: sock=5 state=1
+4     2.427: accsock: sock=5
+4     2.427: updatetcpsvr: state=1
+4     2.427: strread: n=1024
+4     2.438: strread: n=32768
+4     2.438: readserial: dev=4 n=32768
+5     2.438: readserial: exit dev=4 nr=0
+4     2.438: strread: n=1024
+4     2.438: readtcpsvr: state=1
+4     2.438: waittcpsvr: sock=5 state=1
+4     2.438: accsock: sock=5
+4     2.438: updatetcpsvr: state=1
+4     2.438: strread: n=1024
+4     2.448: strread: n=32768
+4     2.448: readserial: dev=4 n=32768
+5     2.448: readserial: exit dev=4 nr=0
+4     2.448: strread: n=1024
+4     2.448: readtcpsvr: state=1
+4     2.448: waittcpsvr: sock=5 state=1
+4     2.448: accsock: sock=5
+4     2.448: updatetcpsvr: state=1
+4     2.448: strread: n=1024
+4     2.459: strread: n=32768
+4     2.459: readserial: dev=4 n=32768
+5     2.459: readserial: exit dev=4 nr=0
+4     2.459: strread: n=1024
+4     2.459: readtcpsvr: state=1
+4     2.459: waittcpsvr: sock=5 state=1
+4     2.459: accsock: sock=5
+4     2.459: updatetcpsvr: state=1
+4     2.459: strread: n=1024
+4     2.469: strread: n=32768
+4     2.469: readserial: dev=4 n=32768
+5     2.469: readserial: exit dev=4 nr=0
+4     2.469: strread: n=1024
+4     2.469: readtcpsvr: state=1
+4     2.469: waittcpsvr: sock=5 state=1
+4     2.469: accsock: sock=5
+4     2.469: updatetcpsvr: state=1
+4     2.469: strread: n=1024
+4     2.479: strread: n=32768
+4     2.479: readserial: dev=4 n=32768
+5     2.479: readserial: exit dev=4 nr=0
+4     2.479: strread: n=1024
+4     2.479: readtcpsvr: state=1
+4     2.479: waittcpsvr: sock=5 state=1
+4     2.479: accsock: sock=5
+4     2.479: updatetcpsvr: state=1
+4     2.479: strread: n=1024
+4     2.490: strread: n=32768
+4     2.490: readserial: dev=4 n=32768
+5     2.490: readserial: exit dev=4 nr=0
+4     2.490: strread: n=1024
+4     2.490: readtcpsvr: state=1
+4     2.490: waittcpsvr: sock=5 state=1
+4     2.490: accsock: sock=5
+4     2.490: updatetcpsvr: state=1
+4     2.490: strread: n=1024
+4     2.500: strread: n=32768
+4     2.500: readserial: dev=4 n=32768
+5     2.500: readserial: exit dev=4 nr=0
+4     2.500: strread: n=1024
+4     2.500: readtcpsvr: state=1
+4     2.500: waittcpsvr: sock=5 state=1
+4     2.500: accsock: sock=5
+4     2.500: updatetcpsvr: state=1
+4     2.500: strread: n=1024
+4     2.510: strread: n=32768
+4     2.510: readserial: dev=4 n=32768
+5     2.510: readserial: exit dev=4 nr=0
+4     2.510: strread: n=1024
+4     2.510: readtcpsvr: state=1
+4     2.510: waittcpsvr: sock=5 state=1
+4     2.510: accsock: sock=5
+4     2.510: updatetcpsvr: state=1
+4     2.510: strread: n=1024
+4     2.520: strread: n=32768
+4     2.520: readserial: dev=4 n=32768
+5     2.520: readserial: exit dev=4 nr=0
+4     2.520: strread: n=1024
+4     2.520: readtcpsvr: state=1
+4     2.520: waittcpsvr: sock=5 state=1
+4     2.520: accsock: sock=5
+4     2.520: updatetcpsvr: state=1
+4     2.520: strread: n=1024
+4     2.531: strread: n=32768
+4     2.531: readserial: dev=4 n=32768
+5     2.531: readserial: exit dev=4 nr=0
+4     2.531: strread: n=1024
+4     2.531: readtcpsvr: state=1
+4     2.531: waittcpsvr: sock=5 state=1
+4     2.531: accsock: sock=5
+4     2.531: updatetcpsvr: state=1
+4     2.531: strread: n=1024
+4     2.541: strread: n=32768
+4     2.541: readserial: dev=4 n=32768
+5     2.541: readserial: exit dev=4 nr=0
+4     2.541: strread: n=1024
+4     2.541: readtcpsvr: state=1
+4     2.541: waittcpsvr: sock=5 state=1
+4     2.541: accsock: sock=5
+4     2.541: updatetcpsvr: state=1
+4     2.541: strread: n=1024
+4     2.551: strread: n=32768
+4     2.551: readserial: dev=4 n=32768
+5     2.551: readserial: exit dev=4 nr=0
+4     2.551: strread: n=1024
+4     2.551: readtcpsvr: state=1
+4     2.551: waittcpsvr: sock=5 state=1
+4     2.551: accsock: sock=5
+4     2.551: updatetcpsvr: state=1
+4     2.551: strread: n=1024
+4     2.561: strread: n=32768
+4     2.561: readserial: dev=4 n=32768
+5     2.561: readserial: exit dev=4 nr=0
+4     2.561: strread: n=1024
+4     2.561: readtcpsvr: state=1
+4     2.561: waittcpsvr: sock=5 state=1
+4     2.561: accsock: sock=5
+3     2.561: setsock: sock=6
+3     2.562: accsock: connected sock=6 addr=127.0.0.1 i=0
+4     2.562: accsock: sock=5
+4     2.562: updatetcpsvr: state=1
+4     2.562: strread: n=1024
+4     2.571: strread: n=32768
+4     2.571: readserial: dev=4 n=32768
+5     2.571: readserial: exit dev=4 nr=0
+4     2.571: strread: n=1024
+4     2.571: readtcpsvr: state=2
+4     2.571: waittcpsvr: sock=5 state=2
+4     2.571: accsock: sock=5
+4     2.571: updatetcpsvr: state=2
+4     2.571: strread: n=1024
+4     2.581: strread: n=32768
+4     2.581: readserial: dev=4 n=32768
+5     2.581: readserial: exit dev=4 nr=0
+4     2.581: strread: n=1024
+4     2.581: readtcpsvr: state=2
+4     2.581: waittcpsvr: sock=5 state=2
+4     2.581: accsock: sock=5
+4     2.581: updatetcpsvr: state=2
+4     2.581: strread: n=1024
+4     2.591: strread: n=32768
+4     2.591: readserial: dev=4 n=32768
+5     2.591: readserial: exit dev=4 nr=0
+4     2.591: strread: n=1024
+4     2.591: readtcpsvr: state=2
+4     2.591: waittcpsvr: sock=5 state=2
+4     2.591: accsock: sock=5
+4     2.591: updatetcpsvr: state=2
+4     2.591: strread: n=1024
+4     2.602: strread: n=32768
+4     2.602: readserial: dev=4 n=32768
+5     2.602: readserial: exit dev=4 nr=0
+4     2.602: strread: n=1024
+4     2.602: readtcpsvr: state=2
+4     2.602: waittcpsvr: sock=5 state=2
+4     2.602: accsock: sock=5
+4     2.602: updatetcpsvr: state=2
+4     2.602: strread: n=1024
+4     2.612: strread: n=32768
+4     2.612: readserial: dev=4 n=32768
+5     2.612: readserial: exit dev=4 nr=0
+4     2.612: strread: n=1024
+4     2.612: readtcpsvr: state=2
+4     2.612: waittcpsvr: sock=5 state=2
+4     2.612: accsock: sock=5
+4     2.612: updatetcpsvr: state=2
+4     2.612: strread: n=1024
+4     2.622: strread: n=32768
+4     2.622: readserial: dev=4 n=32768
+5     2.622: readserial: exit dev=4 nr=0
+4     2.622: strread: n=1024
+4     2.622: readtcpsvr: state=2
+4     2.622: waittcpsvr: sock=5 state=2
+4     2.622: accsock: sock=5
+4     2.622: updatetcpsvr: state=2
+4     2.622: strread: n=1024
+4     2.632: strread: n=32768
+4     2.632: readserial: dev=4 n=32768
+5     2.632: readserial: exit dev=4 nr=0
+4     2.632: strread: n=1024
+4     2.632: readtcpsvr: state=2
+4     2.632: waittcpsvr: sock=5 state=2
+4     2.632: accsock: sock=5
+4     2.632: updatetcpsvr: state=2
+4     2.633: strread: n=1024
+4     2.642: strread: n=32768
+4     2.642: readserial: dev=4 n=32768
+5     2.642: readserial: exit dev=4 nr=0
+4     2.642: strread: n=1024
+4     2.642: readtcpsvr: state=2
+4     2.642: waittcpsvr: sock=5 state=2
+4     2.642: accsock: sock=5
+4     2.642: updatetcpsvr: state=2
+4     2.642: strread: n=1024
+4     2.652: strread: n=32768
+4     2.652: readserial: dev=4 n=32768
+5     2.652: readserial: exit dev=4 nr=0
+4     2.652: strread: n=1024
+4     2.652: readtcpsvr: state=2
+4     2.652: waittcpsvr: sock=5 state=2
+4     2.652: accsock: sock=5
+4     2.652: updatetcpsvr: state=2
+4     2.652: strread: n=1024
+4     2.662: strread: n=32768
+4     2.663: readserial: dev=4 n=32768
+5     2.663: readserial: exit dev=4 nr=0
+4     2.663: strread: n=1024
+4     2.663: readtcpsvr: state=2
+4     2.663: waittcpsvr: sock=5 state=2
+4     2.663: accsock: sock=5
+4     2.663: updatetcpsvr: state=2
+4     2.663: strread: n=1024
+4     2.672: strread: n=32768
+4     2.672: readserial: dev=4 n=32768
+5     2.672: readserial: exit dev=4 nr=0
+4     2.672: strread: n=1024
+4     2.672: readtcpsvr: state=2
+4     2.672: waittcpsvr: sock=5 state=2
+4     2.672: accsock: sock=5
+4     2.672: updatetcpsvr: state=2
+4     2.672: strread: n=1024
+4     2.682: strread: n=32768
+4     2.682: readserial: dev=4 n=32768
+5     2.682: readserial: exit dev=4 nr=0
+4     2.682: strread: n=1024
+4     2.682: readtcpsvr: state=2
+4     2.682: waittcpsvr: sock=5 state=2
+4     2.682: accsock: sock=5
+4     2.682: updatetcpsvr: state=2
+4     2.682: strread: n=1024
+4     2.693: strread: n=32768
+4     2.693: readserial: dev=4 n=32768
+5     2.693: readserial: exit dev=4 nr=0
+4     2.693: strread: n=1024
+4     2.693: readtcpsvr: state=2
+4     2.693: waittcpsvr: sock=5 state=2
+4     2.693: accsock: sock=5
+4     2.693: updatetcpsvr: state=2
+4     2.693: strread: n=1024
+4     2.703: strread: n=32768
+4     2.703: readserial: dev=4 n=32768
+5     2.703: readserial: exit dev=4 nr=0
+4     2.703: strread: n=1024
+4     2.703: readtcpsvr: state=2
+4     2.703: waittcpsvr: sock=5 state=2
+4     2.703: accsock: sock=5
+4     2.703: updatetcpsvr: state=2
+4     2.703: strread: n=1024
+4     2.713: strread: n=32768
+4     2.714: readserial: dev=4 n=32768
+5     2.714: readserial: exit dev=4 nr=0
+4     2.714: strread: n=1024
+4     2.714: readtcpsvr: state=2
+4     2.714: waittcpsvr: sock=5 state=2
+4     2.714: accsock: sock=5
+4     2.714: updatetcpsvr: state=2
+4     2.714: strread: n=1024
+4     2.723: strread: n=32768
+4     2.723: readserial: dev=4 n=32768
+5     2.723: readserial: exit dev=4 nr=0
+4     2.723: strread: n=1024
+4     2.723: readtcpsvr: state=2
+4     2.723: waittcpsvr: sock=5 state=2
+4     2.723: accsock: sock=5
+4     2.723: updatetcpsvr: state=2
+4     2.723: strread: n=1024
+4     2.733: strread: n=32768
+4     2.733: readserial: dev=4 n=32768
+5     2.733: readserial: exit dev=4 nr=0
+4     2.733: strread: n=1024
+4     2.733: readtcpsvr: state=2
+4     2.733: waittcpsvr: sock=5 state=2
+4     2.733: accsock: sock=5
+4     2.733: updatetcpsvr: state=2
+4     2.733: strread: n=1024
+4     2.744: strread: n=32768
+4     2.744: readserial: dev=4 n=32768
+5     2.744: readserial: exit dev=4 nr=0
+4     2.744: strread: n=1024
+4     2.744: readtcpsvr: state=2
+4     2.744: waittcpsvr: sock=5 state=2
+4     2.744: accsock: sock=5
+4     2.744: updatetcpsvr: state=2
+4     2.744: strread: n=1024
+4     2.754: strread: n=32768
+4     2.754: readserial: dev=4 n=32768
+5     2.754: readserial: exit dev=4 nr=0
+4     2.754: strread: n=1024
+4     2.754: readtcpsvr: state=2
+4     2.754: waittcpsvr: sock=5 state=2
+4     2.754: accsock: sock=5
+4     2.754: updatetcpsvr: state=2
+4     2.754: strread: n=1024
+4     2.764: strread: n=32768
+4     2.764: readserial: dev=4 n=32768
+5     2.764: readserial: exit dev=4 nr=0
+4     2.764: strread: n=1024
+4     2.764: readtcpsvr: state=2
+4     2.764: waittcpsvr: sock=5 state=2
+4     2.764: accsock: sock=5
+4     2.764: updatetcpsvr: state=2
+4     2.764: strread: n=1024
+4     2.774: strread: n=32768
+4     2.774: readserial: dev=4 n=32768
+5     2.775: readserial: exit dev=4 nr=0
+4     2.775: strread: n=1024
+4     2.775: readtcpsvr: state=2
+4     2.775: waittcpsvr: sock=5 state=2
+4     2.775: accsock: sock=5
+4     2.775: updatetcpsvr: state=2
+4     2.775: strread: n=1024
+4     2.784: strread: n=32768
+4     2.784: readserial: dev=4 n=32768
+5     2.784: readserial: exit dev=4 nr=0
+4     2.784: strread: n=1024
+4     2.784: readtcpsvr: state=2
+4     2.784: waittcpsvr: sock=5 state=2
+4     2.784: accsock: sock=5
+4     2.784: updatetcpsvr: state=2
+4     2.784: strread: n=1024
+4     2.794: strread: n=32768
+4     2.794: readserial: dev=4 n=32768
+5     2.794: readserial: exit dev=4 nr=0
+4     2.794: strread: n=1024
+4     2.794: readtcpsvr: state=2
+4     2.794: waittcpsvr: sock=5 state=2
+4     2.794: accsock: sock=5
+4     2.794: updatetcpsvr: state=2
+4     2.794: strread: n=1024
+4     2.805: strread: n=32768
+4     2.805: readserial: dev=4 n=32768
+5     2.805: readserial: exit dev=4 nr=0
+4     2.805: strread: n=1024
+4     2.805: readtcpsvr: state=2
+4     2.805: waittcpsvr: sock=5 state=2
+4     2.805: accsock: sock=5
+4     2.805: updatetcpsvr: state=2
+4     2.805: strread: n=1024
+4     2.815: strread: n=32768
+4     2.815: readserial: dev=4 n=32768
+5     2.815: readserial: exit dev=4 nr=0
+4     2.815: strread: n=1024
+4     2.815: readtcpsvr: state=2
+4     2.815: waittcpsvr: sock=5 state=2
+4     2.815: accsock: sock=5
+4     2.815: updatetcpsvr: state=2
+4     2.815: strread: n=1024
+4     2.826: strread: n=32768
+4     2.826: readserial: dev=4 n=32768
+5     2.826: readserial: exit dev=4 nr=0
+4     2.826: strread: n=1024
+4     2.826: readtcpsvr: state=2
+4     2.826: waittcpsvr: sock=5 state=2
+4     2.826: accsock: sock=5
+4     2.826: updatetcpsvr: state=2
+4     2.826: strread: n=1024
+4     2.836: strread: n=32768
+4     2.836: readserial: dev=4 n=32768
+5     2.836: readserial: exit dev=4 nr=0
+4     2.836: strread: n=1024
+4     2.836: readtcpsvr: state=2
+4     2.836: waittcpsvr: sock=5 state=2
+4     2.836: accsock: sock=5
+4     2.836: updatetcpsvr: state=2
+4     2.836: strread: n=1024
+4     2.846: strread: n=32768
+4     2.846: readserial: dev=4 n=32768
+5     2.846: readserial: exit dev=4 nr=0
+4     2.846: strread: n=1024
+4     2.846: readtcpsvr: state=2
+4     2.846: waittcpsvr: sock=5 state=2
+4     2.846: accsock: sock=5
+4     2.846: updatetcpsvr: state=2
+4     2.846: strread: n=1024
+4     2.856: strread: n=32768
+4     2.856: readserial: dev=4 n=32768
+5     2.856: readserial: exit dev=4 nr=0
+4     2.856: strread: n=1024
+4     2.856: readtcpsvr: state=2
+4     2.857: waittcpsvr: sock=5 state=2
+4     2.857: accsock: sock=5
+4     2.857: updatetcpsvr: state=2
+4     2.857: strread: n=1024
+4     2.866: strread: n=32768
+4     2.866: readserial: dev=4 n=32768
+5     2.866: readserial: exit dev=4 nr=0
+4     2.866: strread: n=1024
+4     2.866: readtcpsvr: state=2
+4     2.866: waittcpsvr: sock=5 state=2
+4     2.866: accsock: sock=5
+4     2.866: updatetcpsvr: state=2
+4     2.866: strread: n=1024
+4     2.876: strread: n=32768
+4     2.876: readserial: dev=4 n=32768
+5     2.876: readserial: exit dev=4 nr=0
+4     2.876: strread: n=1024
+4     2.876: readtcpsvr: state=2
+4     2.876: waittcpsvr: sock=5 state=2
+4     2.876: accsock: sock=5
+4     2.876: updatetcpsvr: state=2
+4     2.876: strread: n=1024
+4     2.887: strread: n=32768
+4     2.887: readserial: dev=4 n=32768
+5     2.887: readserial: exit dev=4 nr=0
+4     2.887: strread: n=1024
+4     2.887: readtcpsvr: state=2
+4     2.887: waittcpsvr: sock=5 state=2
+4     2.887: accsock: sock=5
+4     2.887: updatetcpsvr: state=2
+4     2.887: strread: n=1024
+4     2.897: strread: n=32768
+4     2.897: readserial: dev=4 n=32768
+5     2.897: readserial: exit dev=4 nr=0
+4     2.897: strread: n=1024
+4     2.897: readtcpsvr: state=2
+4     2.897: waittcpsvr: sock=5 state=2
+4     2.897: accsock: sock=5
+4     2.897: updatetcpsvr: state=2
+4     2.897: strread: n=1024
+4     2.907: strread: n=32768
+4     2.907: readserial: dev=4 n=32768
+5     2.907: readserial: exit dev=4 nr=0
+4     2.907: strread: n=1024
+4     2.907: readtcpsvr: state=2
+4     2.907: waittcpsvr: sock=5 state=2
+4     2.907: accsock: sock=5
+4     2.907: updatetcpsvr: state=2
+4     2.907: strread: n=1024
+4     2.917: strread: n=32768
+4     2.918: readserial: dev=4 n=32768
+5     2.918: readserial: exit dev=4 nr=0
+4     2.918: strread: n=1024
+4     2.918: readtcpsvr: state=2
+4     2.918: waittcpsvr: sock=5 state=2
+4     2.918: accsock: sock=5
+4     2.918: updatetcpsvr: state=2
+4     2.918: strread: n=1024
+4     2.927: strread: n=32768
+4     2.927: readserial: dev=4 n=32768
+5     2.927: readserial: exit dev=4 nr=0
+4     2.927: strread: n=1024
+4     2.927: readtcpsvr: state=2
+4     2.927: waittcpsvr: sock=5 state=2
+4     2.927: accsock: sock=5
+4     2.927: updatetcpsvr: state=2
+4     2.927: strread: n=1024
+4     2.937: strread: n=32768
+4     2.937: readserial: dev=4 n=32768
+5     2.937: readserial: exit dev=4 nr=0
+4     2.937: strread: n=1024
+4     2.937: readtcpsvr: state=2
+4     2.937: waittcpsvr: sock=5 state=2
+4     2.937: accsock: sock=5
+4     2.937: updatetcpsvr: state=2
+4     2.937: strread: n=1024
+4     2.947: strread: n=32768
+4     2.947: readserial: dev=4 n=32768
+5     2.947: readserial: exit dev=4 nr=0
+4     2.947: strread: n=1024
+4     2.947: readtcpsvr: state=2
+4     2.947: waittcpsvr: sock=5 state=2
+4     2.947: accsock: sock=5
+4     2.948: updatetcpsvr: state=2
+4     2.948: strread: n=1024
+4     2.957: strread: n=32768
+4     2.957: readserial: dev=4 n=32768
+5     2.957: readserial: exit dev=4 nr=0
+4     2.957: strread: n=1024
+4     2.957: readtcpsvr: state=2
+4     2.957: waittcpsvr: sock=5 state=2
+4     2.957: accsock: sock=5
+4     2.957: updatetcpsvr: state=2
+4     2.957: strread: n=1024
+4     2.967: strread: n=32768
+4     2.967: readserial: dev=4 n=32768
+5     2.967: readserial: exit dev=4 nr=0
+4     2.967: strread: n=1024
+4     2.967: readtcpsvr: state=2
+4     2.967: waittcpsvr: sock=5 state=2
+4     2.967: accsock: sock=5
+4     2.967: updatetcpsvr: state=2
+4     2.967: strread: n=1024
+4     2.978: strread: n=32768
+4     2.978: readserial: dev=4 n=32768
+5     2.978: readserial: exit dev=4 nr=0
+4     2.978: strread: n=1024
+4     2.978: readtcpsvr: state=2
+4     2.978: waittcpsvr: sock=5 state=2
+4     2.978: accsock: sock=5
+4     2.978: updatetcpsvr: state=2
+4     2.978: strread: n=1024
+4     2.988: strread: n=32768
+4     2.988: readserial: dev=4 n=32768
+5     2.988: readserial: exit dev=4 nr=0
+4     2.988: strread: n=1024
+4     2.988: readtcpsvr: state=2
+4     2.988: waittcpsvr: sock=5 state=2
+4     2.988: accsock: sock=5
+4     2.988: updatetcpsvr: state=2
+4     2.988: strread: n=1024
+4     2.998: strread: n=32768
+4     2.998: readserial: dev=4 n=32768
+5     2.998: readserial: exit dev=4 nr=0
+4     2.998: strread: n=1024
+4     2.998: readtcpsvr: state=2
+4     2.998: waittcpsvr: sock=5 state=2
+4     2.998: accsock: sock=5
+4     2.998: updatetcpsvr: state=2
+4     2.998: strread: n=1024
+4     3.009: strread: n=32768
+4     3.009: readserial: dev=4 n=32768
+5     3.009: readserial: exit dev=4 nr=0
+4     3.009: strread: n=1024
+4     3.009: readtcpsvr: state=2
+4     3.009: waittcpsvr: sock=5 state=2
+4     3.009: accsock: sock=5
+4     3.009: updatetcpsvr: state=2
+4     3.009: strread: n=1024
+4     3.019: strread: n=32768
+4     3.019: readserial: dev=4 n=32768
+5     3.019: readserial: exit dev=4 nr=0
+4     3.019: strread: n=1024
+4     3.019: readtcpsvr: state=2
+4     3.019: waittcpsvr: sock=5 state=2
+4     3.019: accsock: sock=5
+4     3.019: updatetcpsvr: state=2
+4     3.019: strread: n=1024
+4     3.029: strread: n=32768
+4     3.029: readserial: dev=4 n=32768
+5     3.029: readserial: exit dev=4 nr=0
+4     3.029: strread: n=1024
+4     3.029: readtcpsvr: state=2
+4     3.029: waittcpsvr: sock=5 state=2
+4     3.029: accsock: sock=5
+4     3.029: updatetcpsvr: state=2
+4     3.029: strread: n=1024
+4     3.039: strread: n=32768
+4     3.039: readserial: dev=4 n=32768
+5     3.039: readserial: exit dev=4 nr=0
+4     3.039: strread: n=1024
+4     3.039: readtcpsvr: state=2
+4     3.039: waittcpsvr: sock=5 state=2
+4     3.039: accsock: sock=5
+4     3.039: updatetcpsvr: state=2
+4     3.039: strread: n=1024
+4     3.050: strread: n=32768
+4     3.050: readserial: dev=4 n=32768
+5     3.050: readserial: exit dev=4 nr=0
+4     3.050: strread: n=1024
+4     3.050: readtcpsvr: state=2
+4     3.050: waittcpsvr: sock=5 state=2
+4     3.050: accsock: sock=5
+4     3.050: updatetcpsvr: state=2
+4     3.050: strread: n=1024
+4     3.059: strread: n=32768
+4     3.059: readserial: dev=4 n=32768
+5     3.059: readserial: exit dev=4 nr=0
+4     3.059: strread: n=1024
+4     3.059: readtcpsvr: state=2
+4     3.059: waittcpsvr: sock=5 state=2
+4     3.059: accsock: sock=5
+4     3.059: updatetcpsvr: state=2
+4     3.059: strread: n=1024
+4     3.069: strread: n=32768
+4     3.069: readserial: dev=4 n=32768
+5     3.069: readserial: exit dev=4 nr=0
+4     3.069: strread: n=1024
+4     3.069: readtcpsvr: state=2
+4     3.069: waittcpsvr: sock=5 state=2
+4     3.069: accsock: sock=5
+4     3.069: updatetcpsvr: state=2
+4     3.069: strread: n=1024
+4     3.080: strread: n=32768
+4     3.080: readserial: dev=4 n=32768
+5     3.080: readserial: exit dev=4 nr=0
+4     3.080: strread: n=1024
+4     3.080: readtcpsvr: state=2
+4     3.080: waittcpsvr: sock=5 state=2
+4     3.080: accsock: sock=5
+4     3.080: updatetcpsvr: state=2
+4     3.080: strread: n=1024
+4     3.090: strread: n=32768
+4     3.090: readserial: dev=4 n=32768
+5     3.090: readserial: exit dev=4 nr=0
+4     3.090: strread: n=1024
+4     3.090: readtcpsvr: state=2
+4     3.090: waittcpsvr: sock=5 state=2
+4     3.090: accsock: sock=5
+4     3.090: updatetcpsvr: state=2
+4     3.090: strread: n=1024
+4     3.100: strread: n=32768
+4     3.100: readserial: dev=4 n=32768
+5     3.100: readserial: exit dev=4 nr=0
+4     3.100: strread: n=1024
+4     3.100: readtcpsvr: state=2
+4     3.100: waittcpsvr: sock=5 state=2
+4     3.100: accsock: sock=5
+4     3.100: updatetcpsvr: state=2
+4     3.100: strread: n=1024
+4     3.111: strread: n=32768
+4     3.111: readserial: dev=4 n=32768
+5     3.111: readserial: exit dev=4 nr=0
+4     3.111: strread: n=1024
+4     3.111: readtcpsvr: state=2
+4     3.111: waittcpsvr: sock=5 state=2
+4     3.111: accsock: sock=5
+4     3.111: updatetcpsvr: state=2
+4     3.111: strread: n=1024
+4     3.121: strread: n=32768
+4     3.121: readserial: dev=4 n=32768
+5     3.121: readserial: exit dev=4 nr=0
+4     3.121: strread: n=1024
+4     3.121: readtcpsvr: state=2
+4     3.121: waittcpsvr: sock=5 state=2
+4     3.121: accsock: sock=5
+4     3.121: updatetcpsvr: state=2
+4     3.121: strread: n=1024
+4     3.131: strread: n=32768
+4     3.131: readserial: dev=4 n=32768
+5     3.131: readserial: exit dev=4 nr=0
+4     3.131: strread: n=1024
+4     3.131: readtcpsvr: state=2
+4     3.131: waittcpsvr: sock=5 state=2
+4     3.131: accsock: sock=5
+4     3.131: updatetcpsvr: state=2
+4     3.131: strread: n=1024
+4     3.141: strread: n=32768
+4     3.141: readserial: dev=4 n=32768
+5     3.141: readserial: exit dev=4 nr=0
+4     3.142: strread: n=1024
+4     3.142: readtcpsvr: state=2
+4     3.142: waittcpsvr: sock=5 state=2
+4     3.142: accsock: sock=5
+4     3.142: updatetcpsvr: state=2
+4     3.142: strread: n=1024
+4     3.151: strread: n=32768
+4     3.151: readserial: dev=4 n=32768
+5     3.151: readserial: exit dev=4 nr=0
+4     3.151: strread: n=1024
+4     3.151: readtcpsvr: state=2
+4     3.151: waittcpsvr: sock=5 state=2
+4     3.151: accsock: sock=5
+4     3.151: updatetcpsvr: state=2
+4     3.151: strread: n=1024
+4     3.161: strread: n=32768
+4     3.161: readserial: dev=4 n=32768
+5     3.161: readserial: exit dev=4 nr=0
+4     3.161: strread: n=1024
+4     3.161: readtcpsvr: state=2
+4     3.161: waittcpsvr: sock=5 state=2
+4     3.161: accsock: sock=5
+4     3.161: updatetcpsvr: state=2
+4     3.161: strread: n=1024
+4     3.171: strread: n=32768
+4     3.171: readserial: dev=4 n=32768
+5     3.171: readserial: exit dev=4 nr=0
+4     3.171: strread: n=1024
+4     3.171: readtcpsvr: state=2
+4     3.171: waittcpsvr: sock=5 state=2
+4     3.171: accsock: sock=5
+4     3.171: updatetcpsvr: state=2
+4     3.171: strread: n=1024
+4     3.182: strread: n=32768
+4     3.182: readserial: dev=4 n=32768
+5     3.182: readserial: exit dev=4 nr=0
+4     3.182: strread: n=1024
+4     3.182: readtcpsvr: state=2
+4     3.182: waittcpsvr: sock=5 state=2
+4     3.182: accsock: sock=5
+4     3.182: updatetcpsvr: state=2
+4     3.182: strread: n=1024
+4     3.192: strread: n=32768
+4     3.192: readserial: dev=4 n=32768
+5     3.192: readserial: exit dev=4 nr=0
+4     3.192: strread: n=1024
+4     3.192: readtcpsvr: state=2
+4     3.192: waittcpsvr: sock=5 state=2
+4     3.192: accsock: sock=5
+4     3.192: updatetcpsvr: state=2
+4     3.192: strread: n=1024
+4     3.202: strread: n=32768
+4     3.202: readserial: dev=4 n=32768
+5     3.202: readserial: exit dev=4 nr=0
+4     3.202: strread: n=1024
+4     3.202: readtcpsvr: state=2
+4     3.202: waittcpsvr: sock=5 state=2
+4     3.202: accsock: sock=5
+4     3.202: updatetcpsvr: state=2
+4     3.202: strread: n=1024
+4     3.212: strread: n=32768
+4     3.212: readserial: dev=4 n=32768
+5     3.212: readserial: exit dev=4 nr=0
+4     3.212: strread: n=1024
+4     3.212: readtcpsvr: state=2
+4     3.212: waittcpsvr: sock=5 state=2
+4     3.212: accsock: sock=5
+4     3.212: updatetcpsvr: state=2
+4     3.212: strread: n=1024
+4     3.223: strread: n=32768
+4     3.223: readserial: dev=4 n=32768
+5     3.223: readserial: exit dev=4 nr=0
+4     3.223: strread: n=1024
+4     3.223: readtcpsvr: state=2
+4     3.223: waittcpsvr: sock=5 state=2
+4     3.223: accsock: sock=5
+4     3.223: updatetcpsvr: state=2
+4     3.223: strread: n=1024
+4     3.233: strread: n=32768
+4     3.233: readserial: dev=4 n=32768
+5     3.233: readserial: exit dev=4 nr=0
+4     3.233: strread: n=1024
+4     3.233: readtcpsvr: state=2
+4     3.233: waittcpsvr: sock=5 state=2
+4     3.233: accsock: sock=5
+4     3.233: updatetcpsvr: state=2
+4     3.233: strread: n=1024
+4     3.243: strread: n=32768
+4     3.243: readserial: dev=4 n=32768
+5     3.243: readserial: exit dev=4 nr=0
+4     3.243: strread: n=1024
+4     3.243: readtcpsvr: state=2
+4     3.243: waittcpsvr: sock=5 state=2
+4     3.243: accsock: sock=5
+4     3.243: updatetcpsvr: state=2
+4     3.243: strread: n=1024
+4     3.253: strread: n=32768
+4     3.253: readserial: dev=4 n=32768
+5     3.253: readserial: exit dev=4 nr=0
+4     3.253: strread: n=1024
+4     3.253: readtcpsvr: state=2
+4     3.253: waittcpsvr: sock=5 state=2
+4     3.253: accsock: sock=5
+4     3.253: updatetcpsvr: state=2
+4     3.253: strread: n=1024
+4     3.263: strread: n=32768
+4     3.263: readserial: dev=4 n=32768
+5     3.264: readserial: exit dev=4 nr=0
+4     3.264: strread: n=1024
+4     3.264: readtcpsvr: state=2
+4     3.264: waittcpsvr: sock=5 state=2
+4     3.264: accsock: sock=5
+4     3.264: updatetcpsvr: state=2
+4     3.264: strread: n=1024
+4     3.273: strread: n=32768
+4     3.273: readserial: dev=4 n=32768
+5     3.273: readserial: exit dev=4 nr=0
+4     3.273: strread: n=1024
+4     3.273: readtcpsvr: state=2
+4     3.273: waittcpsvr: sock=5 state=2
+4     3.273: accsock: sock=5
+4     3.273: updatetcpsvr: state=2
+4     3.273: strread: n=1024
+4     3.283: strread: n=32768
+4     3.283: readserial: dev=4 n=32768
+5     3.283: readserial: exit dev=4 nr=0
+4     3.283: strread: n=1024
+4     3.283: readtcpsvr: state=2
+4     3.283: waittcpsvr: sock=5 state=2
+4     3.283: accsock: sock=5
+4     3.283: updatetcpsvr: state=2
+4     3.283: strread: n=1024
+4     3.293: strread: n=32768
+4     3.293: readserial: dev=4 n=32768
+5     3.293: readserial: exit dev=4 nr=0
+4     3.293: strread: n=1024
+4     3.294: readtcpsvr: state=2
+4     3.294: waittcpsvr: sock=5 state=2
+4     3.294: accsock: sock=5
+4     3.294: updatetcpsvr: state=2
+4     3.294: strread: n=1024
+4     3.303: strread: n=32768
+4     3.303: readserial: dev=4 n=32768
+5     3.303: readserial: exit dev=4 nr=0
+4     3.303: strread: n=1024
+4     3.303: readtcpsvr: state=2
+4     3.303: waittcpsvr: sock=5 state=2
+4     3.303: accsock: sock=5
+4     3.303: updatetcpsvr: state=2
+4     3.303: strread: n=1024
+4     3.313: strread: n=32768
+4     3.313: readserial: dev=4 n=32768
+5     3.313: readserial: exit dev=4 nr=0
+4     3.313: strread: n=1024
+4     3.313: readtcpsvr: state=2
+4     3.313: waittcpsvr: sock=5 state=2
+4     3.313: accsock: sock=5
+4     3.313: updatetcpsvr: state=2
+4     3.313: strread: n=1024
+4     3.323: strread: n=32768
+4     3.324: readserial: dev=4 n=32768
+5     3.324: readserial: exit dev=4 nr=0
+4     3.324: strread: n=1024
+4     3.324: readtcpsvr: state=2
+4     3.324: waittcpsvr: sock=5 state=2
+4     3.324: accsock: sock=5
+4     3.324: updatetcpsvr: state=2
+4     3.324: strread: n=1024
+4     3.333: strread: n=32768
+4     3.333: readserial: dev=4 n=32768
+5     3.333: readserial: exit dev=4 nr=0
+4     3.333: strread: n=1024
+4     3.333: readtcpsvr: state=2
+4     3.333: waittcpsvr: sock=5 state=2
+4     3.333: accsock: sock=5
+4     3.333: updatetcpsvr: state=2
+4     3.333: strread: n=1024
+4     3.343: strread: n=32768
+4     3.343: readserial: dev=4 n=32768
+5     3.343: readserial: exit dev=4 nr=0
+4     3.343: strread: n=1024
+4     3.343: readtcpsvr: state=2
+4     3.343: waittcpsvr: sock=5 state=2
+4     3.343: accsock: sock=5
+4     3.343: updatetcpsvr: state=2
+4     3.343: strread: n=1024
+4     3.354: strread: n=32768
+4     3.354: readserial: dev=4 n=32768
+5     3.354: readserial: exit dev=4 nr=0
+4     3.354: strread: n=1024
+4     3.354: readtcpsvr: state=2
+4     3.354: waittcpsvr: sock=5 state=2
+4     3.354: accsock: sock=5
+4     3.354: updatetcpsvr: state=2
+4     3.354: strread: n=1024
+4     3.364: strread: n=32768
+4     3.364: readserial: dev=4 n=32768
+5     3.364: readserial: exit dev=4 nr=0
+4     3.364: strread: n=1024
+4     3.364: readtcpsvr: state=2
+4     3.364: waittcpsvr: sock=5 state=2
+4     3.364: accsock: sock=5
+4     3.364: updatetcpsvr: state=2
+4     3.364: strread: n=1024
+4     3.374: strread: n=32768
+4     3.374: readserial: dev=4 n=32768
+5     3.374: readserial: exit dev=4 nr=0
+4     3.374: strread: n=1024
+4     3.374: readtcpsvr: state=2
+4     3.374: waittcpsvr: sock=5 state=2
+4     3.374: accsock: sock=5
+4     3.374: updatetcpsvr: state=2
+4     3.374: strread: n=1024
+4     3.385: strread: n=32768
+4     3.385: readserial: dev=4 n=32768
+5     3.385: readserial: exit dev=4 nr=0
+4     3.385: strread: n=1024
+4     3.385: readtcpsvr: state=2
+4     3.385: waittcpsvr: sock=5 state=2
+4     3.385: accsock: sock=5
+4     3.385: updatetcpsvr: state=2
+4     3.385: strread: n=1024
+4     3.395: strread: n=32768
+4     3.395: readserial: dev=4 n=32768
+5     3.395: readserial: exit dev=4 nr=0
+4     3.395: strread: n=1024
+4     3.395: readtcpsvr: state=2
+4     3.395: waittcpsvr: sock=5 state=2
+4     3.395: accsock: sock=5
+4     3.395: updatetcpsvr: state=2
+4     3.395: strread: n=1024
+4     3.405: strread: n=32768
+4     3.405: readserial: dev=4 n=32768
+5     3.405: readserial: exit dev=4 nr=0
+4     3.405: strread: n=1024
+4     3.405: readtcpsvr: state=2
+4     3.405: waittcpsvr: sock=5 state=2
+4     3.405: accsock: sock=5
+4     3.406: updatetcpsvr: state=2
+4     3.406: strread: n=1024
+4     3.415: strread: n=32768
+4     3.415: readserial: dev=4 n=32768
+5     3.415: readserial: exit dev=4 nr=0
+4     3.415: strread: n=1024
+4     3.415: readtcpsvr: state=2
+4     3.415: waittcpsvr: sock=5 state=2
+4     3.415: accsock: sock=5
+4     3.415: updatetcpsvr: state=2
+4     3.415: strread: n=1024
+4     3.425: strread: n=32768
+4     3.425: readserial: dev=4 n=32768
+5     3.425: readserial: exit dev=4 nr=0
+4     3.425: strread: n=1024
+4     3.425: readtcpsvr: state=2
+4     3.425: waittcpsvr: sock=5 state=2
+4     3.425: accsock: sock=5
+4     3.425: updatetcpsvr: state=2
+4     3.425: strread: n=1024
+4     3.435: strread: n=32768
+4     3.435: readserial: dev=4 n=32768
+5     3.435: readserial: exit dev=4 nr=0
+4     3.435: strread: n=1024
+4     3.436: readtcpsvr: state=2
+4     3.436: waittcpsvr: sock=5 state=2
+4     3.436: accsock: sock=5
+4     3.436: updatetcpsvr: state=2
+4     3.436: strread: n=1024
+4     3.445: strread: n=32768
+4     3.445: readserial: dev=4 n=32768
+5     3.445: readserial: exit dev=4 nr=0
+4     3.445: strread: n=1024
+4     3.445: readtcpsvr: state=2
+4     3.445: waittcpsvr: sock=5 state=2
+4     3.445: accsock: sock=5
+4     3.445: updatetcpsvr: state=2
+4     3.445: strread: n=1024
+4     3.455: strread: n=32768
+4     3.455: readserial: dev=4 n=32768
+5     3.455: readserial: exit dev=4 nr=0
+4     3.455: strread: n=1024
+4     3.455: readtcpsvr: state=2
+4     3.455: waittcpsvr: sock=5 state=2
+4     3.455: accsock: sock=5
+4     3.455: updatetcpsvr: state=2
+4     3.455: strread: n=1024
+4     3.465: strread: n=32768
+4     3.465: readserial: dev=4 n=32768
+5     3.465: readserial: exit dev=4 nr=0
+4     3.465: strread: n=1024
+4     3.465: readtcpsvr: state=2
+4     3.466: waittcpsvr: sock=5 state=2
+4     3.466: accsock: sock=5
+4     3.466: updatetcpsvr: state=2
+4     3.466: strread: n=1024
+4     3.475: strread: n=32768
+4     3.475: readserial: dev=4 n=32768
+5     3.475: readserial: exit dev=4 nr=0
+4     3.475: strread: n=1024
+4     3.475: readtcpsvr: state=2
+4     3.475: waittcpsvr: sock=5 state=2
+4     3.475: accsock: sock=5
+4     3.475: updatetcpsvr: state=2
+4     3.475: strread: n=1024
+4     3.485: strread: n=32768
+4     3.485: readserial: dev=4 n=32768
+5     3.486: readserial: exit dev=4 nr=0
+4     3.486: strread: n=1024
+4     3.486: readtcpsvr: state=2
+4     3.486: waittcpsvr: sock=5 state=2
+4     3.486: accsock: sock=5
+4     3.486: updatetcpsvr: state=2
+4     3.486: strread: n=1024
+4     3.495: strread: n=32768
+4     3.495: readserial: dev=4 n=32768
+5     3.495: readserial: exit dev=4 nr=0
+4     3.495: strread: n=1024
+4     3.495: readtcpsvr: state=2
+4     3.495: waittcpsvr: sock=5 state=2
+4     3.495: accsock: sock=5
+4     3.495: updatetcpsvr: state=2
+4     3.495: strread: n=1024
+4     3.506: strread: n=32768
+4     3.506: readserial: dev=4 n=32768
+5     3.506: readserial: exit dev=4 nr=0
+4     3.506: strread: n=1024
+4     3.506: readtcpsvr: state=2
+4     3.506: waittcpsvr: sock=5 state=2
+4     3.506: accsock: sock=5
+4     3.506: updatetcpsvr: state=2
+4     3.506: strread: n=1024
+4     3.516: strread: n=32768
+4     3.516: readserial: dev=4 n=32768
+5     3.516: readserial: exit dev=4 nr=0
+4     3.516: strread: n=1024
+4     3.516: readtcpsvr: state=2
+4     3.516: waittcpsvr: sock=5 state=2
+4     3.516: accsock: sock=5
+4     3.516: updatetcpsvr: state=2
+4     3.516: strread: n=1024
+4     3.526: strread: n=32768
+4     3.526: readserial: dev=4 n=32768
+5     3.526: readserial: exit dev=4 nr=0
+4     3.526: strread: n=1024
+4     3.526: readtcpsvr: state=2
+4     3.526: waittcpsvr: sock=5 state=2
+4     3.526: accsock: sock=5
+4     3.526: updatetcpsvr: state=2
+4     3.526: strread: n=1024
+4     3.537: strread: n=32768
+4     3.537: readserial: dev=4 n=32768
+5     3.537: readserial: exit dev=4 nr=0
+4     3.537: strread: n=1024
+4     3.537: readtcpsvr: state=2
+4     3.537: waittcpsvr: sock=5 state=2
+4     3.537: accsock: sock=5
+4     3.537: updatetcpsvr: state=2
+4     3.537: strwrite: n=6
+3     3.537: writeserial: dev=4 n=6
+5     3.537: writeserial: exit dev=4 ns=0
+4     3.537: strwrite: n=6
+4     3.537: strread: n=1024
+4     3.537: readtcpsvr: state=2
+4     3.537: waittcpsvr: sock=5 state=2
+4     3.537: accsock: sock=5
+4     3.537: updatetcpsvr: state=2
+4     3.537: strread: n=1024
+4     3.547: strread: n=32768
+4     3.547: readserial: dev=4 n=32768
+5     3.547: readserial: exit dev=4 nr=0
+4     3.547: strread: n=1024
+4     3.547: readtcpsvr: state=2
+4     3.547: waittcpsvr: sock=5 state=2
+4     3.547: accsock: sock=5
+4     3.547: updatetcpsvr: state=2
+4     3.547: strread: n=1024
+4     3.557: strread: n=32768
+4     3.557: readserial: dev=4 n=32768
+5     3.557: readserial: exit dev=4 nr=0
+4     3.557: strread: n=1024
+4     3.557: readtcpsvr: state=2
+4     3.557: waittcpsvr: sock=5 state=2
+4     3.557: accsock: sock=5
+4     3.557: updatetcpsvr: state=2
+4     3.557: strread: n=1024
+4     3.567: strread: n=32768
+4     3.568: readserial: dev=4 n=32768
+5     3.568: readserial: exit dev=4 nr=0
+4     3.568: strread: n=1024
+4     3.568: readtcpsvr: state=2
+4     3.568: waittcpsvr: sock=5 state=2
+4     3.568: accsock: sock=5
+4     3.568: updatetcpsvr: state=2
+4     3.568: strread: n=1024
+4     3.577: strread: n=32768
+4     3.577: readserial: dev=4 n=32768
+5     3.577: readserial: exit dev=4 nr=0
+4     3.577: strread: n=1024
+4     3.577: readtcpsvr: state=2
+4     3.577: waittcpsvr: sock=5 state=2
+4     3.577: accsock: sock=5
+4     3.577: updatetcpsvr: state=2
+4     3.577: strread: n=1024
+4     3.587: strread: n=32768
+4     3.587: readserial: dev=4 n=32768
+5     3.587: readserial: exit dev=4 nr=0
+4     3.587: strread: n=1024
+4     3.587: readtcpsvr: state=2
+4     3.587: waittcpsvr: sock=5 state=2
+4     3.587: accsock: sock=5
+4     3.587: updatetcpsvr: state=2
+4     3.587: strread: n=1024
+4     3.598: strread: n=32768
+4     3.598: readserial: dev=4 n=32768
+5     3.598: readserial: exit dev=4 nr=0
+4     3.598: strread: n=1024
+4     3.598: readtcpsvr: state=2
+4     3.598: waittcpsvr: sock=5 state=2
+4     3.598: accsock: sock=5
+4     3.598: updatetcpsvr: state=2
+4     3.598: strread: n=1024
+4     3.608: strread: n=32768
+4     3.608: readserial: dev=4 n=32768
+5     3.608: readserial: exit dev=4 nr=0
+4     3.608: strread: n=1024
+4     3.608: readtcpsvr: state=2
+4     3.608: waittcpsvr: sock=5 state=2
+4     3.608: accsock: sock=5
+4     3.608: updatetcpsvr: state=2
+4     3.608: strread: n=1024
+4     3.618: strread: n=32768
+4     3.618: readserial: dev=4 n=32768
+5     3.618: readserial: exit dev=4 nr=0
+4     3.618: strread: n=1024
+4     3.618: readtcpsvr: state=2
+4     3.618: waittcpsvr: sock=5 state=2
+4     3.618: accsock: sock=5
+4     3.618: updatetcpsvr: state=2
+4     3.618: strread: n=1024
+4     3.628: strread: n=32768
+4     3.628: readserial: dev=4 n=32768
+5     3.628: readserial: exit dev=4 nr=0
+4     3.628: strread: n=1024
+4     3.628: readtcpsvr: state=2
+4     3.628: waittcpsvr: sock=5 state=2
+4     3.628: accsock: sock=5
+4     3.628: updatetcpsvr: state=2
+4     3.629: strread: n=1024
+4     3.638: strread: n=32768
+4     3.638: readserial: dev=4 n=32768
+5     3.638: readserial: exit dev=4 nr=0
+4     3.638: strread: n=1024
+4     3.638: readtcpsvr: state=2
+4     3.638: waittcpsvr: sock=5 state=2
+4     3.638: accsock: sock=5
+4     3.638: updatetcpsvr: state=2
+4     3.638: strread: n=1024
+4     3.648: strread: n=32768
+4     3.648: readserial: dev=4 n=32768
+5     3.648: readserial: exit dev=4 nr=0
+4     3.648: strread: n=1024
+4     3.648: readtcpsvr: state=2
+4     3.648: waittcpsvr: sock=5 state=2
+4     3.648: accsock: sock=5
+4     3.648: updatetcpsvr: state=2
+4     3.648: strread: n=1024
+4     3.658: strread: n=32768
+4     3.659: readserial: dev=4 n=32768
+5     3.659: readserial: exit dev=4 nr=0
+4     3.659: strread: n=1024
+4     3.659: readtcpsvr: state=2
+4     3.659: waittcpsvr: sock=5 state=2
+4     3.659: accsock: sock=5
+4     3.659: updatetcpsvr: state=2
+4     3.659: strread: n=1024
+4     3.668: strread: n=32768
+4     3.668: readserial: dev=4 n=32768
+5     3.668: readserial: exit dev=4 nr=0
+4     3.668: strread: n=1024
+4     3.668: readtcpsvr: state=2
+4     3.668: waittcpsvr: sock=5 state=2
+4     3.668: accsock: sock=5
+4     3.668: updatetcpsvr: state=2
+4     3.668: strread: n=1024
+4     3.678: strread: n=32768
+4     3.679: readserial: dev=4 n=32768
+5     3.679: readserial: exit dev=4 nr=0
+4     3.679: strread: n=1024
+4     3.679: readtcpsvr: state=2
+4     3.679: waittcpsvr: sock=5 state=2
+4     3.679: accsock: sock=5
+4     3.679: updatetcpsvr: state=2
+4     3.679: strread: n=1024
+4     3.688: strread: n=32768
+4     3.688: readserial: dev=4 n=32768
+5     3.688: readserial: exit dev=4 nr=0
+4     3.688: strread: n=1024
+4     3.688: readtcpsvr: state=2
+4     3.688: waittcpsvr: sock=5 state=2
+4     3.688: accsock: sock=5
+4     3.688: updatetcpsvr: state=2
+4     3.688: strread: n=1024
+4     3.698: strread: n=32768
+4     3.698: readserial: dev=4 n=32768
+5     3.698: readserial: exit dev=4 nr=0
+4     3.698: strread: n=1024
+4     3.698: readtcpsvr: state=2
+4     3.698: waittcpsvr: sock=5 state=2
+4     3.698: accsock: sock=5
+4     3.698: updatetcpsvr: state=2
+4     3.698: strread: n=1024
+4     3.709: strread: n=32768
+4     3.709: readserial: dev=4 n=32768
+5     3.709: readserial: exit dev=4 nr=0
+4     3.709: strread: n=1024
+4     3.709: readtcpsvr: state=2
+4     3.709: waittcpsvr: sock=5 state=2
+4     3.709: accsock: sock=5
+4     3.709: updatetcpsvr: state=2
+4     3.709: strread: n=1024
+4     3.719: strread: n=32768
+4     3.719: readserial: dev=4 n=32768
+5     3.719: readserial: exit dev=4 nr=0
+4     3.719: strread: n=1024
+4     3.719: readtcpsvr: state=2
+4     3.719: waittcpsvr: sock=5 state=2
+4     3.719: accsock: sock=5
+4     3.719: updatetcpsvr: state=2
+4     3.719: strread: n=1024
+4     3.730: strread: n=32768
+4     3.730: readserial: dev=4 n=32768
+5     3.730: readserial: exit dev=4 nr=0
+4     3.730: strread: n=1024
+4     3.730: readtcpsvr: state=2
+4     3.730: waittcpsvr: sock=5 state=2
+4     3.730: accsock: sock=5
+4     3.730: updatetcpsvr: state=2
+4     3.730: strread: n=1024
+4     3.740: strread: n=32768
+4     3.740: readserial: dev=4 n=32768
+5     3.740: readserial: exit dev=4 nr=0
+4     3.740: strread: n=1024
+4     3.740: readtcpsvr: state=2
+4     3.740: waittcpsvr: sock=5 state=2
+4     3.740: accsock: sock=5
+4     3.740: updatetcpsvr: state=2
+4     3.740: strread: n=1024
+4     3.750: strread: n=32768
+4     3.750: readserial: dev=4 n=32768
+5     3.750: readserial: exit dev=4 nr=0
+4     3.750: strread: n=1024
+4     3.751: readtcpsvr: state=2
+4     3.751: waittcpsvr: sock=5 state=2
+4     3.751: accsock: sock=5
+4     3.751: updatetcpsvr: state=2
+4     3.751: strread: n=1024
+4     3.760: strread: n=32768
+4     3.760: readserial: dev=4 n=32768
+5     3.760: readserial: exit dev=4 nr=0
+4     3.760: strread: n=1024
+4     3.760: readtcpsvr: state=2
+4     3.760: waittcpsvr: sock=5 state=2
+4     3.760: accsock: sock=5
+4     3.760: updatetcpsvr: state=2
+4     3.760: strread: n=1024
+4     3.770: strread: n=32768
+4     3.770: readserial: dev=4 n=32768
+5     3.770: readserial: exit dev=4 nr=0
+4     3.770: strread: n=1024
+4     3.770: readtcpsvr: state=2
+4     3.770: waittcpsvr: sock=5 state=2
+4     3.770: accsock: sock=5
+4     3.770: updatetcpsvr: state=2
+4     3.770: strread: n=1024
+4     3.780: strread: n=32768
+4     3.780: readserial: dev=4 n=32768
+5     3.780: readserial: exit dev=4 nr=0
+4     3.780: strread: n=1024
+4     3.780: readtcpsvr: state=2
+4     3.780: waittcpsvr: sock=5 state=2
+4     3.780: accsock: sock=5
+4     3.780: updatetcpsvr: state=2
+4     3.781: strread: n=1024
+4     3.790: strread: n=32768
+4     3.790: readserial: dev=4 n=32768
+5     3.790: readserial: exit dev=4 nr=0
+4     3.790: strread: n=1024
+4     3.790: readtcpsvr: state=2
+4     3.790: waittcpsvr: sock=5 state=2
+4     3.790: accsock: sock=5
+4     3.790: updatetcpsvr: state=2
+4     3.790: strread: n=1024
+4     3.800: strread: n=32768
+4     3.800: readserial: dev=4 n=32768
+5     3.800: readserial: exit dev=4 nr=0
+4     3.800: strread: n=1024
+4     3.800: readtcpsvr: state=2
+4     3.800: waittcpsvr: sock=5 state=2
+4     3.800: accsock: sock=5
+4     3.800: updatetcpsvr: state=2
+4     3.800: strread: n=1024
+4     3.811: strread: n=32768
+4     3.811: readserial: dev=4 n=32768
+5     3.811: readserial: exit dev=4 nr=0
+4     3.811: strread: n=1024
+4     3.811: readtcpsvr: state=2
+4     3.811: waittcpsvr: sock=5 state=2
+4     3.811: accsock: sock=5
+4     3.811: updatetcpsvr: state=2
+4     3.811: strread: n=1024
+4     3.821: strread: n=32768
+4     3.821: readserial: dev=4 n=32768
+5     3.821: readserial: exit dev=4 nr=0
+4     3.821: strread: n=1024
+4     3.821: readtcpsvr: state=2
+4     3.821: waittcpsvr: sock=5 state=2
+4     3.821: accsock: sock=5
+4     3.821: updatetcpsvr: state=2
+4     3.821: strread: n=1024
+4     3.832: strread: n=32768
+4     3.832: readserial: dev=4 n=32768
+5     3.832: readserial: exit dev=4 nr=0
+4     3.832: strread: n=1024
+4     3.832: readtcpsvr: state=2
+4     3.832: waittcpsvr: sock=5 state=2
+4     3.832: accsock: sock=5
+4     3.832: updatetcpsvr: state=2
+4     3.832: strread: n=1024
+4     3.842: strread: n=32768
+4     3.842: readserial: dev=4 n=32768
+5     3.842: readserial: exit dev=4 nr=0
+4     3.842: strread: n=1024
+4     3.842: readtcpsvr: state=2
+4     3.842: waittcpsvr: sock=5 state=2
+4     3.842: accsock: sock=5
+4     3.842: updatetcpsvr: state=2
+4     3.842: strread: n=1024
+4     3.852: strread: n=32768
+4     3.852: readserial: dev=4 n=32768
+5     3.852: readserial: exit dev=4 nr=0
+4     3.852: strread: n=1024
+4     3.852: readtcpsvr: state=2
+4     3.852: waittcpsvr: sock=5 state=2
+4     3.852: accsock: sock=5
+4     3.852: updatetcpsvr: state=2
+4     3.852: strread: n=1024
+4     3.862: strread: n=32768
+4     3.863: readserial: dev=4 n=32768
+5     3.863: readserial: exit dev=4 nr=0
+4     3.863: strread: n=1024
+4     3.863: readtcpsvr: state=2
+4     3.863: waittcpsvr: sock=5 state=2
+4     3.863: accsock: sock=5
+4     3.863: updatetcpsvr: state=2
+4     3.863: strread: n=1024
+4     3.872: strread: n=32768
+4     3.872: readserial: dev=4 n=32768
+5     3.872: readserial: exit dev=4 nr=0
+4     3.872: strread: n=1024
+4     3.872: readtcpsvr: state=2
+4     3.872: waittcpsvr: sock=5 state=2
+4     3.872: accsock: sock=5
+4     3.872: updatetcpsvr: state=2
+4     3.872: strread: n=1024
+4     3.882: strread: n=32768
+4     3.882: readserial: dev=4 n=32768
+5     3.882: readserial: exit dev=4 nr=0
+4     3.882: strread: n=1024
+4     3.882: readtcpsvr: state=2
+4     3.882: waittcpsvr: sock=5 state=2
+4     3.882: accsock: sock=5
+4     3.882: updatetcpsvr: state=2
+4     3.882: strread: n=1024
+4     3.892: strread: n=32768
+4     3.892: readserial: dev=4 n=32768
+5     3.892: readserial: exit dev=4 nr=0
+4     3.892: strread: n=1024
+4     3.892: readtcpsvr: state=2
+4     3.892: waittcpsvr: sock=5 state=2
+4     3.892: accsock: sock=5
+4     3.893: updatetcpsvr: state=2
+4     3.893: strread: n=1024
+4     3.902: strread: n=32768
+4     3.902: readserial: dev=4 n=32768
+5     3.902: readserial: exit dev=4 nr=0
+4     3.902: strread: n=1024
+4     3.902: readtcpsvr: state=2
+4     3.902: waittcpsvr: sock=5 state=2
+4     3.902: accsock: sock=5
+4     3.902: updatetcpsvr: state=2
+4     3.902: strread: n=1024
+4     3.912: strread: n=32768
+4     3.912: readserial: dev=4 n=32768
+5     3.912: readserial: exit dev=4 nr=0
+4     3.912: strread: n=1024
+4     3.912: readtcpsvr: state=2
+4     3.912: waittcpsvr: sock=5 state=2
+4     3.912: accsock: sock=5
+4     3.912: updatetcpsvr: state=2
+4     3.912: strread: n=1024
+4     3.922: strread: n=32768
+4     3.922: readserial: dev=4 n=32768
+5     3.922: readserial: exit dev=4 nr=0
+4     3.922: strread: n=1024
+4     3.922: readtcpsvr: state=2
+4     3.922: waittcpsvr: sock=5 state=2
+4     3.922: accsock: sock=5
+4     3.922: updatetcpsvr: state=2
+4     3.922: strread: n=1024
+4     3.932: strread: n=32768
+4     3.932: readserial: dev=4 n=32768
+5     3.932: readserial: exit dev=4 nr=0
+4     3.932: strread: n=1024
+4     3.932: readtcpsvr: state=2
+4     3.932: waittcpsvr: sock=5 state=2
+4     3.932: accsock: sock=5
+4     3.932: updatetcpsvr: state=2
+4     3.933: strread: n=1024
+4     3.942: strread: n=32768
+4     3.942: readserial: dev=4 n=32768
+5     3.942: readserial: exit dev=4 nr=0
+4     3.942: strread: n=1024
+4     3.942: readtcpsvr: state=2
+4     3.942: waittcpsvr: sock=5 state=2
+4     3.942: accsock: sock=5
+4     3.942: updatetcpsvr: state=2
+4     3.942: strread: n=1024
+4     3.952: strread: n=32768
+4     3.952: readserial: dev=4 n=32768
+5     3.952: readserial: exit dev=4 nr=0
+4     3.952: strread: n=1024
+4     3.952: readtcpsvr: state=2
+4     3.952: waittcpsvr: sock=5 state=2
+4     3.952: accsock: sock=5
+4     3.952: updatetcpsvr: state=2
+4     3.952: strread: n=1024
+4     3.962: strread: n=32768
+4     3.962: readserial: dev=4 n=32768
+5     3.962: readserial: exit dev=4 nr=0
+4     3.962: strread: n=1024
+4     3.962: readtcpsvr: state=2
+4     3.962: waittcpsvr: sock=5 state=2
+4     3.962: accsock: sock=5
+4     3.963: updatetcpsvr: state=2
+4     3.963: strread: n=1024
+4     3.972: strread: n=32768
+4     3.972: readserial: dev=4 n=32768
+5     3.972: readserial: exit dev=4 nr=0
+4     3.972: strread: n=1024
+4     3.972: readtcpsvr: state=2
+4     3.972: waittcpsvr: sock=5 state=2
+4     3.972: accsock: sock=5
+4     3.972: updatetcpsvr: state=2
+4     3.972: strread: n=1024
+4     3.983: strread: n=32768
+4     3.983: readserial: dev=4 n=32768
+5     3.983: readserial: exit dev=4 nr=0
+4     3.983: strread: n=1024
+4     3.983: readtcpsvr: state=2
+4     3.983: waittcpsvr: sock=5 state=2
+4     3.983: accsock: sock=5
+4     3.983: updatetcpsvr: state=2
+4     3.983: strread: n=1024
+4     3.993: strread: n=32768
+4     3.993: readserial: dev=4 n=32768
+5     3.993: readserial: exit dev=4 nr=0
+4     3.993: strread: n=1024
+4     3.993: readtcpsvr: state=2
+4     3.993: waittcpsvr: sock=5 state=2
+4     3.993: accsock: sock=5
+4     3.993: updatetcpsvr: state=2
+4     3.993: strread: n=1024
+4     4.003: strread: n=32768
+4     4.003: readserial: dev=4 n=32768
+5     4.003: readserial: exit dev=4 nr=0
+4     4.003: strread: n=1024
+4     4.003: readtcpsvr: state=2
+4     4.003: waittcpsvr: sock=5 state=2
+4     4.003: accsock: sock=5
+4     4.003: updatetcpsvr: state=2
+4     4.003: strread: n=1024
+4     4.014: strread: n=32768
+4     4.014: readserial: dev=4 n=32768
+5     4.014: readserial: exit dev=4 nr=0
+4     4.014: strread: n=1024
+4     4.014: readtcpsvr: state=2
+4     4.014: waittcpsvr: sock=5 state=2
+4     4.014: accsock: sock=5
+4     4.014: updatetcpsvr: state=2
+4     4.014: strread: n=1024
+4     4.024: strread: n=32768
+4     4.024: readserial: dev=4 n=32768
+5     4.024: readserial: exit dev=4 nr=0
+4     4.024: strread: n=1024
+4     4.024: readtcpsvr: state=2
+4     4.024: waittcpsvr: sock=5 state=2
+4     4.024: accsock: sock=5
+4     4.024: updatetcpsvr: state=2
+4     4.024: strread: n=1024
+4     4.034: strread: n=32768
+4     4.034: readserial: dev=4 n=32768
+5     4.034: readserial: exit dev=4 nr=0
+4     4.034: strread: n=1024
+4     4.035: readtcpsvr: state=2
+4     4.035: waittcpsvr: sock=5 state=2
+4     4.035: accsock: sock=5
+4     4.035: updatetcpsvr: state=2
+4     4.035: strread: n=1024
+4     4.044: strread: n=32768
+4     4.044: readserial: dev=4 n=32768
+5     4.044: readserial: exit dev=4 nr=0
+4     4.044: strread: n=1024
+4     4.044: readtcpsvr: state=2
+4     4.044: waittcpsvr: sock=5 state=2
+4     4.044: accsock: sock=5
+4     4.044: updatetcpsvr: state=2
+4     4.044: strread: n=1024
+4     4.054: strread: n=32768
+4     4.054: readserial: dev=4 n=32768
+5     4.054: readserial: exit dev=4 nr=0
+4     4.054: strread: n=1024
+4     4.054: readtcpsvr: state=2
+4     4.054: waittcpsvr: sock=5 state=2
+4     4.054: accsock: sock=5
+4     4.054: updatetcpsvr: state=2
+4     4.054: strread: n=1024
+4     4.065: strread: n=32768
+4     4.065: readserial: dev=4 n=32768
+5     4.065: readserial: exit dev=4 nr=0
+4     4.065: strread: n=1024
+4     4.065: readtcpsvr: state=2
+4     4.065: waittcpsvr: sock=5 state=2
+4     4.065: accsock: sock=5
+4     4.065: updatetcpsvr: state=2
+4     4.065: strread: n=1024
+4     4.075: strread: n=32768
+4     4.075: readserial: dev=4 n=32768
+5     4.075: readserial: exit dev=4 nr=0
+4     4.075: strread: n=1024
+4     4.075: readtcpsvr: state=2
+4     4.075: waittcpsvr: sock=5 state=2
+4     4.075: accsock: sock=5
+4     4.075: updatetcpsvr: state=2
+4     4.075: strread: n=1024
+4     4.086: strread: n=32768
+4     4.086: readserial: dev=4 n=32768
+5     4.086: readserial: exit dev=4 nr=0
+4     4.086: strread: n=1024
+4     4.086: readtcpsvr: state=2
+4     4.086: waittcpsvr: sock=5 state=2
+4     4.086: accsock: sock=5
+4     4.086: updatetcpsvr: state=2
+4     4.086: strread: n=1024
+4     4.096: strread: n=32768
+4     4.096: readserial: dev=4 n=32768
+5     4.096: readserial: exit dev=4 nr=0
+4     4.096: strread: n=1024
+4     4.096: readtcpsvr: state=2
+4     4.096: waittcpsvr: sock=5 state=2
+4     4.096: accsock: sock=5
+4     4.096: updatetcpsvr: state=2
+4     4.096: strread: n=1024
+4     4.106: strread: n=32768
+4     4.106: readserial: dev=4 n=32768
+5     4.106: readserial: exit dev=4 nr=0
+4     4.106: strread: n=1024
+4     4.106: readtcpsvr: state=2
+4     4.106: waittcpsvr: sock=5 state=2
+4     4.106: accsock: sock=5
+4     4.106: updatetcpsvr: state=2
+4     4.106: strread: n=1024
+4     4.116: strread: n=32768
+4     4.117: readserial: dev=4 n=32768
+5     4.117: readserial: exit dev=4 nr=0
+4     4.117: strread: n=1024
+4     4.117: readtcpsvr: state=2
+4     4.117: waittcpsvr: sock=5 state=2
+4     4.117: accsock: sock=5
+4     4.117: updatetcpsvr: state=2
+4     4.117: strread: n=1024
+4     4.126: strread: n=32768
+4     4.126: readserial: dev=4 n=32768
+5     4.126: readserial: exit dev=4 nr=0
+4     4.126: strread: n=1024
+4     4.126: readtcpsvr: state=2
+4     4.126: waittcpsvr: sock=5 state=2
+4     4.126: accsock: sock=5
+4     4.126: updatetcpsvr: state=2
+4     4.126: strread: n=1024
+4     4.136: strread: n=32768
+4     4.136: readserial: dev=4 n=32768
+5     4.136: readserial: exit dev=4 nr=0
+4     4.136: strread: n=1024
+4     4.136: readtcpsvr: state=2
+4     4.136: waittcpsvr: sock=5 state=2
+4     4.136: accsock: sock=5
+4     4.136: updatetcpsvr: state=2
+4     4.136: strread: n=1024
+4     4.146: strread: n=32768
+4     4.146: readserial: dev=4 n=32768
+5     4.146: readserial: exit dev=4 nr=0
+4     4.146: strread: n=1024
+4     4.146: readtcpsvr: state=2
+4     4.146: waittcpsvr: sock=5 state=2
+4     4.146: accsock: sock=5
+4     4.146: updatetcpsvr: state=2
+4     4.146: strread: n=1024
+4     4.156: strread: n=32768
+4     4.156: readserial: dev=4 n=32768
+5     4.156: readserial: exit dev=4 nr=0
+4     4.156: strread: n=1024
+4     4.156: readtcpsvr: state=2
+4     4.156: waittcpsvr: sock=5 state=2
+4     4.156: accsock: sock=5
+4     4.156: updatetcpsvr: state=2
+4     4.156: strread: n=1024
+4     4.166: strread: n=32768
+4     4.167: readserial: dev=4 n=32768
+5     4.167: readserial: exit dev=4 nr=0
+4     4.167: strread: n=1024
+4     4.167: readtcpsvr: state=2
+4     4.167: waittcpsvr: sock=5 state=2
+4     4.167: accsock: sock=5
+4     4.167: updatetcpsvr: state=2
+4     4.167: strread: n=1024
+4     4.176: strread: n=32768
+4     4.176: readserial: dev=4 n=32768
+5     4.176: readserial: exit dev=4 nr=0
+4     4.176: strread: n=1024
+4     4.176: readtcpsvr: state=2
+4     4.176: waittcpsvr: sock=5 state=2
+4     4.176: accsock: sock=5
+4     4.176: updatetcpsvr: state=2
+4     4.176: strread: n=1024
+4     4.186: strread: n=32768
+4     4.186: readserial: dev=4 n=32768
+5     4.186: readserial: exit dev=4 nr=0
+4     4.186: strread: n=1024
+4     4.186: readtcpsvr: state=2
+4     4.186: waittcpsvr: sock=5 state=2
+4     4.186: accsock: sock=5
+4     4.186: updatetcpsvr: state=2
+4     4.186: strread: n=1024
+4     4.196: strread: n=32768
+4     4.196: readserial: dev=4 n=32768
+5     4.196: readserial: exit dev=4 nr=0
+4     4.196: strread: n=1024
+4     4.196: readtcpsvr: state=2
+4     4.196: waittcpsvr: sock=5 state=2
+4     4.196: accsock: sock=5
+4     4.196: updatetcpsvr: state=2
+4     4.196: strread: n=1024
+4     4.207: strread: n=32768
+4     4.207: readserial: dev=4 n=32768
+5     4.207: readserial: exit dev=4 nr=0
+4     4.207: strread: n=1024
+4     4.207: readtcpsvr: state=2
+4     4.207: waittcpsvr: sock=5 state=2
+4     4.207: accsock: sock=5
+4     4.207: updatetcpsvr: state=2
+4     4.207: strread: n=1024
+4     4.217: strread: n=32768
+4     4.217: readserial: dev=4 n=32768
+5     4.217: readserial: exit dev=4 nr=0
+4     4.217: strread: n=1024
+4     4.217: readtcpsvr: state=2
+4     4.217: waittcpsvr: sock=5 state=2
+4     4.217: accsock: sock=5
+4     4.217: updatetcpsvr: state=2
+4     4.217: strread: n=1024
+4     4.227: strread: n=32768
+4     4.227: readserial: dev=4 n=32768
+5     4.227: readserial: exit dev=4 nr=0
+4     4.227: strread: n=1024
+4     4.227: readtcpsvr: state=2
+4     4.227: waittcpsvr: sock=5 state=2
+4     4.227: accsock: sock=5
+4     4.228: updatetcpsvr: state=2
+4     4.228: strread: n=1024
+4     4.237: strread: n=32768
+4     4.237: readserial: dev=4 n=32768
+5     4.237: readserial: exit dev=4 nr=0
+4     4.237: strread: n=1024
+4     4.237: readtcpsvr: state=2
+4     4.237: waittcpsvr: sock=5 state=2
+4     4.237: accsock: sock=5
+4     4.237: updatetcpsvr: state=2
+4     4.237: strread: n=1024
+4     4.247: strread: n=32768
+4     4.247: readserial: dev=4 n=32768
+5     4.247: readserial: exit dev=4 nr=0
+4     4.247: strread: n=1024
+4     4.247: readtcpsvr: state=2
+4     4.247: waittcpsvr: sock=5 state=2
+4     4.247: accsock: sock=5
+4     4.247: updatetcpsvr: state=2
+4     4.248: strread: n=1024
+4     4.257: strread: n=32768
+4     4.257: readserial: dev=4 n=32768
+5     4.257: readserial: exit dev=4 nr=0
+4     4.257: strread: n=1024
+4     4.257: readtcpsvr: state=2
+4     4.257: waittcpsvr: sock=5 state=2
+4     4.257: accsock: sock=5
+4     4.257: updatetcpsvr: state=2
+4     4.257: strread: n=1024
+4     4.267: strread: n=32768
+4     4.267: readserial: dev=4 n=32768
+5     4.267: readserial: exit dev=4 nr=0
+4     4.267: strread: n=1024
+4     4.267: readtcpsvr: state=2
+4     4.267: waittcpsvr: sock=5 state=2
+4     4.267: accsock: sock=5
+4     4.267: updatetcpsvr: state=2
+4     4.267: strread: n=1024
+4     4.278: strread: n=32768
+4     4.278: readserial: dev=4 n=32768
+5     4.278: readserial: exit dev=4 nr=0
+4     4.278: strread: n=1024
+4     4.278: readtcpsvr: state=2
+4     4.278: waittcpsvr: sock=5 state=2
+4     4.278: accsock: sock=5
+4     4.278: updatetcpsvr: state=2
+4     4.278: strread: n=1024
+4     4.288: strread: n=32768
+4     4.288: readserial: dev=4 n=32768
+5     4.288: readserial: exit dev=4 nr=0
+4     4.288: strread: n=1024
+4     4.288: readtcpsvr: state=2
+4     4.288: waittcpsvr: sock=5 state=2
+4     4.288: accsock: sock=5
+4     4.288: updatetcpsvr: state=2
+4     4.288: strread: n=1024
+4     4.298: strread: n=32768
+4     4.298: readserial: dev=4 n=32768
+5     4.298: readserial: exit dev=4 nr=0
+4     4.298: strread: n=1024
+4     4.298: readtcpsvr: state=2
+4     4.298: waittcpsvr: sock=5 state=2
+4     4.298: accsock: sock=5
+4     4.298: updatetcpsvr: state=2
+4     4.298: strread: n=1024
+4     4.309: strread: n=32768
+4     4.309: readserial: dev=4 n=32768
+5     4.309: readserial: exit dev=4 nr=0
+4     4.309: strread: n=1024
+4     4.309: readtcpsvr: state=2
+4     4.309: waittcpsvr: sock=5 state=2
+4     4.309: accsock: sock=5
+4     4.309: updatetcpsvr: state=2
+4     4.309: strread: n=1024
+4     4.319: strread: n=32768
+4     4.319: readserial: dev=4 n=32768
+5     4.319: readserial: exit dev=4 nr=0
+4     4.319: strread: n=1024
+4     4.319: readtcpsvr: state=2
+4     4.319: waittcpsvr: sock=5 state=2
+4     4.319: accsock: sock=5
+4     4.319: updatetcpsvr: state=2
+4     4.319: strread: n=1024
+4     4.329: strread: n=32768
+4     4.329: readserial: dev=4 n=32768
+5     4.329: readserial: exit dev=4 nr=0
+4     4.329: strread: n=1024
+4     4.329: readtcpsvr: state=2
+4     4.329: waittcpsvr: sock=5 state=2
+4     4.329: accsock: sock=5
+4     4.329: updatetcpsvr: state=2
+4     4.329: strread: n=1024
+4     4.339: strread: n=32768
+4     4.339: readserial: dev=4 n=32768
+5     4.339: readserial: exit dev=4 nr=0
+4     4.339: strread: n=1024
+4     4.339: readtcpsvr: state=2
+4     4.339: waittcpsvr: sock=5 state=2
+4     4.340: accsock: sock=5
+4     4.340: updatetcpsvr: state=2
+4     4.340: strread: n=1024
+4     4.349: strread: n=32768
+4     4.349: readserial: dev=4 n=32768
+5     4.349: readserial: exit dev=4 nr=0
+4     4.349: strread: n=1024
+4     4.349: readtcpsvr: state=2
+4     4.349: waittcpsvr: sock=5 state=2
+4     4.349: accsock: sock=5
+4     4.349: updatetcpsvr: state=2
+4     4.349: strread: n=1024
+4     4.359: strread: n=32768
+4     4.359: readserial: dev=4 n=32768
+5     4.359: readserial: exit dev=4 nr=0
+4     4.359: strread: n=1024
+4     4.359: readtcpsvr: state=2
+4     4.359: waittcpsvr: sock=5 state=2
+4     4.359: accsock: sock=5
+4     4.359: updatetcpsvr: state=2
+4     4.359: strread: n=1024
+4     4.369: strread: n=32768
+4     4.369: readserial: dev=4 n=32768
+5     4.369: readserial: exit dev=4 nr=0
+4     4.369: strread: n=1024
+4     4.369: readtcpsvr: state=2
+4     4.369: waittcpsvr: sock=5 state=2
+4     4.369: accsock: sock=5
+4     4.369: updatetcpsvr: state=2
+4     4.369: strread: n=1024
+4     4.379: strread: n=32768
+4     4.379: readserial: dev=4 n=32768
+5     4.379: readserial: exit dev=4 nr=0
+4     4.379: strread: n=1024
+4     4.379: readtcpsvr: state=2
+4     4.379: waittcpsvr: sock=5 state=2
+4     4.379: accsock: sock=5
+4     4.379: updatetcpsvr: state=2
+4     4.379: strread: n=1024
+4     4.389: strread: n=32768
+4     4.389: readserial: dev=4 n=32768
+5     4.389: readserial: exit dev=4 nr=0
+4     4.389: strread: n=1024
+4     4.389: readtcpsvr: state=2
+4     4.389: waittcpsvr: sock=5 state=2
+4     4.389: accsock: sock=5
+4     4.389: updatetcpsvr: state=2
+4     4.389: strread: n=1024
+4     4.399: strread: n=32768
+4     4.399: readserial: dev=4 n=32768
+5     4.399: readserial: exit dev=4 nr=0
+4     4.399: strread: n=1024
+4     4.399: readtcpsvr: state=2
+4     4.399: waittcpsvr: sock=5 state=2
+4     4.399: accsock: sock=5
+4     4.399: updatetcpsvr: state=2
+4     4.399: strread: n=1024
+4     4.409: strread: n=32768
+4     4.409: readserial: dev=4 n=32768
+5     4.409: readserial: exit dev=4 nr=0
+4     4.409: strread: n=1024
+4     4.409: readtcpsvr: state=2
+4     4.409: waittcpsvr: sock=5 state=2
+4     4.409: accsock: sock=5
+4     4.409: updatetcpsvr: state=2
+4     4.409: strread: n=1024
+4     4.419: strread: n=32768
+4     4.419: readserial: dev=4 n=32768
+5     4.419: readserial: exit dev=4 nr=0
+4     4.419: strread: n=1024
+4     4.419: readtcpsvr: state=2
+4     4.419: waittcpsvr: sock=5 state=2
+4     4.419: accsock: sock=5
+4     4.419: updatetcpsvr: state=2
+4     4.419: strread: n=1024
+4     4.430: strread: n=32768
+4     4.430: readserial: dev=4 n=32768
+5     4.430: readserial: exit dev=4 nr=0
+4     4.430: strread: n=1024
+4     4.430: readtcpsvr: state=2
+4     4.430: waittcpsvr: sock=5 state=2
+4     4.430: accsock: sock=5
+4     4.430: updatetcpsvr: state=2
+4     4.430: strread: n=1024
+4     4.440: strread: n=32768
+4     4.440: readserial: dev=4 n=32768
+5     4.440: readserial: exit dev=4 nr=0
+4     4.440: strread: n=1024
+4     4.440: readtcpsvr: state=2
+4     4.440: waittcpsvr: sock=5 state=2
+4     4.440: accsock: sock=5
+4     4.440: updatetcpsvr: state=2
+4     4.440: strread: n=1024
+4     4.450: strread: n=32768
+4     4.450: readserial: dev=4 n=32768
+5     4.451: readserial: exit dev=4 nr=0
+4     4.451: strread: n=1024
+4     4.451: readtcpsvr: state=2
+4     4.451: waittcpsvr: sock=5 state=2
+4     4.451: accsock: sock=5
+4     4.451: updatetcpsvr: state=2
+4     4.451: strread: n=1024
+4     4.460: strread: n=32768
+4     4.460: readserial: dev=4 n=32768
+5     4.460: readserial: exit dev=4 nr=0
+4     4.460: strread: n=1024
+4     4.460: readtcpsvr: state=2
+4     4.460: waittcpsvr: sock=5 state=2
+4     4.460: accsock: sock=5
+4     4.460: updatetcpsvr: state=2
+4     4.460: strread: n=1024
+4     4.470: strread: n=32768
+4     4.470: readserial: dev=4 n=32768
+5     4.470: readserial: exit dev=4 nr=0
+4     4.470: strread: n=1024
+4     4.470: readtcpsvr: state=2
+4     4.470: waittcpsvr: sock=5 state=2
+4     4.470: accsock: sock=5
+4     4.470: updatetcpsvr: state=2
+4     4.470: strread: n=1024
+4     4.480: strread: n=32768
+4     4.480: readserial: dev=4 n=32768
+5     4.480: readserial: exit dev=4 nr=0
+4     4.480: strread: n=1024
+4     4.480: readtcpsvr: state=2
+4     4.480: waittcpsvr: sock=5 state=2
+4     4.481: accsock: sock=5
+4     4.481: updatetcpsvr: state=2
+4     4.481: strread: n=1024
+4     4.490: strread: n=32768
+4     4.490: readserial: dev=4 n=32768
+5     4.490: readserial: exit dev=4 nr=0
+4     4.490: strread: n=1024
+4     4.490: readtcpsvr: state=2
+4     4.490: waittcpsvr: sock=5 state=2
+4     4.490: accsock: sock=5
+4     4.490: updatetcpsvr: state=2
+4     4.490: strread: n=1024
+4     4.500: strread: n=32768
+4     4.500: readserial: dev=4 n=32768
+5     4.500: readserial: exit dev=4 nr=0
+4     4.500: strread: n=1024
+4     4.500: readtcpsvr: state=2
+4     4.500: waittcpsvr: sock=5 state=2
+4     4.500: accsock: sock=5
+4     4.500: updatetcpsvr: state=2
+4     4.500: strread: n=1024
+4     4.511: strread: n=32768
+4     4.511: readserial: dev=4 n=32768
+5     4.511: readserial: exit dev=4 nr=0
+4     4.511: strread: n=1024
+4     4.511: readtcpsvr: state=2
+4     4.511: waittcpsvr: sock=5 state=2
+4     4.511: accsock: sock=5
+4     4.511: updatetcpsvr: state=2
+4     4.511: strread: n=1024
+4     4.521: strread: n=32768
+4     4.521: readserial: dev=4 n=32768
+5     4.521: readserial: exit dev=4 nr=0
+4     4.521: strread: n=1024
+4     4.521: readtcpsvr: state=2
+4     4.521: waittcpsvr: sock=5 state=2
+4     4.521: accsock: sock=5
+4     4.521: updatetcpsvr: state=2
+4     4.521: strread: n=1024
+4     4.531: strread: n=32768
+4     4.532: readserial: dev=4 n=32768
+5     4.532: readserial: exit dev=4 nr=0
+4     4.532: strread: n=1024
+4     4.532: readtcpsvr: state=2
+4     4.532: waittcpsvr: sock=5 state=2
+4     4.532: accsock: sock=5
+4     4.532: updatetcpsvr: state=2
+4     4.532: strread: n=1024
+4     4.541: strread: n=32768
+4     4.541: readserial: dev=4 n=32768
+5     4.541: readserial: exit dev=4 nr=0
+4     4.541: strread: n=1024
+4     4.541: readtcpsvr: state=2
+4     4.541: waittcpsvr: sock=5 state=2
+4     4.541: accsock: sock=5
+4     4.541: updatetcpsvr: state=2
+4     4.541: strread: n=1024
+4     4.551: strread: n=32768
+4     4.551: readserial: dev=4 n=32768
+5     4.551: readserial: exit dev=4 nr=0
+4     4.551: strread: n=1024
+4     4.551: readtcpsvr: state=2
+4     4.551: waittcpsvr: sock=5 state=2
+4     4.551: accsock: sock=5
+4     4.551: updatetcpsvr: state=2
+4     4.551: strread: n=1024
+4     4.561: strread: n=32768
+4     4.561: readserial: dev=4 n=32768
+5     4.561: readserial: exit dev=4 nr=0
+4     4.561: strread: n=1024
+4     4.561: readtcpsvr: state=2
+4     4.561: waittcpsvr: sock=5 state=2
+4     4.561: accsock: sock=5
+4     4.561: updatetcpsvr: state=2
+4     4.561: strread: n=1024
+4     4.571: strread: n=32768
+4     4.571: readserial: dev=4 n=32768
+5     4.571: readserial: exit dev=4 nr=0
+4     4.571: strread: n=1024
+4     4.571: readtcpsvr: state=2
+4     4.571: waittcpsvr: sock=5 state=2
+4     4.571: accsock: sock=5
+4     4.571: updatetcpsvr: state=2
+4     4.571: strread: n=1024
+4     4.582: strread: n=32768
+4     4.582: readserial: dev=4 n=32768
+5     4.582: readserial: exit dev=4 nr=0
+4     4.582: strread: n=1024
+4     4.582: readtcpsvr: state=2
+4     4.582: waittcpsvr: sock=5 state=2
+4     4.582: accsock: sock=5
+4     4.582: updatetcpsvr: state=2
+4     4.582: strread: n=1024
+3     4.586: strsvrstop:
+3     4.586: strsendcmd: cmd=
+3     4.586: strsendcmd: cmd=
+3     4.586: strsendcmd: cmd=
+3     4.592: strclose: type=1 mode=3
+3     4.592: closeserial: dev=4
+3     4.592: strclose: type=3 mode=3
+3     4.592: closetcpsvr:
+3     4.592: strclose: type=0 mode=3
+3 no port to close stream: type=0
+3     4.592: strclose: type=0 mode=0
+3 no port to close stream: type=0
+3     4.592: strclose: type=0 mode=0
+3 no port to close stream: type=0
+3     4.592: strclose: type=0 mode=0
+3 no port to close stream: type=0
