@@ -2,7 +2,7 @@
 // rtkconv : rinex converter
 //
 //			Copyright (C) 2007-2020 by T.TAKASU, All rights
-//reserved.
+// reserved.
 //
 // options : rtkconv [-t title][-i file]
 //

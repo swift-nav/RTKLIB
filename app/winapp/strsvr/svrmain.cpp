@@ -2,7 +2,7 @@
 // strsvr : stream server
 //
 //			Copyright (C) 2007-2020 by T.TAKASU, All rights
-//reserved.
+// reserved.
 //
 // options : strsvr [-t title][-i file][-auto][-tray]
 //

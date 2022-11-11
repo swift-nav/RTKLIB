@@ -388,6 +388,12 @@ int main(int argc, char **argv) {
     if (*cmdfile[i])
       readcmd(cmdfile[i], cmds_periodic[i], 2);
   }
+
+  for (i = 0; i < MAXSTR; i++) {
+    if (*paths[i]) {
+      sprintf(logs[i], "log%d", i);
+    }
+  }
   /* start stream server */
   if (!strsvrstart(&strsvr, opts, types, paths, logs, conv, cmds, cmds_periodic,
                    stapos)) {

@@ -34,7 +34,8 @@
 
 #define ID_CRESPOS 1     /* hemis msg id: bin 1 position/velocity */
 #define ID_CRESGLOEPH 65 /* hemis msg id: bin 65 glonass ephemeris */
-#define ID_CRESGLORAW 66 /* hemis msg id: bin 66 glonass L1/L2 phase and code \
+#define ID_CRESGLORAW                                                         \
+  66                     /* hemis msg id: bin 66 glonass L1/L2 phase and code \
                           */
 #define ID_CRESRAW2 76   /* hemis msg id: bin 76 dual-freq raw */
 #define ID_CRESWAAS 80   /* hemis msg id: bin 80 waas messages */

@@ -161,8 +161,9 @@
 #define POLYCRC24Q 0x1864CFBu /* CRC24Q polynomial */
 
 #define SQR(x) ((x) * (x))
-#define MAX_VAR_EPH SQR(300.0) /* max variance eph to reject satellite (m^2) \
-                                */
+#define MAX_VAR_EPH                                        \
+  SQR(300.0) /* max variance eph to reject satellite (m^2) \
+              */
 
 static const double gpst0[] = {1980, 1, 6, 0, 0, 0}; /* gps time reference */
 static const double gst0[] = {
