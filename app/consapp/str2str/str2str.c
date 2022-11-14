@@ -33,220 +33,181 @@
 #include <unistd.h>
 #include "rtklib.h"
 
-#ifndef SIGHUP
-#define SIGHUP 1
-#endif
-#ifndef SIGPIPE
-#define SIGPIPE 13
-#endif
-
-#define PRGNAME "str2str"      /* program name */
-#define MAXSTR 9               /* max number of streams */
-#define TRFILE "str2str.trace" /* trace file */
+#define PRGNAME     "str2str"          /* program name */
+#define MAXSTR      5                  /* max number of streams */
+#define TRFILE      "str2str.trace"    /* trace file */
 
 /* global variables ----------------------------------------------------------*/
-static strsvr_t strsvr;          /* stream server */
-static volatile int intrflg = 0; /* interrupt flag */
+static strsvr_t strsvr;                /* stream server */
+static volatile int intrflg=0;         /* interrupt flag */
 
 /* help text -----------------------------------------------------------------*/
-static const char *help[] = {
-    "",
-    " usage: str2str [-in stream] [-out stream [-out stream...]] [options]",
-    "",
-    " Input data from a stream and divide and output them to multiple streams",
-    " The input stream can be serial, tcp client, tcp server, ntrip client, or",
-    " file. The output stream can be serial, tcp client, tcp server, ntrip "
-    "server,",
-    " or file. str2str is a resident type application. To stop it, type ctr-c "
-    "in",
-    " console if run foreground or send signal SIGINT for background process.",
-    " if run foreground or send signal SIGINT for background process.",
-    " if both of the input stream and the output stream follow #format, the",
-    " format of input messages are converted to output. To specify the output",
-    " messages, use -msg option. If the option -in or -out omitted, stdin for",
-    " input or stdout for output is used. If the stream in the option -in or "
-    "-out",
-#ifndef __MINGW32__
-    " is null, stdin or stdout is used as well. To reload ntrip source table",
-    " specified by the option -ft, send SIGUSR2 to the process",
-#else
-    " is null, stdin or stdout is used as well.",
-#endif
-    " Command options are as follows.",
-    "",
-    " -in  stream[#format] input  stream path and format",
-    " -out stream[#format] output stream path and format",
-    "",
-    "  stream path",
-    "    serial       : serial://port[:brate[:bsize[:parity[:stopb[:fctr]]]]]",
-    "    tcp server   : tcpsvr://:port",
-    "    tcp client   : tcpcli://addr[:port]",
-    "    udp server   : udpsvr://addr:port",
-    "    udp client   : udpcli://addr:port",
-    "    ntrip client : ntrip://[user[:passwd]@]addr[:port][/mntpnt]",
-    "    ntrip server : ntrips://[:passwd@]addr[:port]/mntpnt[:str] (only out)",
-    "    ntrip caster : ntripc_c://[user:passwd@][:port]/mntpnt[:srctbl] (only out)",
-    "    file         : [file://]path[::T][::+start][::xseppd][::S=swap]",
-    "",
-    "  format",
-    "    rtcm2        : RTCM 2 (only in)",
-    "    rtcm3        : RTCM 3",
-    "    nov          : NovAtel OEMV/4/6,OEMStar (only in)",
-    "    oem3         : NovAtel OEM3 (only in)",
-    "    ubx          : ublox LEA-4T/5T/6T (only in)",
-    "    sbp          : Swift Navigation SBP",
-    "    json         : Swift Navigation SBP-JSON",
-    "    stq          : SkyTraq S1315F (only in)",
-    "    javad        : Javad (only in)",
-    "    nvs          : NVS BINR (only in)",
-    "    binex        : BINEX (only in)",
-    "    rt17         : Trimble RT17 (only in)",
-    "    sbf          : Septentrio SBF (only in)",
-    "",
-    " -msg \"type[(tint)][,type[(tint)]...]\"",
-    "                   rtcm message types and output intervals (s)",
-    " -sta sta          station id",
-    " -opt opt          receiver dependent options",
-    " -s  msec          timeout time (ms) [10000]",
-    " -r  msec          reconnect interval (ms) [10000]",
-    " -n  msec          nmea request cycle (ms) [0]",
-    " -f  sec           file swap margin (s) [30]",
-    " -c  file          input commands file [no]",
-    " -c1 file          output 1 commands file [no]",
-    " -c2 file          output 2 commands file [no]",
-    " -c3 file          output 3 commands file [no]",
-    " -c4 file          output 4 commands file [no]",
-    " -p  lat lon hgt   station position (latitude/longitude/height) (deg,m)",
-    " -px x y z         station position (x/y/z-ecef) (m)",
-    " -a  antinfo       antenna info (separated by ,)",
-    " -i  rcvinfo       receiver info (separated by ,)",
-    " -o  e n u         antenna offset (e,n,u) (m)",
-    " -l  local_dir     ftp/http local directory []",
-    " -x  proxy_addr    http/ntrip proxy address [no]",
-    " -b  str_no        relay back messages from output str to input str [no]",
-    " -t  level         trace level [0]",
-    " -fl file          log file [str2str.trace]",
-    " -h                print help",
+static const char *help[]={
+"",
+" usage: str2str [-in stream] [-out stream [-out stream...]] [options]",
+"",
+" Input data from a stream and divide and output them to multiple streams",
+" The input stream can be serial, tcp client, tcp server, ntrip client, or",
+" file. The output stream can be serial, tcp client, tcp server, ntrip server,",
+" or file. str2str is a resident type application. To stop it, type ctr-c in",
+" console if run foreground or send signal SIGINT for background process.",
+" if run foreground or send signal SIGINT for background process.",
+" if both of the input stream and the output stream follow #format, the",
+" format of input messages are converted to output. To specify the output",
+" messages, use -msg option. If the option -in or -out omitted, stdin for",
+" input or stdout for output is used. If the stream in the option -in or -out",
+" is null, stdin or stdout is used as well.",
+" Command options are as follows.",
+"",
+" -in  stream[#format] input  stream path and format",
+" -out stream[#format] output stream path and format",
+"",
+"  stream path",
+"    serial       : serial://port[:brate[:bsize[:parity[:stopb[:fctr]]]]]",
+"    tcp server   : tcpsvr://:port",
+"    tcp client   : tcpcli://addr[:port]",
+"    ntrip client : ntrip://[user[:passwd]@]addr[:port][/mntpnt]",
+"    ntrip server : ntrips://[:passwd@]addr[:port]/mntpnt[:str] (only out)",
+"    ntrip caster : ntripc://[user:passwd@][:port]/mntpnt[:srctbl] (only out)",
+"    file         : [file://]path[::T][::+start][::xseppd][::S=swap]",
+"",
+"  format",
+"    rtcm2        : RTCM 2 (only in)",
+"    rtcm3        : RTCM 3",
+"    nov          : NovAtel OEMV/4/6,OEMStar (only in)",
+"    oem3         : NovAtel OEM3 (only in)",
+"    ubx          : ublox LEA-4T/5T/6T (only in)",
+"    ss2          : NovAtel Superstar II (only in)",
+"    hemis        : Hemisphere Eclipse/Crescent (only in)",
+"    stq          : SkyTraq S1315F (only in)",
+"    javad        : Javad (only in)",
+"    nvs          : NVS BINR (only in)",
+"    binex        : BINEX (only in)",
+"    rt17         : Trimble RT17 (only in)",
+"    sbf          : Septentrio SBF (only in)",
+"",
+" -msg \"type[(tint)][,type[(tint)]...]\"",
+"                   rtcm message types and output intervals (s)",
+" -sta sta          station id",
+" -opt opt          receiver dependent options",
+" -s  msec          timeout time (ms) [10000]",
+" -r  msec          reconnect interval (ms) [10000]",
+" -n  msec          nmea request cycle (m) [0]",
+" -f  sec           file swap margin (s) [30]",
+" -c  file          input commands file [no]",
+" -c1 file          output 1 commands file [no]",
+" -c2 file          output 2 commands file [no]",
+" -c3 file          output 3 commands file [no]",
+" -c4 file          output 4 commands file [no]",
+" -p  lat lon hgt   station position (latitude/longitude/height) (deg,m)",
+" -px x y z         station position (x/y/z-ecef) (m)",
+" -a  antinfo       antenna info (separated by ,)",
+" -i  rcvinfo       receiver info (separated by ,)",
+" -o  e n u         antenna offset (e,n,u) (m)",
+" -l  local_dir     ftp/http local directory []",
+" -x  proxy_addr    http/ntrip proxy address [no]",
+" -b  str_no        relay back messages from output str to input str [no]",
+" -t  level         trace level [0]",
+" -fl file          log file [str2str.trace]",
+" -h                print help",
 };
 /* print help ----------------------------------------------------------------*/
-static void printhelp(void) {
-  int i;
-  for (i = 0; i < sizeof(help) / sizeof(*help); i++)
-    fprintf(stderr, "%s\n", help[i]);
-  exit(0);
+static void printhelp(void)
+{
+    int i;
+    for (i=0;i<sizeof(help)/sizeof(*help);i++) fprintf(stderr,"%s\n",help[i]);
+    exit(0);
 }
 /* signal handler ------------------------------------------------------------*/
-static void sigfunc(int sig) { intrflg = 1; }
+static void sigfunc(int sig)
+{
+    intrflg=1;
+}
 /* decode format -------------------------------------------------------------*/
-static void decodefmt(char *path, int *fmt) {
-  char *p;
-
-  *fmt = -1;
-
-  if ((p = strrchr(path, '#'))) {
-    if (!strcmp(p, "#rtcm2"))
-      *fmt = STRFMT_RTCM2;
-    else if (!strcmp(p, "#rtcm3"))
-      *fmt = STRFMT_RTCM3;
-    else if (!strcmp(p, "#nov"))
-      *fmt = STRFMT_OEM4;
-    else if (!strcmp(p, "#oem3"))
-      *fmt = STRFMT_OEM3;
-    else if (!strcmp(p, "#ubx"))
-      *fmt = STRFMT_UBX;
-    else if (!strcmp(p, "#sbp"))
-      *fmt = STRFMT_SBP;
-    else if (!strcmp(p, "#json"))
-      *fmt = STRFMT_SBPJSON;
-    else if (!strcmp(p, "#stq"))
-      *fmt = STRFMT_STQ;
-    else if (!strcmp(p, "#javad"))
-      *fmt = STRFMT_JAVAD;
-    else if (!strcmp(p, "#nvs"))
-      *fmt = STRFMT_NVS;
-    else if (!strcmp(p, "#binex"))
-      *fmt = STRFMT_BINEX;
-    else if (!strcmp(p, "#rt17"))
-      *fmt = STRFMT_RT17;
-    else if (!strcmp(p, "#sbf"))
-      *fmt = STRFMT_SEPT;
-    else
-      return;
-    *p = '\0';
-  }
+static void decodefmt(char *path, int *fmt)
+{
+    char *p;
+    
+    *fmt=-1;
+    
+    if ((p=strrchr(path,'#'))) {
+        if      (!strcmp(p,"#rtcm2")) *fmt=STRFMT_RTCM2;
+        else if (!strcmp(p,"#rtcm3")) *fmt=STRFMT_RTCM3;
+        else if (!strcmp(p,"#nov"  )) *fmt=STRFMT_OEM4;
+        else if (!strcmp(p,"#oem3" )) *fmt=STRFMT_OEM3;
+        else if (!strcmp(p,"#ubx"  )) *fmt=STRFMT_UBX;
+        else if (!strcmp(p,"#ss2"  )) *fmt=STRFMT_SS2;
+        else if (!strcmp(p,"#hemis")) *fmt=STRFMT_CRES;
+        else if (!strcmp(p,"#stq"  )) *fmt=STRFMT_STQ;
+        else if (!strcmp(p,"#javad")) *fmt=STRFMT_JAVAD;
+        else if (!strcmp(p,"#nvs"  )) *fmt=STRFMT_NVS;
+        else if (!strcmp(p,"#binex")) *fmt=STRFMT_BINEX;
+        else if (!strcmp(p,"#rt17" )) *fmt=STRFMT_RT17;
+        else if (!strcmp(p,"#sbf"  )) *fmt=STRFMT_SEPT;
+        else return;
+        *p='\0';
+    }
 }
 /* decode stream path --------------------------------------------------------*/
-static int decodepath(const char *path, int *type, char *strpath, int *fmt) {
-  char buff[1024], *p;
-
-  strcpy(buff, path);
-
-  /* decode format */
-  decodefmt(buff, fmt);
-
-  /* decode type */
-  if (!(p = strstr(buff, "://"))) {
-    strcpy(strpath, buff);
-    *type = STR_FILE;
+static int decodepath(const char *path, int *type, char *strpath, int *fmt)
+{
+    char buff[1024],*p;
+    
+    strcpy(buff,path);
+    
+    /* decode format */
+    decodefmt(buff,fmt);
+    
+    /* decode type */
+    if (!(p=strstr(buff,"://"))) {
+        strcpy(strpath,buff);
+        *type=STR_FILE;
+        return 1;
+    }
+    if      (!strncmp(path,"serial",6)) *type=STR_SERIAL;
+    else if (!strncmp(path,"tcpsvr",6)) *type=STR_TCPSVR;
+    else if (!strncmp(path,"tcpcli",6)) *type=STR_TCPCLI;
+    else if (!strncmp(path,"ntripc",6)) *type=STR_NTRIPCAS;
+    else if (!strncmp(path,"ntrips",6)) *type=STR_NTRIPSVR;
+    else if (!strncmp(path,"ntrip", 5)) *type=STR_NTRIPCLI;
+    else if (!strncmp(path,"file",  4)) *type=STR_FILE;
+    else {
+        fprintf(stderr,"stream path error: %s\n",buff);
+        return 0;
+    }
+    strcpy(strpath,p+3);
     return 1;
-  }
-  if (!strncmp(path, "serial", 6))
-    *type = STR_SERIAL;
-  else if (!strncmp(path, "tcpsvr", 6))
-    *type = STR_TCPSVR;
-  else if (!strncmp(path, "udpsvr", 6))
-    *type = STR_UDPSVR;
-  else if (!strncmp(path, "udpcli", 6))
-    *type = STR_UDPCLI;
-  else if (!strncmp(path, "tcpcli", 6))
-    *type = STR_TCPCLI;
-  else if (!strncmp(path, "ntripc", 6))
-    *type = STR_NTRIPCAS;
-  else if (!strncmp(path, "ntrips", 6))
-    *type = STR_NTRIPSVR;
-  else if (!strncmp(path, "ntrip", 5))
-    *type = STR_NTRIPCLI;
-  else if (!strncmp(path, "file", 4))
-    *type = STR_FILE;
-  else {
-    fprintf(stderr, "stream path error: %s\n", buff);
-    return 0;
-  }
-  strcpy(strpath, p + 3);
-  return 1;
 }
 /* read receiver commands ----------------------------------------------------*/
-static void readcmd(const char *file, char *cmd, int type) {
-  FILE *fp;
-  char buff[MAXSTR], *p = cmd;
-  int i = 0;
-
-  *p = '\0';
-
-  if (!(fp = fopen(file, "r")))
-    return;
-
-  while (fgets(buff, sizeof(buff), fp)) {
-    if (*buff == '@')
-      i++;
-    else if (i == type && p + strlen(buff) + 1 < cmd + MAXRCVCMD) {
-      p += sprintf(p, "%s", buff);
+static void readcmd(const char *file, char *cmd, int type)
+{
+    FILE *fp;
+    char buff[MAXSTR],*p=cmd;
+    int i=0;
+    
+    *p='\0';
+    
+    if (!(fp=fopen(file,"r"))) return;
+    
+    while (fgets(buff,sizeof(buff),fp)) {
+        if (*buff=='@') i++;
+        else if (i==type&&p+strlen(buff)+1<cmd+MAXRCVCMD) {
+            p+=sprintf(p,"%s",buff);
+        }
     }
-  }
-  fclose(fp);
+    fclose(fp);
 }
-
 /* str2str -------------------------------------------------------------------*/
 int main(int argc, char **argv)
 {
-    static char cmd_strs[MAXSTR][MAXRCVCMD]={"","","","","","","","",""};
-    static char cmd_periodic_strs[MAXSTR][MAXRCVCMD]={"","","","","","","","",""};
+    static char cmd_strs[MAXSTR][MAXRCVCMD]={"","","","",""};
+    static char cmd_periodic_strs[MAXSTR][MAXRCVCMD]={"","","","",""};
     const char ss[]={'E','-','W','C','C'};
     strconv_t *conv[MAXSTR]={NULL};
     double pos[3],stapos[3]={0},stadel[3]={0};
     static char s1[MAXSTR][MAXSTRPATH]={{0}},s2[MAXSTR][MAXSTRPATH]={{0}};
     char *paths[MAXSTR],*logs[MAXSTR];
-    char *cmdfile[MAXSTR]={"","","","","","","","",""},*cmds[MAXSTR],*cmds_periodic[MAXSTR];
+    char *cmdfile[MAXSTR]={"","","","",""},*cmds[MAXSTR],*cmds_periodic[MAXSTR];
     char *local="",*proxy="",*msg="1004,1019",*opt="",buff[256],*p;
     char strmsg[MAXSTRMSG]="",*antinfo="",*rcvinfo="";
     char *ant[]={"","",""},*rcv[]={"","",""},*logfile="";
@@ -263,9 +224,11 @@ int main(int argc, char **argv)
     for (i=1;i<argc;i++) {
         if (!strcmp(argv[i],"-in")&&i+1<argc) {
             if (!decodepath(argv[++i],types,paths[0],fmts)) return -1;
+            sprintf(logs[0], "log0", i);
         }
         else if (!strcmp(argv[i],"-out")&&i+1<argc&&n<MAXSTR-1) {
             if (!decodepath(argv[++i],types+n+1,paths[n+1],fmts+n+1)) return -1;
+            sprintf(logs[n], "log%d", n);
             n++;
         }
         else if (!strcmp(argv[i],"-p")&&i+3<argc) {
@@ -306,12 +269,7 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i],"-t"  )&&i+1<argc) trlevel=atoi(argv[++i]);
         else if (*argv[i]=='-') printhelp();
     }
-    if (n==0) {
-        /* use stdout as only output */
-        fprintf(stderr, "using stdout as output\n");
-        n=1; /* stdout */
-        decodepath("/dev/stdout",types+n,paths[n],fmts+n);
-    }
+    if (n<=0) n=1; /* stdout */
     
     for (i=0;i<n;i++) {
         if (fmts[i+1]<=0) continue;
@@ -355,6 +313,7 @@ int main(int argc, char **argv)
     
     strsetdir(local);
     strsetproxy(proxy);
+    
     for (i=0;i<MAXSTR;i++) {
         if (*cmdfile[i]) readcmd(cmdfile[i],cmds[i],0);
         if (*cmdfile[i]) readcmd(cmdfile[i],cmds_periodic[i],2);
@@ -378,19 +337,18 @@ int main(int argc, char **argv)
         
         sleepms(dispint);
     }
-    for (i = 0; i < MAXSTR; i++) {
-        if (cmdfile[i])
-            readcmd(cmdfile[i], cmds[i], 1);
+    for (i=0;i<MAXSTR;i++) {
+        if (*cmdfile[i]) readcmd(cmdfile[i],cmds[i],1);
     }
     /* stop stream server */
-    strsvrstop(&strsvr, cmds);
-
-    for (i = 0; i < n; i++) {
+    strsvrstop(&strsvr,cmds);
+    
+    for (i=0;i<n;i++) {
         strconvfree(conv[i]);
     }
-    if (trlevel > 0) {
+    if (trlevel>0) {
         traceclose();
     }
-    fprintf(stderr, "stream server stop\n");
+    fprintf(stderr,"stream server stop\n");
     return 0;
 }
