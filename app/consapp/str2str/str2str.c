@@ -263,11 +263,11 @@ int main(int argc, char **argv)
     for (i=1;i<argc;i++) {
         if (!strcmp(argv[i],"-in")&&i+1<argc) {
             if (!decodepath(argv[++i],types,paths[0],fmts)) return -1;
-            sprintf(logs[0], "log0", i);
+            sprintf(logs[0], "inputlog");
         }
         else if (!strcmp(argv[i],"-out")&&i+1<argc&&n<MAXSTR-1) {
             if (!decodepath(argv[++i],types+n+1,paths[n+1],fmts+n+1)) return -1;
-            sprintf(logs[n], "log%d", n);
+            sprintf(logs[n+1], "outputlog%d", n+1);
             n++;
         }
         else if (!strcmp(argv[i],"-p")&&i+3<argc) {
