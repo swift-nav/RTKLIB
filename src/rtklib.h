@@ -1099,6 +1099,7 @@ typedef struct {        /* RINEX options type */
     char tobs[7][MAXOBSTYPE][4]; /* obs types {GPS,GLO,GAL,QZS,SBS,CMP,IRN} */
     double shift[7][MAXOBSTYPE]; /* phase shift (cyc) {GPS,GLO,GAL,QZS,SBS,CMP,IRN} */
     int nobs[7];        /* number of obs types {GPS,GLO,GAL,QZS,SBS,CMP,IRN} */
+    int outsnr;         /* output standardized signal strength */
 } rnxopt_t;
 
 typedef struct {        /* satellite status type */

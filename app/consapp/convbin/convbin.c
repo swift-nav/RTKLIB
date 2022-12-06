@@ -98,6 +98,7 @@ static const char *help[]={
 "     -oi          include iono correction in rinex nav header [off]",
 "     -ot          include time correction in rinex nav header [off]",
 "     -ol          include leap seconds in rinex nav header [off]",
+"     -os          include standardized signal strength (1-9) in rinex obs [off]",
 "     -halfc       half-cycle ambiguity correction [off]",
 "     -mask   [sig[,...]] signal mask(s) (sig={G|R|E|J|S|C|I}L{1C|1P|1W|...})",
 "     -nomask [sig[,...]] signal no mask (same as above)",
@@ -436,6 +437,9 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
         }
         else if (!strcmp(argv[i],"-ol")) {
             opt->outleaps=1;
+        }
+        else if (!strcmp(argv[i],"-os")) {
+            opt->outsnr=1;
         }
         else if (!strcmp(argv[i],"-scan")) {
             /* obsolute */ ;
