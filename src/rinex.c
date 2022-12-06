@@ -2031,7 +2031,7 @@ extern int outrnxobsh(FILE *fp, const rnxopt_t *opt, const nav_t *nav)
 {
     double ep[6],pos[3]={0},del[3]={0};
     char date[32],*sys,*tsys="GPS";
-    int i;
+    int i,m,j,snr;
     
     trace(3,"outrnxobsh:\n");
     
@@ -2085,6 +2085,15 @@ extern int outrnxobsh(FILE *fp, const rnxopt_t *opt, const nav_t *nav)
     if (opt->tint>0.0) {
         fprintf(fp,"%10.3f%50s%-20s\n",opt->tint,"","INTERVAL");
     }
+    if (opt->rnxver>=300) { /* ver.3 */
+        snr=0;
+        for (m=0;m<7;m++) {
+            for (j=0;j<opt->nobs[m];j++) {
+                if (opt->tobs[m][j][0]=='S') snr=1;
+            }
+        }
+        if (snr) fprintf(fp,"%4s%-56s%-20s\n","DBHZ","","SIGNAL STRENGTH UNIT");
+    }
     time2epoch(opt->tstart,ep);
     fprintf(fp,"  %04.0f    %02.0f    %02.0f    %02.0f    %02.0f   %010.7f     %-12s%-20s\n",
             ep[0],ep[1],ep[2],ep[3],ep[4],ep[5],tsys,"TIME OF FIRST OBS");
@@ -2105,7 +2114,7 @@ extern int outrnxobsh(FILE *fp, const rnxopt_t *opt, const nav_t *nav)
     return fprintf(fp,"%-60.60s%-20s\n","","END OF HEADER")!=EOF;
 }
 /* output observation data field ---------------------------------------------*/
-static void outrnxobsf(FILE *fp, double obs, int lli)
+static void outrnxobsf(FILE *fp, double obs, int lli, int snr)
 {
     if (obs==0.0||obs<=-1E9||obs>=1E9) {
         fprintf(fp,"              ");
@@ -2114,10 +2123,16 @@ static void outrnxobsf(FILE *fp, double obs, int lli)
         fprintf(fp,"%14.3f",obs);
     }
     if (lli<0||!(lli&(LLI_SLIP|LLI_HALFC|LLI_BOCTRK))) {
-        fprintf(fp,"  ");
+        fprintf(fp," ");
     }
     else {
-        fprintf(fp,"%1.1d ",lli&(LLI_SLIP|LLI_HALFC|LLI_BOCTRK));
+        fprintf(fp,"%1.1d",lli&(LLI_SLIP|LLI_HALFC|LLI_BOCTRK));
+    }
+    if (snr<0) {
+        fprintf(fp," ");
+    }
+    else {
+        fprintf(fp,"%1.1d",snr);
     }
 }
 /* search obsservattion data index -------------------------------------------*/
@@ -2195,9 +2210,9 @@ extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
                       int flag, double _dClockBias)
 {
     const char *mask;
-    double ep[6],dL;
+    double ep[6],dL,snrRaw;
     char sats[MAXOBS][4]={""};
-    int i,j,k,m,ns,sys,ind[MAXOBS],s[MAXOBS]={0};
+    int i,j,k,m,ns,sys,ind[MAXOBS],s[MAXOBS]={0},snrRnx;
     
     trace(3,"outrnxobsb: n=%d\n",n);
     
@@ -2253,19 +2268,29 @@ extern int outrnxobsb(FILE *fp, const rnxopt_t *opt, const obsd_t *obs, int n,
             /* search obs data index */
             if ((k=obsindex(opt->rnxver,sys,obs[ind[i]].code,opt->tobs[m][j],
                             mask))<0) {
-                outrnxobsf(fp,0.0,-1);
+                outrnxobsf(fp,0.0,-1,-1);
                 continue;
             }
             /* phase shift (cyc) */
             dL=(obs[ind[i]].L[k]!=0.0)?opt->shift[m][j]:0.0;
             
+            /* stardized signal strength */
+            snrRaw=obs[ind[i]].SNR[k]*SNR_UNIT;
+            if (opt->outsnr&&snrRaw>0.0) {
+                snrRnx=snrRaw/6;
+                snrRnx=snrRnx<1?1:snrRnx;
+                snrRnx=snrRnx>9?9:snrRnx;
+            } else {
+                snrRnx=-1;
+            }
+
             /* output field */
             switch (opt->tobs[m][j][0]) {
                 case 'C':
-                case 'P': outrnxobsf(fp,obs[ind[i]].P[k],-1); break;
-                case 'L': outrnxobsf(fp,obs[ind[i]].L[k]+dL,obs[ind[i]].LLI[k]); break;
-                case 'D': outrnxobsf(fp,obs[ind[i]].D[k],-1); break;
-                case 'S': outrnxobsf(fp,obs[ind[i]].SNR[k]*SNR_UNIT,-1); break;
+                case 'P': outrnxobsf(fp,obs[ind[i]].P[k],-1,snrRnx); break;
+                case 'L': outrnxobsf(fp,obs[ind[i]].L[k]+dL,obs[ind[i]].LLI[k],-1); break;
+                case 'D': outrnxobsf(fp,obs[ind[i]].D[k],-1,-1); break;
+                case 'S': outrnxobsf(fp,snrRaw,-1,-1); break;
             }
         }
         if (opt->rnxver>=300&&fprintf(fp,"\n")==EOF) return 0;
