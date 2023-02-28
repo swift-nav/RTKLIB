@@ -107,3 +107,24 @@ jobs:
             macOS/${{ env.MACOS_ARCHIVE }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+  publish:
+    needs: [release]
+    runs-on: ubuntu-latest
+    name: Publish
+    steps:
+      - name: Store git tag vars
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - uses: swift-nav/swift-cli-publisher@v2
+        env:
+          VERSION: "${{ env.VERSION }}"
+          DL_MAC: "swiftnav_rtklib-${{ env.VERSION }}-macOS.zip"
+          DL_WINDOWS: "swiftnav_rtklib-${{ env.VERSION }}-Windows.zip"
+          DL_LINUX: "swiftnav_rtklib-${{ env.VERSION }}-Linux.zip"
+          TOOLS: "str2str,sbp2rinex"
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          gh-name: ${{ secrets.GH_NAME }}
+          gh-email: ${{ secrets.GH_EMAIL }}
