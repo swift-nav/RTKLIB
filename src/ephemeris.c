@@ -499,7 +499,7 @@ static seph_t *selseph(gtime_t time, int sat, const nav_t *nav)
     return nav->seph+j;
 }
 /* satellite clock with broadcast ephemeris ----------------------------------*/
-static int ephclk(gtime_t time, gtime_t teph, int sat, const nav_t *nav,
+extern int ephclk(gtime_t time, gtime_t teph, int sat, const nav_t *nav,
                   double *dts)
 {
     eph_t  *eph;

@@ -1535,6 +1535,8 @@ EXPORT int  readsap(const char *file, gtime_t time, nav_t *nav);
 EXPORT int  readdcb(const char *file, nav_t *nav, const sta_t *sta);
 EXPORT int  readfcb(const char *file, nav_t *nav);
 EXPORT void alm2pos(gtime_t time, const alm_t *alm, double *rs, double *dts);
+EXPORT int  ephclk(gtime_t time, gtime_t teph, int sat, const nav_t *nav,
+                   double *dts);
 
 EXPORT int tle_read(const char *file, tle_t *tle);
 EXPORT int tle_name_read(const char *file, tle_t *tle);
