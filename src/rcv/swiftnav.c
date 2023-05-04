@@ -1184,22 +1184,39 @@ static int decode_galnav(raw_t *raw) {
 
   eph.ttr = raw->time;
 
-  if (!strstr(raw->opt, "EPHALL")) {
-    if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
-        (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
-      return 0;
-    }
-  }
-
   source = puiTmp[156];
-  eph.code = (source == 1) ? (GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5A) :
-          (GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B | GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5B);
+
+  eph.sat = sat;
+  if (source == 0) { /* I/NAV */
+
+    if (!strstr(raw->opt, "EPHALL")) {
+      if ((eph.iode == raw->nav.eph[sat - 1].iode) &&
+          (eph.iodc == raw->nav.eph[sat - 1].iodc)) {
+        return 0;
+      }
+    }
+
+    eph.code = GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E1_B | GAL_BROADCAST_ORBIT5_DATA_SOURCE_INAV_E5B_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5B;
+    raw->nav.eph[sat - 1] = eph;
+    raw->ephset = 0;
+
+  } else { /* F/NAV */
+
+    if (!strstr(raw->opt, "EPHALL")) {
+      if ((eph.iode == raw->nav.eph[sat - 1 + MAXSAT].iode) &&
+          (eph.iodc == raw->nav.eph[sat - 1 + MAXSAT].iodc)) {
+        return 0;
+      }
+    }
+
+    eph.code = GAL_BROADCAST_ORBIT5_DATA_SOURCE_FNAV_E5A_I | GAL_BROADCAST_ORBIT5_TOC_SISA_E5A;
+    raw->nav.eph[sat - 1 + MAXSAT] = eph;
+    raw->ephset = 1;
+  }
+  raw->ephsat = sat;
 
   trace(3, "%s: decoded eph for E%02d\n", __FUNCTION__, prn);
 
-  eph.sat = sat;
-  raw->nav.eph[sat - 1] = eph;
-  raw->ephsat = sat;
   return 2;
 }
 
