@@ -2180,7 +2180,10 @@ static int decode_msm_head(rtcm_t *rtcm, int sys, int *sync, int *iod,
     return ncell;
 }
 /* compute rough ranges by adding integer number of milliseconds (i.e. DF397) */
-static void compute_rough_ranges(int sys, msm_h_t *h, double *r, rtcm_t *rtcm)
+static inline void compute_rough_ranges(const gtime_t obstime, int sys,
+                                        const double base_pos[3],
+                                        const uint8_t sats[64], int nsats,
+                                        const nav_t *nav, double *r)
 {
     int i,prn,sat;
     gtime_t tot;
@@ -2194,16 +2197,16 @@ static void compute_rough_ranges(int sys, msm_h_t *h, double *r, rtcm_t *rtcm)
     double var; // sat position and clock error variance (m^2)
     int svh; // satellite health flag
 
-    trace(3,"compute_rough_ranges: time=%s n=%d\n", time_str(rtcm->time,3),h->nsat);
+    trace(3,"compute_rough_ranges: time=%s n=%d\n", time_str(obstime,3),nsats);
 
-    if(norm(rtcm->sta.pos,3)<=0.0) {
+    if(norm(base_pos,3)<=0.0) {
         trace(2,"no base station position\n");
-        for (i=0;i<h->nsat;i++) r[i]=0.0;
+        for (i=0;i<nsats;i++) r[i]=0.0;
         return;
     }
 
-    for (i=0;i<h->nsat;i++) {
-        prn=h->sats[i];
+    for (i=0;i<nsats;i++) {
+        prn=sats[i];
         if      (sys==SYS_QZS) prn+=MINPRNQZS-1;
         else if (sys==SYS_SBS) prn+=MINPRNSBS-1;
 
@@ -2219,10 +2222,10 @@ static void compute_rough_ranges(int sys, msm_h_t *h, double *r, rtcm_t *rtcm)
         }
 
         // estimate time of transmission for the observation
-        tot=timeadd(rtcm->time,-0.07);
+        tot=timeadd(obstime,-0.07);
 
         // evaluate ephemeris at time of transmission
-        if(!ephclk(tot,rtcm->time,sat,&rtcm->nav,&dt)) {
+        if(!ephclk(tot,obstime,sat,nav,&dt)) {
             trace(2,"no broadcast clock %s sat=%i\n",time_str(tot,3),sat);
             r[i]=0.0;
             continue;
@@ -2232,7 +2235,7 @@ static void compute_rough_ranges(int sys, msm_h_t *h, double *r, rtcm_t *rtcm)
         tot=timeadd(tot, -dt);
 
         // evaluate satellite position and clock at time of transmission
-        if(!satpos(tot,rtcm->time,sat,EPHOPT_BRDC,&rtcm->nav,rs,dts,&var,&svh)) {
+        if(!satpos(tot,obstime,sat,EPHOPT_BRDC,nav,rs,dts,&var,&svh)) {
             trace(2,"no ephemeris %s sat=%i\n",time_str(tot,3),sat);
             r[i]=0.0;
             continue;
@@ -2246,7 +2249,7 @@ static void compute_rough_ranges(int sys, msm_h_t *h, double *r, rtcm_t *rtcm)
         }
 
         // geometric range from base station to satellite (corrected for Sagnac effect)
-        geometric_range = geodist(rs,rtcm->sta.pos,e);
+        geometric_range = geodist(rs,base_pos,e);
 
         if(geometric_range<=0.0) {
             trace(2,"invalid geometric range for sat %i\n",sat);
@@ -2309,7 +2312,7 @@ static int decode_msm1(rtcm_t *rtcm, int sys)
         prv=getbits(rtcm->buff,i,15); i+=15;
         if (prv!=-16384) pr[j]=prv*P2_24*RANGE_MS;
     }
-    compute_rough_ranges(sys,&h,r,rtcm);
+    compute_rough_ranges(rtcm->time,sys,rtcm->sta.pos,h.sats,h.nsat,&rtcm->nav,r);
 
     /* save obs data in msm message */
     save_msm_obs(rtcm,sys,&h,r,pr,cp,NULL,NULL,NULL,NULL,NULL,NULL);
