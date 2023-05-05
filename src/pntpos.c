@@ -55,7 +55,7 @@ static double varerr(const prcopt_t *opt, double el, int sys)
     return SQR(fact)*varr;
 }
 /* get group delay parameter (m) ---------------------------------------------*/
-static double gettgd(int sat, const nav_t *nav, int type)
+extern double gettgd(int sat, const nav_t *nav, int type)
 {
     int i,sys=satsys(sat,NULL);
     
