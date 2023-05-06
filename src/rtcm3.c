@@ -2087,9 +2087,13 @@ static void save_msm_obs(rtcm_t *rtcm, int sys, msm_h_t *h, const double *r,
                     rtcm->obs.data[index].D[idx[k]]=
                         (float)(-(rr[i]+rrf[j])*freq/CLIGHT);
                 }
-                rtcm->obs.data[index].LLI[idx[k]]=
-                    lossoflock(rtcm,sat,idx[k],lock[j])+(half[j]?2:0);
-                rtcm->obs.data[index].SNR [idx[k]]=(uint16_t)(cnr[j]/SNR_UNIT+0.5);
+                if (lock&&half) {
+                  rtcm->obs.data[index].LLI[idx[k]]=
+                      lossoflock(rtcm,sat,idx[k],lock[j])+(half[j]?2:0);
+                }
+                if (cnr) {
+                  rtcm->obs.data[index].SNR [idx[k]]=(uint16_t)(cnr[j]/SNR_UNIT+0.5);
+                }
                 rtcm->obs.data[index].code[idx[k]]=code[k];
             }
             j++;
@@ -2175,12 +2179,144 @@ static int decode_msm_head(rtcm_t *rtcm, int sys, int *sync, int *iod,
     }
     return ncell;
 }
+/* compute rough ranges by adding integer number of milliseconds (i.e. DF397) */
+static inline void compute_rough_ranges(const gtime_t obstime, int sys,
+                                        const double base_pos[3],
+                                        const uint8_t sats[64], int nsats,
+                                        const nav_t *nav, double *r)
+{
+    int i,prn,sat;
+    gtime_t tot;
+    double dt; // satellite clock bias
+    double geometric_range;
+    double pseudorange_ms, rough_range_ms;
+    uint8_t integer_ms;
+    double e[3]; // LOS unit vector
+    double rs[6]; // satellite position and velocity
+    double dts[2]; // sat clock {bias,drift} (s|s/s)
+    double var; // sat position and clock error variance (m^2)
+    int svh; // satellite health flag
+
+    trace(3,"compute_rough_ranges: time=%s n=%d\n", time_str(obstime,3),nsats);
+
+    if(norm(base_pos,3)<=0.0) {
+        trace(2,"no base station position\n");
+        for (i=0;i<nsats;i++) r[i]=0.0;
+        return;
+    }
+
+    for (i=0;i<nsats;i++) {
+        prn=sats[i];
+        if      (sys==SYS_QZS) prn+=MINPRNQZS-1;
+        else if (sys==SYS_SBS) prn+=MINPRNSBS-1;
+
+        if (r[i]==0.0) {
+            trace(2,"no rough range: prn=%d\n",prn);
+            continue;
+        }
+
+        if (!(sat=satno(sys,prn))) {
+            trace(2,"satellite number error: prn=%d\n",prn);
+            r[i]=0.0;
+            continue;
+        }
+
+        // estimate time of transmission for the observation
+        tot=timeadd(obstime,-0.07);
+
+        // evaluate ephemeris at time of transmission
+        if(!ephclk(tot,obstime,sat,nav,&dt)) {
+            trace(2,"no broadcast clock %s sat=%i\n",time_str(tot,3),sat);
+            r[i]=0.0;
+            continue;
+        }
+
+        // adjust time of transmission for satellite clock bias
+        tot=timeadd(tot, -dt);
+
+        // evaluate satellite position and clock at time of transmission
+        if(!satpos(tot,obstime,sat,EPHOPT_BRDC,nav,rs,dts,&var,&svh)) {
+            trace(2,"no ephemeris %s sat=%i\n",time_str(tot,3),sat);
+            r[i]=0.0;
+            continue;
+        }
+
+        // exclude satellite due to bad health?
+        if(satexclude(sat,var,svh,NULL)) {
+            trace(2,"unhealthy sat %i\n",sat);
+            r[i]=0.0;
+            continue;
+        }
+
+        // geometric range from base station to satellite (corrected for Sagnac effect)
+        geometric_range = geodist(rs,base_pos,e);
+
+        if(geometric_range<=0.0) {
+            trace(2,"invalid geometric range for sat %i\n",sat);
+            r[i]=0.0;
+            continue;
+        }
+
+        // satellite clock bias (corrected for relativistic effect)
+        geometric_range -= CLIGHT * dts[0];
+
+        // convert estimated pseudorange to milliseconds
+        pseudorange_ms = geometric_range / RANGE_MS;
+
+        // remove the rough pseudorange and the fine pseudorange from the estimated pseudorange
+        rough_range_ms = rint(pseudorange_ms / (double)P2_10) * P2_10;
+
+        // estimate number of whole milliseconds
+        integer_ms = (uint8_t)floor(rough_range_ms);
+
+        // convert to metres and add to rough range
+        r[i] += (double)integer_ms * RANGE_MS;
+    }
+}
 /* decode unsupported MSM message --------------------------------------------*/
 static int decode_msm0(rtcm_t *rtcm, int sys)
 {
     msm_h_t h={0};
     int i,sync,iod;
     if (decode_msm_head(rtcm,sys,&sync,&iod,&h,&i)<0) return -1;
+    rtcm->obsflag=!sync;
+    return sync?0:1;
+}
+/* decode MSM 1: compact GNSS pseudoranges -----------------------------------*/
+static int decode_msm1(rtcm_t *rtcm, int sys)
+{
+    msm_h_t h={0};
+    double r[64],pr[64],cp[64];
+    int i,j,type,sync,iod,ncell,rng_m,prv;
+
+    type=getbitu(rtcm->buff,24,12);
+
+    /* decode msm header */
+    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&h,&i))<0) return -1;
+
+    if (i+h.nsat*10+ncell*15>rtcm->len*8) {
+        trace(2,"rtcm3 %d length error: nsat=%d ncell=%d len=%d\n",type,h.nsat,
+              ncell,rtcm->len);
+        return -1;
+    }
+    for (j=0;j<h.nsat;j++) r[j]=0.0;
+    for (j=0;j<ncell;j++) pr[j]=cp[j]=-1E16;
+
+    /* decode satellite data */
+    for (j=0;j<h.nsat;j++) { /* rough range modulo 1ms */
+        rng_m=getbitu(rtcm->buff,i,10); i+=10;
+        r[j]=rng_m*P2_10*RANGE_MS;
+    }
+    /* decode signal data */
+    for (j=0;j<ncell;j++) { /* pseudorange */
+        prv=getbits(rtcm->buff,i,15); i+=15;
+        if (prv!=-16384) pr[j]=prv*P2_24*RANGE_MS;
+    }
+    compute_rough_ranges(rtcm->time,sys,rtcm->sta.pos,h.sats,h.nsat,&rtcm->nav,r);
+
+    /* save obs data in msm message */
+    save_msm_obs(rtcm,sys,&h,r,pr,cp,NULL,NULL,NULL,NULL,NULL,NULL);
+
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -2600,49 +2736,49 @@ extern int decode_rtcm3(rtcm_t *rtcm)
         case 1066: ret=decode_ssr4(rtcm,SYS_GLO,0); break;
         case 1067: ret=decode_ssr5(rtcm,SYS_GLO,0); break;
         case 1068: ret=decode_ssr6(rtcm,SYS_GLO,0); break;
-        case 1071: ret=decode_msm0(rtcm,SYS_GPS); break; /* not supported */
+        case 1071: ret=decode_msm1(rtcm,SYS_GPS); break;
         case 1072: ret=decode_msm0(rtcm,SYS_GPS); break; /* not supported */
         case 1073: ret=decode_msm0(rtcm,SYS_GPS); break; /* not supported */
         case 1074: ret=decode_msm4(rtcm,SYS_GPS); break;
         case 1075: ret=decode_msm5(rtcm,SYS_GPS); break;
         case 1076: ret=decode_msm6(rtcm,SYS_GPS); break;
         case 1077: ret=decode_msm7(rtcm,SYS_GPS); break;
-        case 1081: ret=decode_msm0(rtcm,SYS_GLO); break; /* not supported */
+        case 1081: ret=decode_msm1(rtcm,SYS_GLO); break;
         case 1082: ret=decode_msm0(rtcm,SYS_GLO); break; /* not supported */
         case 1083: ret=decode_msm0(rtcm,SYS_GLO); break; /* not supported */
         case 1084: ret=decode_msm4(rtcm,SYS_GLO); break;
         case 1085: ret=decode_msm5(rtcm,SYS_GLO); break;
         case 1086: ret=decode_msm6(rtcm,SYS_GLO); break;
         case 1087: ret=decode_msm7(rtcm,SYS_GLO); break;
-        case 1091: ret=decode_msm0(rtcm,SYS_GAL); break; /* not supported */
+        case 1091: ret=decode_msm1(rtcm,SYS_GAL); break;
         case 1092: ret=decode_msm0(rtcm,SYS_GAL); break; /* not supported */
         case 1093: ret=decode_msm0(rtcm,SYS_GAL); break; /* not supported */
         case 1094: ret=decode_msm4(rtcm,SYS_GAL); break;
         case 1095: ret=decode_msm5(rtcm,SYS_GAL); break;
         case 1096: ret=decode_msm6(rtcm,SYS_GAL); break;
         case 1097: ret=decode_msm7(rtcm,SYS_GAL); break;
-        case 1101: ret=decode_msm0(rtcm,SYS_SBS); break; /* not supported */
+        case 1101: ret=decode_msm1(rtcm,SYS_SBS); break;
         case 1102: ret=decode_msm0(rtcm,SYS_SBS); break; /* not supported */
         case 1103: ret=decode_msm0(rtcm,SYS_SBS); break; /* not supported */
         case 1104: ret=decode_msm4(rtcm,SYS_SBS); break;
         case 1105: ret=decode_msm5(rtcm,SYS_SBS); break;
         case 1106: ret=decode_msm6(rtcm,SYS_SBS); break;
         case 1107: ret=decode_msm7(rtcm,SYS_SBS); break;
-        case 1111: ret=decode_msm0(rtcm,SYS_QZS); break; /* not supported */
+        case 1111: ret=decode_msm1(rtcm,SYS_QZS); break;
         case 1112: ret=decode_msm0(rtcm,SYS_QZS); break; /* not supported */
         case 1113: ret=decode_msm0(rtcm,SYS_QZS); break; /* not supported */
         case 1114: ret=decode_msm4(rtcm,SYS_QZS); break;
         case 1115: ret=decode_msm5(rtcm,SYS_QZS); break;
         case 1116: ret=decode_msm6(rtcm,SYS_QZS); break;
         case 1117: ret=decode_msm7(rtcm,SYS_QZS); break;
-        case 1121: ret=decode_msm0(rtcm,SYS_CMP); break; /* not supported */
+        case 1121: ret=decode_msm1(rtcm,SYS_CMP); break;
         case 1122: ret=decode_msm0(rtcm,SYS_CMP); break; /* not supported */
         case 1123: ret=decode_msm0(rtcm,SYS_CMP); break; /* not supported */
         case 1124: ret=decode_msm4(rtcm,SYS_CMP); break;
         case 1125: ret=decode_msm5(rtcm,SYS_CMP); break;
         case 1126: ret=decode_msm6(rtcm,SYS_CMP); break;
         case 1127: ret=decode_msm7(rtcm,SYS_CMP); break;
-        case 1131: ret=decode_msm0(rtcm,SYS_IRN); break; /* not supported */
+        case 1131: ret=decode_msm1(rtcm,SYS_IRN); break;
         case 1132: ret=decode_msm0(rtcm,SYS_IRN); break; /* not supported */
         case 1133: ret=decode_msm0(rtcm,SYS_IRN); break; /* not supported */
         case 1134: ret=decode_msm4(rtcm,SYS_IRN); break;
