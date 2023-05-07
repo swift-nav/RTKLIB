@@ -36,7 +36,7 @@ all : str2str
 str2str : str2str.o stream.o rtkcmn.o solution.o sbas.o geoid.o
 str2str : rcvraw.o novatel.o ublox.o swiftnav.o skytraq.o javad.o
 str2str : nvs.o binex.o rt17.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o preceph.o streamsvr.o
-str2str : septentrio.o
+str2str : ephemeris.o septentrio.o
 
 str2str  :
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
@@ -83,6 +83,8 @@ rtcm3e.o   : $(SRC)/rtcm3e.c
 	$(CC) -c $(CFLAGS) $(SRC)/rtcm3e.c
 preceph.o  : $(SRC)/preceph.c
 	$(CC) -c $(CFLAGS) $(SRC)/preceph.c
+ephemeris.o: $(SRC)/ephemeris.c
+	$(CC) -c $(CFLAGS) $(SRC)/ephemeris.c
 septentrio.o: $(SRC)/rcv/septentrio.c
 	$(CC) -c $(CFLAGS) $(SRC)/rcv/septentrio.c
 
@@ -107,6 +109,7 @@ rtcm2.o    : $(SRC)/rtklib.h makefile
 rtcm3.o    : $(SRC)/rtklib.h makefile
 rtcm3e.o   : $(SRC)/rtklib.h makefile
 preceph.o  : $(SRC)/rtklib.h makefile
+ephemeris.o: $(SRC)/rtklib.h makefile
 septentrio.o: $(SRC)/rtklib.h makefile
 
 install:
