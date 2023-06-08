@@ -37,7 +37,7 @@ static void print_help(void)
 /* test rtcm nav data --------------------------------------------------------*/
 static int is_nav(int type)
 {
-    return type==1019||type==1044||type==1045||type==1046;
+    return type==1019||type==1042||type==1044||type==1045||type==1046;
 }
 /* test rtcm gnav data -------------------------------------------------------*/
 static int is_gnav(int type)
