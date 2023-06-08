@@ -61,7 +61,7 @@ static void gen_rtcm_obs(rtcm_t *rtcm, const int *type, int n, FILE *fp)
     for (i=0;i<n;i++) {
         if (is_nav(type[i])||is_gnav(type[i])||is_ant(type[i])) continue;
         
-        if (!gen_rtcm3(rtcm,type[i],i!=j)) continue;
+        if (!gen_rtcm3(rtcm,type[i],0,i!=j)) continue;
         if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
     }
 }
@@ -82,7 +82,7 @@ static void gen_rtcm_nav(gtime_t time, rtcm_t *rtcm, const nav_t *nav,
         for (j=0;j<n;j++) {
             if (!is_nav(type[j])) continue;
             
-            if (!gen_rtcm3(rtcm,type[j],0)) continue;
+            if (!gen_rtcm3(rtcm,type[j],0,0)) continue;
             if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
         }
         index[0]=i+1;
@@ -99,7 +99,7 @@ static void gen_rtcm_nav(gtime_t time, rtcm_t *rtcm, const nav_t *nav,
         for (j=0;j<n;j++) {
             if (!is_gnav(type[j])) continue;
             
-            if (!gen_rtcm3(rtcm,type[j],0)) continue;
+            if (!gen_rtcm3(rtcm,type[j],0,0)) continue;
             if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
         }
         index[1]=i+1;
@@ -113,7 +113,7 @@ static void gen_rtcm_ant(rtcm_t *rtcm, const int *type, int n, FILE *fp)
     for (i=0;i<n;i++) {
         if (!is_ant(type[i])) continue;
         
-        if (!gen_rtcm3(rtcm,type[i],0)) continue;
+        if (!gen_rtcm3(rtcm,type[i],0,0)) continue;
         if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
     }
 }

@@ -2,10 +2,10 @@
 
 BINDIR = /usr/local/bin
 SRC    = ../../src
-CFLAGS = -Wall -O3 -ansi -pedantic -I$(SRC) -DTRACE -DENAGLO -DENAGAL -DENAQZS -DNFREQ=3 -DNEXOBS=3
+CFLAGS = -Wall -O3 -pedantic -I$(SRC) -DTRACE -DENAGLO -DENAGAL -DENAQZS -DNFREQ=3 -DNEXOBS=3
 LDLIBS  = -lm
 
-rnx2rtcm   : rnx2rtcm.o rtkcmn.o rinex.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o
+rnx2rtcm   : rnx2rtcm.o rtkcmn.o rinex.o rtcm.o rtcm2.o rtcm3.o rtcm3e.o ephemeris.o preceph.o sbas.o
 
 rnx2rtcm.o : rnx2rtcm.c
 	$(CC) -c $(CFLAGS) rnx2rtcm.c
@@ -21,6 +21,12 @@ rtcm3.o    : $(SRC)/rtcm3.c
 	$(CC) -c $(CFLAGS) $(SRC)/rtcm3.c
 rtcm3e.o   : $(SRC)/rtcm3e.c
 	$(CC) -c $(CFLAGS) $(SRC)/rtcm3e.c
+ephemeris.o : $(SRC)/ephemeris.c
+	$(CC) -c $(CFLAGS) $(SRC)/ephemeris.c
+preceph.o : $(SRC)/preceph.c
+	$(CC) -c $(CFLAGS) $(SRC)/preceph.c
+sbas.o : $(SRC)/sbas.c
+	$(CC) -c $(CFLAGS) $(SRC)/sbas.c
 
 install:
 	cp rnx2rtcm $(BINDIR)
