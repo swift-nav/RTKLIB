@@ -1010,7 +1010,7 @@ static void convobs(FILE **ofp, rnxopt_t *opt, strfile_t *str, int *n,
     
     if (!ofp[0]||str->obs->n<=0) return;
     
-    time=str->obs->data[0].time;
+    time=str->time;
     
     /* avoid duplicated data by multiple files handover */
     if (tend->time&&timediff(time,*tend)<opt->ttol) return;
