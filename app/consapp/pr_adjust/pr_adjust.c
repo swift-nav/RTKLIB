@@ -74,7 +74,7 @@ static void printhelp() {
 }
 
 
-static double get_group_delay(const obsd_t* obs, int freq, const nav_t* nav) {
+static double get_time_group_delay(const obsd_t* obs, int freq, const nav_t* nav) {
     double gamma, tgd;
     int sat = obs->sat;
     int code = obs->code[freq];
@@ -272,7 +272,7 @@ static void adjust_pseudoranges(const prcopt_t* opt, obsd_t* obs, int num_obs_ro
                     continue;
                 }
 
-                pseudorange = obs[idx_base].P[i] - get_group_delay(obs + idx_base, i, nav);
+                pseudorange = obs[idx_base].P[i] - get_time_group_delay(obs + idx_base, i, nav);
 
                 // PRC = geometric_range - pseudorange
                 obs[idx_rover].P[i] += geometric_range - pseudorange;
@@ -595,6 +595,8 @@ static int execses(prcopt_t* popt, const solopt_t* sopt, const filopt_t* fopt, c
                             popt_.rb[i] = rtcm_base.sta.pos[i];
                         }
 
+                        sortobs(&rtcm_rover.obs);
+                        sortobs(&rtcm_base.obs);
                         apply_dgnss_corrections(&popt_, &rtcm_rover.time, &rtcm_rover.obs, &rtcm_base.obs, &rtcm_rover.nav);
 
                         // write out adjusted pseudoranegs
