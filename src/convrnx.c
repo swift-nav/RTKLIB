@@ -243,6 +243,7 @@ static int input_strfile(strfile_t *str)
     trace(4,"input_strfile:\n");
     
     if (str->format==STRFMT_RTCM2) {
+        str->rtcm.obs.n=0;
         if ((type=input_rtcm2f(&str->rtcm,str->fp))>=1) {
             str->time=str->rtcm.time;
             str->ephsat=str->rtcm.ephsat;
@@ -251,6 +252,7 @@ static int input_strfile(strfile_t *str)
         }
     }
     else if (str->format==STRFMT_RTCM3) {
+        str->rtcm.obs.n=0;
         if ((type=input_rtcm3f(&str->rtcm,str->fp))>=1) {
             str->time=str->rtcm.time;
             str->ephsat=str->rtcm.ephsat;
@@ -259,6 +261,7 @@ static int input_strfile(strfile_t *str)
         }
     }
     else if (str->format<=MAXRCVFMT) {
+        str->raw.obs.n=0;
         if ((type=input_rawf(&str->raw,str->format,str->fp))>=1) {
             str->time=str->raw.time;
             str->ephsat=str->raw.ephsat;
@@ -271,6 +274,7 @@ static int input_strfile(strfile_t *str)
         }
     }
     else if (str->format==STRFMT_RINEX) {
+        str->rnx.obs.n=0;
         if ((type=input_rnxctr(&str->rnx,str->fp))>=1) {
             str->time=str->rnx.time;
             str->ephsat=str->rnx.ephsat;

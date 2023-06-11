@@ -2036,7 +2036,6 @@ static void save_msm_obs(rtcm_t *rtcm, int sys, msm_h_t *h, const double *r,
     /* get signal index */
     sigindex(sys,code,h->nsig,rtcm->opt,idx);
     
-    rtcm->obs.n=0;
     for (i=j=0;i<h->nsat;i++) {
         
         prn=h->sats[i];
