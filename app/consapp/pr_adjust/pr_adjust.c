@@ -33,6 +33,15 @@ extern double gettgd(int sat, const nav_t* nav, int type);
 extern int selsat(const obsd_t* obs, double* azel, int nu, int nr, const prcopt_t* opt, int* sat, int* iu, int* ir);
 
 
+typedef struct prog_opts_t {
+    prcopt_t prc;
+    solopt_t sol;
+    filopt_t fil;
+    int adjust_tgd; /* -tgd command line option */
+    int adjust_clocks; /* -clocks command line option */
+} prog_opts_t;
+
+
 /* help text -----------------------------------------------------------------*/
 static const char* help[]={
 "",
@@ -51,6 +60,8 @@ static const char* help[]={
 " -sys s[,s...] nav system(s) (s=G:GPS,R:GLO,E:GAL,J:QZS,C:BDS,I:IRN) [G|E|C]",
 " -f freq   number of frequencies for relative mode (1:L1,2:L1+L2,3:L1+L2+L5) [3]",
 " -x level  debug trace level (0:off) [0]"
+" -tgd      enable TGD adjustment [disabled]"
+" -clocks   enable clock correction using measured Doppler [disabled]"
 };
 
 extern int showmsg(const char *format, ...) {
@@ -74,7 +85,7 @@ static void printhelp() {
 }
 
 
-static double get_time_group_delay(const obsd_t* obs, int freq, const nav_t* nav) {
+static inline double get_time_group_delay(const obsd_t* obs, int freq, const nav_t* nav) {
     double gamma, tgd;
     int sat = obs->sat;
     int code = obs->code[freq];
@@ -85,8 +96,7 @@ static double get_time_group_delay(const obsd_t* obs, int freq, const nav_t* nav
                 case CODE_L5I:
                 case CODE_L5Q:
                 case CODE_L5X: // L5
-                    gamma = (FREQ1/FREQ5) * (FREQ1/FREQ5);
-                    tgd = gamma * gettgd(sat, nav, 1); /* TGD (m) */
+                    tgd = 0.; /* L1/L5 TGD comes from C/NAV, but there is no way to represent this in RTCM */
                     break;
                 case CODE_L2C:
                 case CODE_L2D:
@@ -114,8 +124,7 @@ static double get_time_group_delay(const obsd_t* obs, int freq, const nav_t* nav
                 case CODE_L5I:
                 case CODE_L5Q:
                 case CODE_L5X: // L5
-                    gamma = (FREQ1/FREQ5) * (FREQ1/FREQ5);
-                    tgd = gamma * gettgd(sat, nav, 1); /* TGD (m) */
+                    tgd = 0.; /* L1/L5 TGD comes from C/NAV, but there is no way to represent this in RTCM */
                     break;
                 case CODE_L2S:
                 case CODE_L2L:
@@ -138,45 +147,27 @@ static double get_time_group_delay(const obsd_t* obs, int freq, const nav_t* nav
                 case CODE_L5Q:
                 case CODE_L5X: // E5a
                     gamma = (FREQ1/FREQ5) * (FREQ1/FREQ5);
-                    tgd = gamma * gettgd(sat, nav, 0); // BGD_E1E5a
+                    tgd = gamma * gettgd(sat, nav, 0); // BGD_E1E5a from F/NAV or I/NAV
                     break;
                 case CODE_L7I:
                 case CODE_L7Q:
                 case CODE_L7X: // E5b
                     gamma = (FREQ1/FREQ7) * (FREQ1/FREQ7);
-                    tgd = gamma * gettgd(sat, nav, 1); // BGD_E1E5b
+                    tgd = gamma * gettgd(sat, nav, 1); // BGD_E1E5b from I/NAV
                     break;
                 default: // E1
-                    tgd = gettgd(sat, nav, 1); // BGD_E1E5b
+                    tgd = gettgd(sat, nav, 1); // BGD_E1E5b from I/NAV
                     break;
             }
             return tgd;
         case SYS_CMP:
             switch(code) {
                 case CODE_L2I: // TGD_B1I
+                case CODE_L1P: // TGD_B1Cp
                     tgd = gettgd(sat, nav, 0);
                     break;
-                case CODE_L7I:
-                case CODE_L7Q:
-                case CODE_L7X:
-                case CODE_L7D:
-                case CODE_L7P:
-                case CODE_L7Z: // TGD_B2I/B2b
+                default:
                     tgd = gettgd(sat, nav, 1);
-                    break;
-                case CODE_L1P: // TGD_B1Cp
-                    tgd = gettgd(sat, nav, 2);
-                    break;
-                case CODE_L5P: // TGD_B2ap
-                    tgd = gettgd(sat, nav, 3);
-                    break;
-                case CODE_L5X:
-                case CODE_L8X:
-                case CODE_L5D: // ISC_B2ad
-                    tgd = gettgd(sat, nav, 5); // ISC_B2ad
-                    break;
-                default: // TGD_B1Cp+ISC_B1Cd
-                    tgd = gettgd(sat, nav, 2) + gettgd(sat, nav, 4);
                     break;
             }
             return tgd;
@@ -191,13 +182,72 @@ static double get_time_group_delay(const obsd_t* obs, int freq, const nav_t* nav
 
 
 /*
+ * calc_pvt
+ *
+ * Wrapper for pntpos() provided by RTKLIB
+ */
+static inline int calc_pvt(const prcopt_t* opt, const obsd_t* obs, int num_obs, const nav_t* nav, sol_t* sol) {
+    char msg[128];
+    int stat;
+    prcopt_t opt_ = *opt;
+    opt_.elmin = 10. * D2R;
+
+    trace(3, "calc_pvt\n");
+
+    sol->time = obs[0].time;
+    msg[0] = '\0';
+
+    stat = pntpos(obs, num_obs, nav, &opt_, sol, NULL, NULL, msg);
+
+    if(!stat) {
+        trace(3, "calc_pvt failed: %s\n", msg);
+    }
+
+    return stat;
+}
+
+
+/*
+ * get_clock_offset
+ *
+ * Use measured Doppler to compensate for different clocks per constellation
+ */
+static inline double get_clock_offset(int sat, int code, const sol_t* sol, double doppler_hz) {
+    double delta_t_s = 0.;
+    double wavelength_m;
+    int sys = satsys(sat, NULL);
+
+    if(sol->stat != SOLQ_NONE) {
+        delta_t_s = sol->dtr[0];
+        switch(sys) {
+            case SYS_GLO:
+                delta_t_s -= sol->dtr[1];
+                break;
+            case SYS_GAL:
+                delta_t_s -= sol->dtr[2];
+                break;
+            case SYS_CMP:
+                delta_t_s -= sol->dtr[3];
+                break;
+            case SYS_IRN:
+                delta_t_s -= sol->dtr[4];
+                break;
+        }
+    }
+
+    wavelength_m = CLIGHT / code2freq(sys, code, 0);
+    return delta_t_s * doppler_hz * wavelength_m;
+}
+
+
+/*
  * adjust_pseudoranges
  *
  * Given a set of rover observations and a set of base observations, compute
  * the PRC (Pseudo Range Correction) value for each satellite and adjust each
  * observation accordingly
  */
-static void adjust_pseudoranges(const prcopt_t* opt, obsd_t* obs, int num_obs_rover, int num_obs_base, const nav_t* nav) {
+static inline void adjust_pseudoranges(const prog_opts_t* prog_opts, const prcopt_t* proc_opts, obsd_t* obs, int num_obs_rover, int num_obs_base, const nav_t* nav) {
     int i;
     double *rs,*dts,*var,*azel;
     double basepos_llh[3]; // base station position as lat/lon/alt
@@ -209,28 +259,41 @@ static void adjust_pseudoranges(const prcopt_t* opt, obsd_t* obs, int num_obs_ro
     int num_obs_total = num_obs_rover + num_obs_base;
     double e[3]; // LOS unit vector
     int idx_rover, idx_base, idx_matching;
-    double geometric_range, pseudorange;
+    double geometric_range;
+    sol_t sol_rover={{0}};
 
     trace(3, "adjust_pseudorange: time=%s n=%d\n", time_str(obs[0].time, 3), num_obs_total);
     trace(4, "obs in=\n"); traceobs(4, obs, num_obs_total);
 
+    if(num_obs_rover == 0) {
+        return;
+    }
+    if(num_obs_base == 0) {
+        trace(1, "no base obs, not attempting correction\n");
+        return;
+    }
+
     rs = mat(6, num_obs_total); dts = mat(2, num_obs_total); var = mat(1, num_obs_total); azel = zeros(2, num_obs_total);
 
+    if(prog_opts->adjust_clocks) {
+        calc_pvt(proc_opts, obs, num_obs_rover, nav, &sol_rover);
+    }
+
     // compute satellite positions/clocks at time of transmission
-    satposs(obs[0].time, obs, num_obs_total, nav, EPHOPT_BRDC, rs, dts, var, svh);
+    satposs(obs[num_obs_rover].time, obs, num_obs_total, nav, EPHOPT_BRDC, rs, dts, var, svh);
 
     // compute geometry values for all satellites visible from base station
-    ecef2pos(opt->rb, basepos_llh);
+    ecef2pos(proc_opts->rb, basepos_llh);
     for(idx_base = 0; idx_base < num_obs_base; idx_base++) {
-        if(geodist(rs + num_obs_rover*6 + idx_base*6, opt->rb, e) <= 0.) {
+        if(geodist(rs + num_obs_rover*6 + idx_base*6, proc_opts->rb, e) <= 0.) {
             continue;
         }
         satazel(basepos_llh, e, azel + num_obs_rover*2 + idx_base*2);
     }
 
     // select common satellites between rover and base station
-    if((num_obs_matching = selsat(obs, azel, num_obs_rover, num_obs_base, opt, matching_sats, iu, ir)) <= 0) {
-        trace(1, "no common satellites\n");
+    if((num_obs_matching = selsat(obs, azel, num_obs_rover, num_obs_base, proc_opts, matching_sats, iu, ir)) <= 0) {
+        trace(1, "no common satellites, not attempting correction\n");
 
         free(rs); free(dts); free(var); free(azel);
         return;
@@ -243,21 +306,21 @@ static void adjust_pseudoranges(const prcopt_t* opt, obsd_t* obs, int num_obs_ro
             idx_base = ir[idx_matching++];
 
             // exclude satellite due to bad health?
-            if(satexclude(obs[idx_rover].sat, var[idx_rover], svh[idx_rover], opt) ||
-               satexclude(obs[idx_base].sat, var[idx_base], svh[idx_base], opt)) {
+            if(satexclude(obs[idx_rover].sat, var[idx_rover], svh[idx_rover], proc_opts) ||
+               satexclude(obs[idx_base].sat, var[idx_base], svh[idx_base], proc_opts)) {
                 trace(3, "unhealthy sat %i\n", obs[idx_rover].sat);
-                for(i = 0; i < opt->nf; i++) { // invalidate
+                for(i = 0; i < proc_opts->nf; i++) { // invalidate
                     obs[idx_rover].P[i] = 0.;
                 }
                 continue;
             }
 
             // geometric range from base station to satellite (corrected for Sagnac effect)
-            geometric_range = geodist(rs + idx_base*6, opt->rb, e);
+            geometric_range = geodist(rs + idx_base*6, proc_opts->rb, e);
 
             if(geometric_range <= 0.) {
                 trace(3, "invalid geometric range for base sat %i\n", obs[idx_base].sat);
-                for(i = 0; i < opt->nf; i++) { // invalidate
+                for(i = 0; i < proc_opts->nf; i++) { // invalidate
                     obs[idx_rover].P[i] = 0.;
                 }
                 continue;
@@ -266,19 +329,25 @@ static void adjust_pseudoranges(const prcopt_t* opt, obsd_t* obs, int num_obs_ro
             // satellite clock bias (corrected for relativistic effect)
             geometric_range -= CLIGHT * dts[idx_base*2];
 
-            for(i = 0; i < opt->nf; i++) {
+            for(i = 0; i < proc_opts->nf; i++) {
                 if(obs[idx_rover].P[i] == 0. || obs[idx_base].P[i] == 0.) {
                     obs[idx_rover].P[i] = 0.;
                     continue;
                 }
 
-                pseudorange = obs[idx_base].P[i] - get_time_group_delay(obs + idx_base, i, nav);
+                // PRC = geometric_range - observed pseudorange
+                obs[idx_rover].P[i] += geometric_range - obs[idx_base].P[i];
 
-                // PRC = geometric_range - pseudorange
-                obs[idx_rover].P[i] += geometric_range - pseudorange;
+                if(prog_opts->adjust_tgd) {
+                    obs[idx_rover].P[i] += get_time_group_delay(obs + idx_base, i, nav);
+                }
+
+                if(prog_opts->adjust_clocks) {
+                    obs[idx_rover].P[i] -= get_clock_offset(obs[idx_rover].sat, obs[idx_rover].code[i], &sol_rover, obs[idx_rover].D[i]);
+                }
             }
         } else { // no matching base observations, invalidate rover pseudorange observations
-            for(i = 0; i < opt->nf; i++) {
+            for(i = 0; i < proc_opts->nf; i++) {
                 obs[idx_rover].P[i] = 0.;
             }
         }
@@ -296,7 +365,7 @@ static void adjust_pseudoranges(const prcopt_t* opt, obsd_t* obs, int num_obs_ro
  * Apply DGNSS corrections from base observations ('base_obs') to rover
  * observations ('rover_obs')
  */
-int apply_dgnss_corrections(const prcopt_t* opt, const gtime_t* epoch_time, obs_t* rover_obs, const obs_t* base_obs, const nav_t* nav) {
+static inline int apply_dgnss_corrections(const prog_opts_t* prog_opts, const prcopt_t* proc_opts, const gtime_t* epoch_time, obs_t* rover_obs, const obs_t* base_obs, const nav_t* nav) {
     int i;
     obsd_t obs[MAXOBS*2];
 
@@ -328,7 +397,7 @@ int apply_dgnss_corrections(const prcopt_t* opt, const gtime_t* epoch_time, obs_
     }
 
     // adjust pseudoranges
-    adjust_pseudoranges(opt, obs, rover_obs->n, base_obs->n, nav);
+    adjust_pseudoranges(prog_opts, proc_opts, obs, rover_obs->n, base_obs->n, nav);
 
     // copy out rover obs
     memcpy(rover_obs->data, obs, rover_obs->n * sizeof(obsd_t));
@@ -393,7 +462,7 @@ static void write_rtcm3_msm(FILE* fp, rtcm_t* out, int msg, int sys, int sync) {
 }
 
 
-static void write_rtcm3_obs(prcopt_t* popt, FILE* fp, const rtcm_t* rtcm_in, rtcm_t* rtcm_out) {
+static inline void write_rtcm3_obs(prcopt_t* popt, FILE* fp, const rtcm_t* rtcm_in, rtcm_t* rtcm_out) {
     int i, prn, sys;
     int navsys = popt->navsys;
 
@@ -434,7 +503,7 @@ static void write_rtcm3_obs(prcopt_t* popt, FILE* fp, const rtcm_t* rtcm_in, rtc
 }
 
 
-static void write_rtcm3_nav(prcopt_t* popt, FILE* fp, const rtcm_t* rtcm_in, rtcm_t* rtcm_out) {
+static inline void write_rtcm3_nav(prcopt_t* popt, FILE* fp, const rtcm_t* rtcm_in, rtcm_t* rtcm_out) {
     int prn;
     int msg_type = 0;
 
@@ -487,7 +556,7 @@ static void write_rtcm3_nav(prcopt_t* popt, FILE* fp, const rtcm_t* rtcm_in, rtc
 
 
 // read observations for 'epoch_time' from 'fp'
-int get_obs_at_time(FILE* fp, rtcm_t* rtcm, const gtime_t* epoch_time, const char* filename) {
+static inline int get_obs_at_time(FILE* fp, rtcm_t* rtcm, const gtime_t* epoch_time, const char* filename) {
     long orig_pos;
     int msg_type;
     double tt;
@@ -529,11 +598,11 @@ int get_obs_at_time(FILE* fp, rtcm_t* rtcm, const gtime_t* epoch_time, const cha
 }
 
 
-static int execses(prcopt_t* popt, const solopt_t* sopt, const filopt_t* fopt, const gtime_t* start_time, char** infile, int n, char* outfile) {
+static int execses(const prog_opts_t* prog_opts, const gtime_t* start_time, char** infile, int n, char* outfile) {
     FILE* fp_rover;
     FILE* fp_base;
     FILE* fp_out;
-    prcopt_t popt_ = *popt;
+    prcopt_t popt_ = prog_opts->prc;
     char tracefile[1024];
     int i, finished = 0;
 
@@ -542,17 +611,17 @@ static int execses(prcopt_t* popt, const solopt_t* sopt, const filopt_t* fopt, c
     trace(3, "execses : n=%d outfile=%s\n", n, outfile);
 
     // open debug trace
-    if(sopt->trace > 0) {
+    if(prog_opts->sol.trace > 0) {
         if (*outfile) {
             strcpy(tracefile, outfile);
             strcat(tracefile, ".trace");
         }
         else {
-            strcpy(tracefile, fopt->trace);
+            strcpy(tracefile, prog_opts->fil.trace);
         }
         traceclose();
         traceopen(tracefile);
-        tracelevel(sopt->trace);
+        tracelevel(prog_opts->sol.trace);
     }
 
     init_rtcm(&rtcm_rover);
@@ -595,9 +664,11 @@ static int execses(prcopt_t* popt, const solopt_t* sopt, const filopt_t* fopt, c
                             popt_.rb[i] = rtcm_base.sta.pos[i];
                         }
 
+                        // sort corrections to allow for rover/base matching
                         sortobs(&rtcm_rover.obs);
                         sortobs(&rtcm_base.obs);
-                        apply_dgnss_corrections(&popt_, &rtcm_rover.time, &rtcm_rover.obs, &rtcm_base.obs, &rtcm_rover.nav);
+
+                        apply_dgnss_corrections(prog_opts, &popt_, &rtcm_rover.time, &rtcm_rover.obs, &rtcm_base.obs, &rtcm_base.nav);
 
                         // write out adjusted pseudoranegs
                         write_rtcm3_obs(&popt_, fp_out, &rtcm_rover, &rtcm_out);
@@ -630,9 +701,7 @@ static int execses(prcopt_t* popt, const solopt_t* sopt, const filopt_t* fopt, c
 
 
 int main(int argc, char* argv[]) {
-    prcopt_t prcopt = prcopt_default;
-    solopt_t solopt = solopt_default;
-    filopt_t filopt = {""};
+    prog_opts_t prog_opts;
     int i, n, ret;
     char* infile[2];
     char* outfile = NULL;
@@ -640,40 +709,48 @@ int main(int argc, char* argv[]) {
     gtime_t trtcm = {0}; /* approx start time for rtcm */
     double epr[]={2010,1,1,0,0,0};
 
-    prcopt.mode = PMODE_SINGLE; // disable usage of iono/tropo modelling
-    prcopt.navsys = SYS_GPS | SYS_GAL | SYS_CMP;
-    prcopt.refpos = 1;
-    prcopt.glomodear = 1;
-    prcopt.nf = 3;
-    prcopt.elmin = 10. * D2R;
+    memset(&prog_opts, 0, sizeof(prog_opts_t));
+    prog_opts.prc = prcopt_default;
+    prog_opts.sol = solopt_default;
 
-    solopt.timef = 0;
-    sprintf(solopt.prog, "%s ver.%s %s", PROGNAME, VER_RTKLIB, PATCH_LEVEL);
-    sprintf(filopt.trace,"%s.trace", PROGNAME);
+    prog_opts.prc.mode = PMODE_SINGLE; // disable usage of iono/tropo modelling
+    prog_opts.prc.navsys = SYS_GPS | SYS_GAL | SYS_CMP;
+    prog_opts.prc.refpos = 1;
+    prog_opts.prc.glomodear = 1;
+    prog_opts.prc.nf = 3;
+    prog_opts.prc.elmin = 0.;
+
+    prog_opts.sol.timef = 0;
+    sprintf(prog_opts.sol.prog, "%s ver.%s %s", PROGNAME, VER_RTKLIB, PATCH_LEVEL);
+    sprintf(prog_opts.fil.trace,"%s.trace", PROGNAME);
 
     for(i=1, n=0; i < argc; i++) {
         if(!strcmp(argv[i], "-o") && i+1 <argc) {
             outfile = argv[++i];
         } else if(!strcmp(argv[i], "-f") && i+1 < argc) {
-            prcopt.nf = atoi(argv[++i]);
+            prog_opts.prc.nf = atoi(argv[++i]);
         } else if(!strcmp(argv[i], "-sys") && i+1 < argc) {
             for(p = argv[++i]; *p; p++) {
                 switch (*p) {
-                    case 'G': prcopt.navsys|=SYS_GPS; break;
-                    case 'R': prcopt.navsys|=SYS_GLO; break;
-                    case 'E': prcopt.navsys|=SYS_GAL; break;
-                    case 'J': prcopt.navsys|=SYS_QZS; break;
-                    case 'C': prcopt.navsys|=SYS_CMP; break;
-                    case 'I': prcopt.navsys|=SYS_IRN; break;
+                    case 'G': prog_opts.prc.navsys|=SYS_GPS; break;
+                    case 'R': prog_opts.prc.navsys|=SYS_GLO; break;
+                    case 'E': prog_opts.prc.navsys|=SYS_GAL; break;
+                    case 'J': prog_opts.prc.navsys|=SYS_QZS; break;
+                    case 'C': prog_opts.prc.navsys|=SYS_CMP; break;
+                    case 'I': prog_opts.prc.navsys|=SYS_IRN; break;
                 }
                 if(!(p=strchr(p,','))) break;
             }
         } else if(!strcmp(argv[i], "-x") && i+1 <argc) {
-            solopt.trace = atoi(argv[++i]);
+            prog_opts.sol.trace = atoi(argv[++i]);
         } else if(!strcmp(argv[i], "-tr") && i+2 < argc) {
             sscanf(argv[++i], "%lf/%lf/%lf", epr, epr+1, epr+2);
             sscanf(argv[++i], "%lf:%lf:%lf", epr+3, epr+4, epr+5);
             trtcm = epoch2time(epr);
+        } else if(!strcmp(argv[i], "-tgd")) {
+            prog_opts.adjust_tgd = 1;
+        } else if(!strcmp(argv[i], "-clocks")) {
+            prog_opts.adjust_clocks = 1;
         } else if(*argv[i] == '-') {
             printhelp();
         } else {
@@ -694,7 +771,7 @@ int main(int argc, char* argv[]) {
         return -3;
     }
 
-    ret = execses(&prcopt, &solopt, &filopt, &trtcm, infile, n, outfile);
+    ret = execses(&prog_opts, &trtcm, infile, n, outfile);
 
     if (!ret) fprintf(stderr,"%40s\r","");
     return ret;
