@@ -37,7 +37,7 @@ static void print_help(void)
 /* test rtcm nav data --------------------------------------------------------*/
 static int is_nav(int type)
 {
-    return type==1019||type==1044||type==1045||type==1046;
+    return type==1019||type==1042||type==1044||type==1045||type==1046;
 }
 /* test rtcm gnav data -------------------------------------------------------*/
 static int is_gnav(int type)
@@ -61,7 +61,7 @@ static void gen_rtcm_obs(rtcm_t *rtcm, const int *type, int n, FILE *fp)
     for (i=0;i<n;i++) {
         if (is_nav(type[i])||is_gnav(type[i])||is_ant(type[i])) continue;
         
-        if (!gen_rtcm3(rtcm,type[i],i!=j)) continue;
+        if (!gen_rtcm3(rtcm,type[i],0,i!=j)) continue;
         if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
     }
 }
@@ -69,20 +69,25 @@ static void gen_rtcm_obs(rtcm_t *rtcm, const int *type, int n, FILE *fp)
 static void gen_rtcm_nav(gtime_t time, rtcm_t *rtcm, const nav_t *nav,
                          int *index, const int *type, int n, FILE *fp)
 {
-    int i,j,sat,prn;
+    int i,j,sat,prn,code;
     
     for (i=index[0];i<nav->n;i++) {
         
         if (time.time&&timediff(nav->eph[i].ttr,time)>-0.1) continue;
         sat=nav->eph[i].sat;
+        code=nav->eph[i].code;
         rtcm->time=nav->eph[i].ttr;
-        rtcm->nav.eph[sat-1]=nav->eph[i];
+        if (satsys(sat,&prn)!=SYS_GAL||((code&1)==1)) { // non-GAL or GAL I/NAV
+            rtcm->nav.eph[sat-1]=nav->eph[i];
+        } else { // GAL F/NAV
+            rtcm->nav.eph[sat-1+MAXSAT]=nav->eph[i];
+        }
         rtcm->ephsat=sat;
         
         for (j=0;j<n;j++) {
             if (!is_nav(type[j])) continue;
             
-            if (!gen_rtcm3(rtcm,type[j],0)) continue;
+            if (!gen_rtcm3(rtcm,type[j],0,0)) continue;
             if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
         }
         index[0]=i+1;
@@ -99,7 +104,7 @@ static void gen_rtcm_nav(gtime_t time, rtcm_t *rtcm, const nav_t *nav,
         for (j=0;j<n;j++) {
             if (!is_gnav(type[j])) continue;
             
-            if (!gen_rtcm3(rtcm,type[j],0)) continue;
+            if (!gen_rtcm3(rtcm,type[j],0,0)) continue;
             if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
         }
         index[1]=i+1;
@@ -113,7 +118,7 @@ static void gen_rtcm_ant(rtcm_t *rtcm, const int *type, int n, FILE *fp)
     for (i=0;i<n;i++) {
         if (!is_ant(type[i])) continue;
         
-        if (!gen_rtcm3(rtcm,type[i],0)) continue;
+        if (!gen_rtcm3(rtcm,type[i],0,0)) continue;
         if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
     }
 }
@@ -129,13 +134,13 @@ static int conv_rtcm(const int *type, int n, const char *outfile,
     geph_t geph0={0};
     int i,j,prn,index[2]={0};
     
-    if (!(rtcm.nav.eph =(eph_t  *)malloc(sizeof(eph_t )*MAXSAT   ))||
+    if (!(rtcm.nav.eph =(eph_t  *)malloc(sizeof(eph_t )*MAXSAT*2 ))||
         !(rtcm.nav.geph=(geph_t *)malloc(sizeof(geph_t)*MAXPRNGLO))) return 0;
     
     rtcm.staid=staid;
     rtcm.sta=*sta;
     
-    for (i=0;i<MAXSAT   ;i++) rtcm.nav.eph [i]=eph0;
+    for (i=0;i<MAXSAT*2 ;i++) rtcm.nav.eph [i]=eph0;
     for (i=0;i<MAXPRNGLO;i++) rtcm.nav.geph[i]=geph0;
     
     /* update glonass freq channel number */

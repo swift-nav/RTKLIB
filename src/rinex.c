@@ -1854,6 +1854,7 @@ extern int input_rnxctr(rnxctr_t *rnx, FILE *fp)
         case 'H': sys=SYS_SBS ; break;
         case 'L': sys=SYS_GAL ; break; /* extension */
         case 'J': sys=SYS_QZS ; break; /* extension */
+        case 'C': sys=SYS_CMP ; break; /* extension */
         default: return 0;
     }
     if ((stat=readrnxnavb(fp,rnx->opt,rnx->ver,sys,&type,&eph,&geph,&seph))<=0) {
