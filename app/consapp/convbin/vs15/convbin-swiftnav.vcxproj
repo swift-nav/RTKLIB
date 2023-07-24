@@ -16,13 +16,8 @@
     <ClCompile Include="..\..\..\..\src\ionex.c" />
     <ClCompile Include="..\..\..\..\src\pntpos.c" />
     <ClCompile Include="..\..\..\..\src\preceph.c" />
-    <ClCompile Include="..\..\..\..\src\qzslex.c" />
     <ClCompile Include="..\..\..\..\src\rcvraw.c" />
     <ClCompile Include="..\..\..\..\src\rcv\binex.c" />
-    <ClCompile Include="..\..\..\..\src\rcv\cmr.c" />
-    <ClCompile Include="..\..\..\..\src\rcv\crescent.c" />
-    <ClCompile Include="..\..\..\..\src\rcv\tersus.c" />
-    <ClCompile Include="..\..\..\..\src\rcv\gw10.c" />
     <ClCompile Include="..\..\..\..\src\rcv\javad.c" />
     <ClCompile Include="..\..\..\..\src\rcv\novatel.c" />
     <ClCompile Include="..\..\..\..\src\rcv\nvs.c" />
