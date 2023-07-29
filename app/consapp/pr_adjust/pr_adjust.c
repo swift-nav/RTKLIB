@@ -607,7 +607,8 @@ static int execses(const prog_opts_t* prog_opts, const gtime_t* start_time, char
     char tracefile[1024];
     int i, finished = 0;
 
-    // each rtcm_t struct is ~1MB, which exceeds the windows stack limit
+    // Each rtcm_t struct is ~1MB, so 3 of them will exceed the stack limit
+    // under windows.  Therefore we allocate them statically instead.
     static rtcm_t rtcm_rover, rtcm_base, rtcm_out;
 
     // open debug trace
