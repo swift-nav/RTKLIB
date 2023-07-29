@@ -59,8 +59,8 @@ static const char* help[]={
 " -o file   set output file",
 " -sys s[,s...] nav system(s) (s=G:GPS,R:GLO,E:GAL,J:QZS,C:BDS,I:IRN) [G|E|C]",
 " -f freq   number of frequencies for relative mode (1:L1,2:L1+L2,3:L1+L2+L5) [3]",
-" -x level  debug trace level (0:off) [0]"
-" -tgd      enable TGD adjustment [disabled]"
+" -x level  debug trace level (0:off) [0]",
+" -tgd      enable TGD adjustment [disabled]",
 " -clocks   enable clock correction using measured Doppler [disabled]"
 };
 
@@ -598,6 +598,7 @@ static inline int get_obs_at_time(FILE* fp, rtcm_t* rtcm, const gtime_t* epoch_t
 }
 
 
+// modelled on execses() from postpos.c
 static int execses(const prog_opts_t* prog_opts, const gtime_t* start_time, char** infile, int n, char* outfile) {
     FILE* fp_rover;
     FILE* fp_base;
@@ -606,9 +607,8 @@ static int execses(const prog_opts_t* prog_opts, const gtime_t* start_time, char
     char tracefile[1024];
     int i, finished = 0;
 
-    rtcm_t rtcm_rover, rtcm_base, rtcm_out;
-
-    trace(3, "execses : n=%d outfile=%s\n", n, outfile);
+    // each rtcm_t struct is ~1MB, which exceeds the windows stack limit
+    static rtcm_t rtcm_rover, rtcm_base, rtcm_out;
 
     // open debug trace
     if(prog_opts->sol.trace > 0) {
@@ -623,6 +623,8 @@ static int execses(const prog_opts_t* prog_opts, const gtime_t* start_time, char
         traceopen(tracefile);
         tracelevel(prog_opts->sol.trace);
     }
+
+    trace(3, "execses : n=%d outfile=%s\n", n, outfile);
 
     init_rtcm(&rtcm_rover);
     rtcm_rover.time = *start_time;
