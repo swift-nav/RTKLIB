@@ -8,20 +8,27 @@ on:
     tags:
       - 'v*'
 jobs:
-  build-windows-linux:
-    name: Run Checks and Build - Windows & Linux
+  build:
+    name: Run Checks and Build
     strategy:
       matrix:
         os:
         - windows-2019
         - ubuntu-20.04
+        - macos-latest
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           ssh-key: ${{ secrets.SSH_KEY }}
+
+      - name: Run convbin build
+        working-directory: app/consapp/convbin/gcc
+        run: |
+          make clean all test
+        if: runner.os != 'Windows'
 
       - name: Run convbin build
         working-directory: app/consapp/convbin/gcc
@@ -57,54 +64,10 @@ jobs:
           path: |
             ${{ env.RELEASE_ARCHIVE }}
             release-archive.filename
-  build-macos:
-    name: Run Checks and Build - macOS
-    runs-on: macos-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          ssh-key: ${{ secrets.SSH_KEY }}
-
-      - name: Run convbin build
-        working-directory: app/consapp/convbin/gcc
-        run: |
-          make clean all test
-
-      - name: Run str2str build
-        working-directory: app/consapp/str2str/gcc
-        run: |
-          make clean all
-
-      - name: Archive ${{ runner.os }} Binaries.
-        shell: bash
-        run: |
-          POSTFIX="";
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            POSTFIX=".exe";
-          fi
-          VERSION="${GITHUB_REF##*/}"
-          DATE="$(date '+%Y-%m-%d')"
-          SBP2RINEX="sbp2rinex${POSTFIX}"
-          STR2STR="str2str${POSTFIX}"
-          cp ./app/consapp/convbin/gcc/$SBP2RINEX $SBP2RINEX
-          cp ./app/consapp/str2str/gcc/$STR2STR $STR2STR
-          RELEASE_ARCHIVE="swiftnav_rtklib-${VERSION}-${{ runner.os }}.zip"
-          7z a -tzip $RELEASE_ARCHIVE $SBP2RINEX $STR2STR LICENSE.txt;
-          echo $RELEASE_ARCHIVE >release-archive.filename
-          echo "RELEASE_ARCHIVE=$(cat release-archive.filename)" >>$GITHUB_ENV
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ runner.os }}-artifacts
-          path: |
-            ${{ env.RELEASE_ARCHIVE }}
-            release-archive.filename
   release:
     name: Create Release
     needs:
-      - build-windows-linux
-      - build-macos
+      - build
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     runs-on: ubuntu-20.04
     steps:
@@ -154,7 +117,7 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - uses: swift-nav/swift-cli-publisher@v2
+      - uses: swift-nav/swift-cli-publisher@v4
         env:
           VERSION: "${{ env.VERSION }}"
           DL_MAC: "swiftnav_rtklib-${{ env.VERSION }}-macOS.zip"
