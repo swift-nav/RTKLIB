@@ -50,7 +50,7 @@
 /* function prototypes -------------------------------------------------------*/
 extern int decode_rtcm2(rtcm_t *rtcm);
 extern int decode_rtcm3(rtcm_t *rtcm);
-extern int encode_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync);
+extern int encode_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync, int smooth, int tint_s);
 
 /* constants -----------------------------------------------------------------*/
 
@@ -74,7 +74,7 @@ extern int init_rtcm(rtcm_t *rtcm)
     
     trace(3,"init_rtcm:\n");
     
-    rtcm->staid=rtcm->stah=rtcm->seqno=rtcm->outtype=0;
+    rtcm->staid=rtcm->stah=rtcm->seqno=0;
     rtcm->time=rtcm->time_s=time0;
     rtcm->sta.name[0]=rtcm->sta.marker[0]='\0';
     rtcm->sta.antdes[0]=rtcm->sta.antsno[0]='\0';
@@ -355,7 +355,7 @@ extern int gen_rtcm2(rtcm_t *rtcm, int type, int sync)
 *          ({nsat} = number of valid satellites, {nsig} = number of signals in
 *          the obs data) 
 *-----------------------------------------------------------------------------*/
-extern int gen_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync)
+extern int gen_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync, int smooth, int tint_s)
 {
     uint32_t crc;
     int i=0;
@@ -370,7 +370,7 @@ extern int gen_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync)
     setbitu(rtcm->buff,i,10,0          ); i+=10;
     
     /* encode rtcm 3 message body */
-    if (!encode_rtcm3(rtcm,type,subtype,sync)) return 0;
+    if (!encode_rtcm3(rtcm,type,subtype,sync,smooth,tint_s)) return 0;
     
     /* padding to align 8 bit boundary */
     for (i=rtcm->nbit;i%8;i++) {

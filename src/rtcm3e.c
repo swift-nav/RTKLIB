@@ -334,12 +334,12 @@ static void gen_obs_glo(rtcm_t *rtcm, const obsd_t *data, int fcn, int *code1,
     if (code2) *code2=to_code2_glo(data->code[1]);
 }
 /* encode RTCM header --------------------------------------------------------*/
-static int encode_head(int type, rtcm_t *rtcm, int sys, int sync, int nsat)
+static int encode_head(int type, rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s, int nsat)
 {
     double tow;
     int i=24,week,epoch;
     
-    trace(4,"encode_head: type=%d sync=%d sys=%d nsat=%d\n",type,sync,sys,nsat);
+    trace(4,"encode_head: type=%d sync=%d sys=%d nsat=%d smooth=%d tint_s=%d\n",type,sync,sys,nsat,smooth,tint_s);
     
     setbitu(rtcm->buff,i,12,type       ); i+=12; /* message no */
     setbitu(rtcm->buff,i,12,rtcm->staid); i+=12; /* ref station id */
@@ -354,14 +354,14 @@ static int encode_head(int type, rtcm_t *rtcm, int sys, int sync, int nsat)
         epoch=ROUND(tow/0.001);
         setbitu(rtcm->buff,i,30,epoch); i+=30; /* gps epoch time */
     }
-    setbitu(rtcm->buff,i, 1,sync); i+= 1; /* synchronous gnss flag */
-    setbitu(rtcm->buff,i, 5,nsat); i+= 5; /* no of satellites */
-    setbitu(rtcm->buff,i, 1,0   ); i+= 1; /* smoothing indicator */
-    setbitu(rtcm->buff,i, 3,0   ); i+= 3; /* smoothing interval */
+    setbitu(rtcm->buff,i, 1,sync  ); i+= 1; /* synchronous gnss flag */
+    setbitu(rtcm->buff,i, 5,nsat  ); i+= 5; /* no of satellites */
+    setbitu(rtcm->buff,i, 1,smooth); i+= 1; /* smoothing indicator */
+    setbitu(rtcm->buff,i, 3,tint_s); i+= 3; /* smoothing interval */
     return i;
 }
 /* encode type 1001: basic L1-only GPS RTK observables -----------------------*/
-static int encode_type1001(rtcm_t *rtcm, int sync)
+static int encode_type1001(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     int i,j,nsat=0,sys,prn;
     int code1,pr1,ppr1,lock1,amb;
@@ -374,7 +374,7 @@ static int encode_type1001(rtcm_t *rtcm, int sync)
         nsat++;
     }
     /* encode header */
-    i=encode_head(1001,rtcm,SYS_GPS,sync,nsat);
+    i=encode_head(1001,rtcm,SYS_GPS,sync,smooth,tint_s,nsat);
     
     for (j=0;j<rtcm->obs.n&&nsat<MAXOBS;j++) {
         sys=satsys(rtcm->obs.data[j].sat,&prn);
@@ -396,7 +396,7 @@ static int encode_type1001(rtcm_t *rtcm, int sync)
     return 1;
 }
 /* encode type 1002: extended L1-only GPS RTK observables --------------------*/
-static int encode_type1002(rtcm_t *rtcm, int sync)
+static int encode_type1002(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     int i,j,nsat=0,sys,prn;
     int code1,pr1,ppr1,lock1,amb,cnr1;
@@ -409,7 +409,7 @@ static int encode_type1002(rtcm_t *rtcm, int sync)
         nsat++;
     }
     /* encode header */
-    i=encode_head(1002,rtcm,SYS_GPS,sync,nsat);
+    i=encode_head(1002,rtcm,SYS_GPS,sync,smooth,tint_s,nsat);
     
     for (j=0;j<rtcm->obs.n&&nsat<MAXOBS;j++) {
         sys=satsys(rtcm->obs.data[j].sat,&prn);
@@ -433,7 +433,7 @@ static int encode_type1002(rtcm_t *rtcm, int sync)
     return 1;
 }
 /* encode type 1003: basic L1&L2 GPS RTK observables -------------------------*/
-static int encode_type1003(rtcm_t *rtcm, int sync)
+static int encode_type1003(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     int i,j,nsat=0,sys,prn;
     int code1,pr1,ppr1,lock1,amb,code2,pr21,ppr2,lock2;
@@ -446,7 +446,7 @@ static int encode_type1003(rtcm_t *rtcm, int sync)
         nsat++;
     }
     /* encode header */
-    i=encode_head(1003,rtcm,SYS_GPS,sync,nsat);
+    i=encode_head(1003,rtcm,SYS_GPS,sync,smooth,tint_s,nsat);
     
     for (j=0;j<rtcm->obs.n&&nsat<MAXOBS;j++) {
         sys=satsys(rtcm->obs.data[j].sat,&prn);
@@ -472,7 +472,7 @@ static int encode_type1003(rtcm_t *rtcm, int sync)
     return 1;
 }
 /* encode type 1004: extended L1&L2 GPS RTK observables ----------------------*/
-static int encode_type1004(rtcm_t *rtcm, int sync)
+static int encode_type1004(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     int i,j,nsat=0,sys,prn;
     int code1,pr1,ppr1,lock1,amb,cnr1,code2,pr21,ppr2,lock2,cnr2;
@@ -485,7 +485,7 @@ static int encode_type1004(rtcm_t *rtcm, int sync)
         nsat++;
     }
     /* encode header */
-    i=encode_head(1004,rtcm,SYS_GPS,sync,nsat);
+    i=encode_head(1004,rtcm,SYS_GPS,sync,smooth,tint_s,nsat);
     
     for (j=0;j<rtcm->obs.n&&nsat<MAXOBS;j++) {
         sys=satsys(rtcm->obs.data[j].sat,&prn);
@@ -514,7 +514,7 @@ static int encode_type1004(rtcm_t *rtcm, int sync)
     return 1;
 }
 /* encode type 1005: stationary RTK reference station ARP --------------------*/
-static int encode_type1005(rtcm_t *rtcm, int sync)
+static int encode_type1005(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     double *p=rtcm->sta.pos;
     int i=24;
@@ -616,7 +616,7 @@ static int encode_type1008(rtcm_t *rtcm, int sync)
     return 1;
 }
 /* encode type 1009: basic L1-only GLONASS RTK observables -------------------*/
-static int encode_type1009(rtcm_t *rtcm, int sync)
+static int encode_type1009(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     int i,j,nsat=0,sat,prn,fcn;
     int code1,pr1,ppr1,lock1,amb;
@@ -628,7 +628,7 @@ static int encode_type1009(rtcm_t *rtcm, int sync)
         nsat++;
     }
     /* encode header */
-    i=encode_head(1009,rtcm,SYS_GLO,sync,nsat);
+    i=encode_head(1009,rtcm,SYS_GLO,sync,smooth,tint_s,nsat);
     
     for (j=0;j<rtcm->obs.n&&nsat<MAXOBS;j++) {
         sat=rtcm->obs.data[j].sat;
@@ -650,7 +650,7 @@ static int encode_type1009(rtcm_t *rtcm, int sync)
     return 1;
 }
 /* encode type 1010: extended L1-only GLONASS RTK observables ----------------*/
-static int encode_type1010(rtcm_t *rtcm, int sync)
+static int encode_type1010(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     int i,j,nsat=0,sat,prn,fcn;
     int code1,pr1,ppr1,lock1,amb,cnr1;
@@ -664,7 +664,7 @@ static int encode_type1010(rtcm_t *rtcm, int sync)
         nsat++;
     }
     /* encode header */
-    i=encode_head(1010,rtcm,SYS_GLO,sync,nsat);
+    i=encode_head(1010,rtcm,SYS_GLO,sync,smooth,tint_s,nsat);
     
     for (j=0;j<rtcm->obs.n&&nsat<MAXOBS;j++) {
         sat=rtcm->obs.data[j].sat;
@@ -688,7 +688,7 @@ static int encode_type1010(rtcm_t *rtcm, int sync)
     return 1;
 }
 /* encode type 1011: basic  L1&L2 GLONASS RTK observables --------------------*/
-static int encode_type1011(rtcm_t *rtcm, int sync)
+static int encode_type1011(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     int i,j,nsat=0,sat,prn,fcn;
     int code1,pr1,ppr1,lock1,amb,code2,pr21,ppr2,lock2;
@@ -702,7 +702,7 @@ static int encode_type1011(rtcm_t *rtcm, int sync)
         nsat++;
     }
     /* encode header */
-    i=encode_head(1011,rtcm,SYS_GLO,sync,nsat);
+    i=encode_head(1011,rtcm,SYS_GLO,sync,smooth,tint_s,nsat);
     
     for (j=0;j<rtcm->obs.n&&nsat<MAXOBS;j++) {
         sat=rtcm->obs.data[j].sat;
@@ -728,7 +728,7 @@ static int encode_type1011(rtcm_t *rtcm, int sync)
     return 1;
 }
 /* encode type 1012: extended L1&L2 GLONASS RTK observables ------------------*/
-static int encode_type1012(rtcm_t *rtcm, int sync)
+static int encode_type1012(rtcm_t *rtcm, int sync, int smooth, int tint_s)
 {
     int i,j,nsat=0,sat,prn,fcn;
     int code1,pr1,ppr1,lock1,amb,cnr1,code2,pr21,ppr2,lock2,cnr2;
@@ -742,7 +742,7 @@ static int encode_type1012(rtcm_t *rtcm, int sync)
         nsat++;
     }
     /* encode header */
-    i=encode_head(1012,rtcm,SYS_GLO,sync,nsat);
+    i=encode_head(1012,rtcm,SYS_GLO,sync,smooth,tint_s,nsat);
     
     for (j=0;j<rtcm->obs.n&&nsat<MAXOBS;j++) {
         sat=rtcm->obs.data[j].sat;
@@ -2026,7 +2026,7 @@ static void gen_msm_sig(rtcm_t *rtcm, int sys, int nsat, int nsig, int ncell,
     }
 }
 /* encode MSM header ---------------------------------------------------------*/
-static int encode_msm_head(int type, rtcm_t *rtcm, int sys, int sync, int *nsat,
+static int encode_msm_head(int type, rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s, int *nsat,
                            int *ncell, double *rrng, double *rrate,
                            uint8_t *info, double *psrng, double *phrng,
                            double *rate, double *lock, uint8_t *half,
@@ -2071,10 +2071,10 @@ static int encode_msm_head(int type, rtcm_t *rtcm, int sys, int sync, int *nsat,
     setbitu(rtcm->buff,i, 1,sync       ); i+= 1; /* multiple message bit */
     setbitu(rtcm->buff,i, 3,rtcm->seqno); i+= 3; /* issue of data station */
     setbitu(rtcm->buff,i, 7,0          ); i+= 7; /* reserved */
-    setbitu(rtcm->buff,i, 2,0          ); i+= 2; /* clock streering indicator */
+    setbitu(rtcm->buff,i, 2,0          ); i+= 2; /* clock steering indicator */
     setbitu(rtcm->buff,i, 2,0          ); i+= 2; /* external clock indicator */
-    setbitu(rtcm->buff,i, 1,0          ); i+= 1; /* smoothing indicator */
-    setbitu(rtcm->buff,i, 3,0          ); i+= 3; /* smoothing interval */
+    setbitu(rtcm->buff,i, 1,smooth     ); i+= 1; /* smoothing indicator */
+    setbitu(rtcm->buff,i, 3,tint_s     ); i+= 3; /* smoothing interval */
     
     /* satellite mask */
     for (j=0;j<64;j++) {
@@ -2330,7 +2330,7 @@ static int encode_msm_rate(rtcm_t *rtcm, int i, const double *rate, int ncell)
     return i;
 }
 /* encode MSM 1: compact pseudorange -----------------------------------------*/
-static int encode_msm1(rtcm_t *rtcm, int sys, int sync)
+static int encode_msm1(rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s)
 {
     double rrng[64],rrate[64],psrng[64];
     int i,nsat,ncell;
@@ -2338,7 +2338,7 @@ static int encode_msm1(rtcm_t *rtcm, int sys, int sync)
     trace(3,"encode_msm1: sys=%d sync=%d\n",sys,sync);
     
     /* encode msm header */
-    if (!(i=encode_msm_head(1,rtcm,sys,sync,&nsat,&ncell,rrng,rrate,NULL,psrng,
+    if (!(i=encode_msm_head(1,rtcm,sys,sync,smooth,tint_s,&nsat,&ncell,rrng,rrate,NULL,psrng,
                             NULL,NULL,NULL,NULL,NULL))) {
         return 0;
     }
@@ -2352,7 +2352,7 @@ static int encode_msm1(rtcm_t *rtcm, int sys, int sync)
     return 1;
 }
 /* encode MSM 2: compact phaserange ------------------------------------------*/
-static int encode_msm2(rtcm_t *rtcm, int sys, int sync)
+static int encode_msm2(rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s)
 {
     double rrng[64],rrate[64],phrng[64],lock[64];
     uint8_t half[64];
@@ -2361,7 +2361,7 @@ static int encode_msm2(rtcm_t *rtcm, int sys, int sync)
     trace(3,"encode_msm2: sys=%d sync=%d\n",sys,sync);
     
     /* encode msm header */
-    if (!(i=encode_msm_head(2,rtcm,sys,sync,&nsat,&ncell,rrng,rrate,NULL,NULL,
+    if (!(i=encode_msm_head(2,rtcm,sys,sync,smooth,tint_s,&nsat,&ncell,rrng,rrate,NULL,NULL,
                             phrng,NULL,lock,half,NULL))) {
         return 0;
     }
@@ -2377,7 +2377,7 @@ static int encode_msm2(rtcm_t *rtcm, int sys, int sync)
     return 1;
 }
 /* encode MSM 3: compact pseudorange and phaserange --------------------------*/
-static int encode_msm3(rtcm_t *rtcm, int sys, int sync)
+static int encode_msm3(rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s)
 {
     double rrng[64],rrate[64],psrng[64],phrng[64],lock[64];
     uint8_t half[64];
@@ -2386,7 +2386,7 @@ static int encode_msm3(rtcm_t *rtcm, int sys, int sync)
     trace(3,"encode_msm3: sys=%d sync=%d\n",sys,sync);
     
     /* encode msm header */
-    if (!(i=encode_msm_head(3,rtcm,sys,sync,&nsat,&ncell,rrng,rrate,NULL,psrng,
+    if (!(i=encode_msm_head(3,rtcm,sys,sync,smooth,tint_s,&nsat,&ncell,rrng,rrate,NULL,psrng,
                             phrng,NULL,lock,half,NULL))) {
         return 0;
     }
@@ -2403,7 +2403,7 @@ static int encode_msm3(rtcm_t *rtcm, int sys, int sync)
     return 1;
 }
 /* encode MSM 4: full pseudorange and phaserange plus CNR --------------------*/
-static int encode_msm4(rtcm_t *rtcm, int sys, int sync)
+static int encode_msm4(rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s)
 {
     double rrng[64],rrate[64],psrng[64],phrng[64],lock[64];
     float cnr[64];
@@ -2413,7 +2413,7 @@ static int encode_msm4(rtcm_t *rtcm, int sys, int sync)
     trace(3,"encode_msm4: sys=%d sync=%d\n",sys,sync);
     
     /* encode msm header */
-    if (!(i=encode_msm_head(4,rtcm,sys,sync,&nsat,&ncell,rrng,rrate,NULL,psrng,
+    if (!(i=encode_msm_head(4,rtcm,sys,sync,smooth,tint_s,&nsat,&ncell,rrng,rrate,NULL,psrng,
                             phrng,NULL,lock,half,cnr))) {
         return 0;
     }
@@ -2431,7 +2431,7 @@ static int encode_msm4(rtcm_t *rtcm, int sys, int sync)
     return 1;
 }
 /* encode MSM 5: full pseudorange, phaserange, phaserangerate and CNR --------*/
-static int encode_msm5(rtcm_t *rtcm, int sys, int sync)
+static int encode_msm5(rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s)
 {
     double rrng[64],rrate[64],psrng[64],phrng[64],rate[64],lock[64];
     float cnr[64];
@@ -2441,7 +2441,7 @@ static int encode_msm5(rtcm_t *rtcm, int sys, int sync)
     trace(3,"encode_msm5: sys=%d sync=%d\n",sys,sync);
     
     /* encode msm header */
-    if (!(i=encode_msm_head(5,rtcm,sys,sync,&nsat,&ncell,rrng,rrate,info,psrng,
+    if (!(i=encode_msm_head(5,rtcm,sys,sync,smooth,tint_s,&nsat,&ncell,rrng,rrate,info,psrng,
                             phrng,rate,lock,half,cnr))) {
         return 0;
     }
@@ -2462,7 +2462,7 @@ static int encode_msm5(rtcm_t *rtcm, int sys, int sync)
     return 1;
 }
 /* encode MSM 6: full pseudorange and phaserange plus CNR (high-res) ---------*/
-static int encode_msm6(rtcm_t *rtcm, int sys, int sync)
+static int encode_msm6(rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s)
 {
     double rrng[64],rrate[64],psrng[64],phrng[64],lock[64];
     float cnr[64];
@@ -2472,7 +2472,7 @@ static int encode_msm6(rtcm_t *rtcm, int sys, int sync)
     trace(3,"encode_msm6: sys=%d sync=%d\n",sys,sync);
     
     /* encode msm header */
-    if (!(i=encode_msm_head(6,rtcm,sys,sync,&nsat,&ncell,rrng,rrate,NULL,psrng,
+    if (!(i=encode_msm_head(6,rtcm,sys,sync,smooth,tint_s,&nsat,&ncell,rrng,rrate,NULL,psrng,
                             phrng,NULL,lock,half,cnr))) {
         return 0;
     }
@@ -2490,7 +2490,7 @@ static int encode_msm6(rtcm_t *rtcm, int sys, int sync)
     return 1;
 }
 /* encode MSM 7: full pseudorange, phaserange, phaserangerate and CNR (h-res) */
-static int encode_msm7(rtcm_t *rtcm, int sys, int sync)
+static int encode_msm7(rtcm_t *rtcm, int sys, int sync, int smooth, int tint_s)
 {
     double rrng[64],rrate[64],psrng[64],phrng[64],rate[64],lock[64];
     float cnr[64];
@@ -2500,7 +2500,7 @@ static int encode_msm7(rtcm_t *rtcm, int sys, int sync)
     trace(3,"encode_msm7: sys=%d sync=%d\n",sys,sync);
     
     /* encode msm header */
-    if (!(i=encode_msm_head(7,rtcm,sys,sync,&nsat,&ncell,rrng,rrate,info,psrng,
+    if (!(i=encode_msm_head(7,rtcm,sys,sync,smooth,tint_s,&nsat,&ncell,rrng,rrate,info,psrng,
                             phrng,rate,lock,half,cnr))) {
         return 0;
     }
@@ -2604,25 +2604,25 @@ static int encode_type4076(rtcm_t *rtcm, int subtype, int sync)
     return 0;
 }
 /* encode RTCM ver.3 message -------------------------------------------------*/
-extern int encode_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync)
+extern int encode_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync, int smooth, int tint_s)
 {
     int ret=0;
     
     trace(3,"encode_rtcm3: type=%d subtype=%d sync=%d\n",type,subtype,sync);
     
     switch (type) {
-        case 1001: ret=encode_type1001(rtcm,sync);     break;
-        case 1002: ret=encode_type1002(rtcm,sync);     break;
-        case 1003: ret=encode_type1003(rtcm,sync);     break;
-        case 1004: ret=encode_type1004(rtcm,sync);     break;
-        case 1005: ret=encode_type1005(rtcm,sync);     break;
+        case 1001: ret=encode_type1001(rtcm,sync,smooth,tint_s);     break;
+        case 1002: ret=encode_type1002(rtcm,sync,smooth,tint_s);     break;
+        case 1003: ret=encode_type1003(rtcm,sync,smooth,tint_s);     break;
+        case 1004: ret=encode_type1004(rtcm,sync,smooth,tint_s);     break;
+        case 1005: ret=encode_type1005(rtcm,sync,smooth,tint_s);     break;
         case 1006: ret=encode_type1006(rtcm,sync);     break;
         case 1007: ret=encode_type1007(rtcm,sync);     break;
         case 1008: ret=encode_type1008(rtcm,sync);     break;
-        case 1009: ret=encode_type1009(rtcm,sync);     break;
-        case 1010: ret=encode_type1010(rtcm,sync);     break;
-        case 1011: ret=encode_type1011(rtcm,sync);     break;
-        case 1012: ret=encode_type1012(rtcm,sync);     break;
+        case 1009: ret=encode_type1009(rtcm,sync,smooth,tint_s);     break;
+        case 1010: ret=encode_type1010(rtcm,sync,smooth,tint_s);     break;
+        case 1011: ret=encode_type1011(rtcm,sync,smooth,tint_s);     break;
+        case 1012: ret=encode_type1012(rtcm,sync,smooth,tint_s);     break;
         case 1019: ret=encode_type1019(rtcm,sync);     break;
         case 1020: ret=encode_type1020(rtcm,sync);     break;
         case 1033: ret=encode_type1033(rtcm,sync);     break;
@@ -2644,55 +2644,55 @@ extern int encode_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync)
         case 1066: ret=encode_ssr4(rtcm,SYS_GLO,0,sync); break;
         case 1067: ret=encode_ssr5(rtcm,SYS_GLO,0,sync); break;
         case 1068: ret=encode_ssr6(rtcm,SYS_GLO,0,sync); break;
-        case 1071: ret=encode_msm1(rtcm,SYS_GPS,sync); break;
-        case 1072: ret=encode_msm2(rtcm,SYS_GPS,sync); break;
-        case 1073: ret=encode_msm3(rtcm,SYS_GPS,sync); break;
-        case 1074: ret=encode_msm4(rtcm,SYS_GPS,sync); break;
-        case 1075: ret=encode_msm5(rtcm,SYS_GPS,sync); break;
-        case 1076: ret=encode_msm6(rtcm,SYS_GPS,sync); break;
-        case 1077: ret=encode_msm7(rtcm,SYS_GPS,sync); break;
-        case 1081: ret=encode_msm1(rtcm,SYS_GLO,sync); break;
-        case 1082: ret=encode_msm2(rtcm,SYS_GLO,sync); break;
-        case 1083: ret=encode_msm3(rtcm,SYS_GLO,sync); break;
-        case 1084: ret=encode_msm4(rtcm,SYS_GLO,sync); break;
-        case 1085: ret=encode_msm5(rtcm,SYS_GLO,sync); break;
-        case 1086: ret=encode_msm6(rtcm,SYS_GLO,sync); break;
-        case 1087: ret=encode_msm7(rtcm,SYS_GLO,sync); break;
-        case 1091: ret=encode_msm1(rtcm,SYS_GAL,sync); break;
-        case 1092: ret=encode_msm2(rtcm,SYS_GAL,sync); break;
-        case 1093: ret=encode_msm3(rtcm,SYS_GAL,sync); break;
-        case 1094: ret=encode_msm4(rtcm,SYS_GAL,sync); break;
-        case 1095: ret=encode_msm5(rtcm,SYS_GAL,sync); break;
-        case 1096: ret=encode_msm6(rtcm,SYS_GAL,sync); break;
-        case 1097: ret=encode_msm7(rtcm,SYS_GAL,sync); break;
-        case 1101: ret=encode_msm1(rtcm,SYS_SBS,sync); break;
-        case 1102: ret=encode_msm2(rtcm,SYS_SBS,sync); break;
-        case 1103: ret=encode_msm3(rtcm,SYS_SBS,sync); break;
-        case 1104: ret=encode_msm4(rtcm,SYS_SBS,sync); break;
-        case 1105: ret=encode_msm5(rtcm,SYS_SBS,sync); break;
-        case 1106: ret=encode_msm6(rtcm,SYS_SBS,sync); break;
-        case 1107: ret=encode_msm7(rtcm,SYS_SBS,sync); break;
-        case 1111: ret=encode_msm1(rtcm,SYS_QZS,sync); break;
-        case 1112: ret=encode_msm2(rtcm,SYS_QZS,sync); break;
-        case 1113: ret=encode_msm3(rtcm,SYS_QZS,sync); break;
-        case 1114: ret=encode_msm4(rtcm,SYS_QZS,sync); break;
-        case 1115: ret=encode_msm5(rtcm,SYS_QZS,sync); break;
-        case 1116: ret=encode_msm6(rtcm,SYS_QZS,sync); break;
-        case 1117: ret=encode_msm7(rtcm,SYS_QZS,sync); break;
-        case 1121: ret=encode_msm1(rtcm,SYS_CMP,sync); break;
-        case 1122: ret=encode_msm2(rtcm,SYS_CMP,sync); break;
-        case 1123: ret=encode_msm3(rtcm,SYS_CMP,sync); break;
-        case 1124: ret=encode_msm4(rtcm,SYS_CMP,sync); break;
-        case 1125: ret=encode_msm5(rtcm,SYS_CMP,sync); break;
-        case 1126: ret=encode_msm6(rtcm,SYS_CMP,sync); break;
-        case 1127: ret=encode_msm7(rtcm,SYS_CMP,sync); break;
-        case 1131: ret=encode_msm1(rtcm,SYS_IRN,sync); break;
-        case 1132: ret=encode_msm2(rtcm,SYS_IRN,sync); break;
-        case 1133: ret=encode_msm3(rtcm,SYS_IRN,sync); break;
-        case 1134: ret=encode_msm4(rtcm,SYS_IRN,sync); break;
-        case 1135: ret=encode_msm5(rtcm,SYS_IRN,sync); break;
-        case 1136: ret=encode_msm6(rtcm,SYS_IRN,sync); break;
-        case 1137: ret=encode_msm7(rtcm,SYS_IRN,sync); break;
+        case 1071: ret=encode_msm1(rtcm,SYS_GPS,sync,smooth,tint_s); break;
+        case 1072: ret=encode_msm2(rtcm,SYS_GPS,sync,smooth,tint_s); break;
+        case 1073: ret=encode_msm3(rtcm,SYS_GPS,sync,smooth,tint_s); break;
+        case 1074: ret=encode_msm4(rtcm,SYS_GPS,sync,smooth,tint_s); break;
+        case 1075: ret=encode_msm5(rtcm,SYS_GPS,sync,smooth,tint_s); break;
+        case 1076: ret=encode_msm6(rtcm,SYS_GPS,sync,smooth,tint_s); break;
+        case 1077: ret=encode_msm7(rtcm,SYS_GPS,sync,smooth,tint_s); break;
+        case 1081: ret=encode_msm1(rtcm,SYS_GLO,sync,smooth,tint_s); break;
+        case 1082: ret=encode_msm2(rtcm,SYS_GLO,sync,smooth,tint_s); break;
+        case 1083: ret=encode_msm3(rtcm,SYS_GLO,sync,smooth,tint_s); break;
+        case 1084: ret=encode_msm4(rtcm,SYS_GLO,sync,smooth,tint_s); break;
+        case 1085: ret=encode_msm5(rtcm,SYS_GLO,sync,smooth,tint_s); break;
+        case 1086: ret=encode_msm6(rtcm,SYS_GLO,sync,smooth,tint_s); break;
+        case 1087: ret=encode_msm7(rtcm,SYS_GLO,sync,smooth,tint_s); break;
+        case 1091: ret=encode_msm1(rtcm,SYS_GAL,sync,smooth,tint_s); break;
+        case 1092: ret=encode_msm2(rtcm,SYS_GAL,sync,smooth,tint_s); break;
+        case 1093: ret=encode_msm3(rtcm,SYS_GAL,sync,smooth,tint_s); break;
+        case 1094: ret=encode_msm4(rtcm,SYS_GAL,sync,smooth,tint_s); break;
+        case 1095: ret=encode_msm5(rtcm,SYS_GAL,sync,smooth,tint_s); break;
+        case 1096: ret=encode_msm6(rtcm,SYS_GAL,sync,smooth,tint_s); break;
+        case 1097: ret=encode_msm7(rtcm,SYS_GAL,sync,smooth,tint_s); break;
+        case 1101: ret=encode_msm1(rtcm,SYS_SBS,sync,smooth,tint_s); break;
+        case 1102: ret=encode_msm2(rtcm,SYS_SBS,sync,smooth,tint_s); break;
+        case 1103: ret=encode_msm3(rtcm,SYS_SBS,sync,smooth,tint_s); break;
+        case 1104: ret=encode_msm4(rtcm,SYS_SBS,sync,smooth,tint_s); break;
+        case 1105: ret=encode_msm5(rtcm,SYS_SBS,sync,smooth,tint_s); break;
+        case 1106: ret=encode_msm6(rtcm,SYS_SBS,sync,smooth,tint_s); break;
+        case 1107: ret=encode_msm7(rtcm,SYS_SBS,sync,smooth,tint_s); break;
+        case 1111: ret=encode_msm1(rtcm,SYS_QZS,sync,smooth,tint_s); break;
+        case 1112: ret=encode_msm2(rtcm,SYS_QZS,sync,smooth,tint_s); break;
+        case 1113: ret=encode_msm3(rtcm,SYS_QZS,sync,smooth,tint_s); break;
+        case 1114: ret=encode_msm4(rtcm,SYS_QZS,sync,smooth,tint_s); break;
+        case 1115: ret=encode_msm5(rtcm,SYS_QZS,sync,smooth,tint_s); break;
+        case 1116: ret=encode_msm6(rtcm,SYS_QZS,sync,smooth,tint_s); break;
+        case 1117: ret=encode_msm7(rtcm,SYS_QZS,sync,smooth,tint_s); break;
+        case 1121: ret=encode_msm1(rtcm,SYS_CMP,sync,smooth,tint_s); break;
+        case 1122: ret=encode_msm2(rtcm,SYS_CMP,sync,smooth,tint_s); break;
+        case 1123: ret=encode_msm3(rtcm,SYS_CMP,sync,smooth,tint_s); break;
+        case 1124: ret=encode_msm4(rtcm,SYS_CMP,sync,smooth,tint_s); break;
+        case 1125: ret=encode_msm5(rtcm,SYS_CMP,sync,smooth,tint_s); break;
+        case 1126: ret=encode_msm6(rtcm,SYS_CMP,sync,smooth,tint_s); break;
+        case 1127: ret=encode_msm7(rtcm,SYS_CMP,sync,smooth,tint_s); break;
+        case 1131: ret=encode_msm1(rtcm,SYS_IRN,sync,smooth,tint_s); break;
+        case 1132: ret=encode_msm2(rtcm,SYS_IRN,sync,smooth,tint_s); break;
+        case 1133: ret=encode_msm3(rtcm,SYS_IRN,sync,smooth,tint_s); break;
+        case 1134: ret=encode_msm4(rtcm,SYS_IRN,sync,smooth,tint_s); break;
+        case 1135: ret=encode_msm5(rtcm,SYS_IRN,sync,smooth,tint_s); break;
+        case 1136: ret=encode_msm6(rtcm,SYS_IRN,sync,smooth,tint_s); break;
+        case 1137: ret=encode_msm7(rtcm,SYS_IRN,sync,smooth,tint_s); break;
         case 1230: ret=encode_type1230(rtcm,sync);     break;
         case 1240: ret=encode_ssr1(rtcm,SYS_GAL,0,sync); break; /* draft */
         case 1241: ret=encode_ssr2(rtcm,SYS_GAL,0,sync); break; /* draft */
