@@ -58,7 +58,7 @@ jobs:
           7z a -tzip $RELEASE_ARCHIVE $SBP2RINEX $STR2STR LICENSE.txt;
           echo $RELEASE_ARCHIVE >release-archive.filename
           echo "RELEASE_ARCHIVE=$(cat release-archive.filename)" >>$GITHUB_ENV
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-artifacts
           path: |
@@ -77,17 +77,17 @@ jobs:
           echo "DATE=${DATE}" >> $GITHUB_ENV
           echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Pull Windows Installer
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: Windows-artifacts
           path: Windows
       - name: Pull macOS Installer
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: macOS-artifacts
           path: macOS
       - name: Pull Linux Installer
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: Linux-artifacts
           path: Linux
