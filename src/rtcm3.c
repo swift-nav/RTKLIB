@@ -72,7 +72,7 @@ typedef struct {              /* multi-signal-message header type */
     uint8_t clk_str;          /* clock steering indicator */
     uint8_t clk_ext;          /* external clock indicator */
     uint8_t smooth;           /* divergence free smoothing indicator */
-    uint8_t tint_s;           /* soothing interval */
+    uint8_t tint_s;           /* smoothing interval */
     uint8_t nsat,nsig;        /* number of satellites/signals */
     uint8_t sats[64];         /* satellites */
     uint8_t sigs[32];         /* signals */
@@ -263,7 +263,7 @@ static int test_staid(rtcm_t *rtcm, int staid)
     return 1;
 }
 /* decode type 1001-1004 message header --------------------------------------*/
-static int decode_head1001(rtcm_t *rtcm, int *sync)
+static int decode_head1001(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
 {
     double tow;
     char *msg,tstr[64];
@@ -275,6 +275,8 @@ static int decode_head1001(rtcm_t *rtcm, int *sync)
         staid=getbitu(rtcm->buff,i,12);       i+=12;
         tow  =getbitu(rtcm->buff,i,30)*0.001; i+=30;
         *sync=getbitu(rtcm->buff,i, 1);       i+= 1;
+        *smooth=getbitu(rtcm->buff,i, 1);     i+= 1;
+        *tint_s=getbitu(rtcm->buff,i, 3);     i+= 3;
         nsat =getbitu(rtcm->buff,i, 5);
     }
     else {
@@ -291,15 +293,15 @@ static int decode_head1001(rtcm_t *rtcm, int *sync)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," staid=%4d %s nsat=%2d sync=%d",staid,tstr,nsat,*sync);
+        sprintf(msg," staid=%4d %s nsat=%2d sync=%d smooth=%d tint_s=%d",staid,tstr,nsat,*sync,*smooth,*tint_s);
     }
     return nsat;
 }
 /* decode type 1001: L1-only GPS RTK observation -----------------------------*/
 static int decode_type1001(rtcm_t *rtcm)
 {
-    int sync;
-    if (decode_head1001(rtcm,&sync)<0) return -1;
+    int sync,smooth,tint_s;
+    if (decode_head1001(rtcm,&sync,&smooth,&tint_s)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -307,9 +309,9 @@ static int decode_type1001(rtcm_t *rtcm)
 static int decode_type1002(rtcm_t *rtcm)
 {
     double pr1,cnr1,tt,cp1,freq=FREQ1;
-    int i=24+64,j,index,nsat,sync,prn,code,sat,ppr1,lock1,amb,sys;
+    int i=24+64,j,index,nsat,sync,smooth,tint_s,prn,code,sat,ppr1,lock1,amb,sys;
     
-    if ((nsat=decode_head1001(rtcm,&sync))<0) return -1;
+    if ((nsat=decode_head1001(rtcm,&sync,&smooth,&tint_s))<0) return -1;
     
     for (j=0;j<nsat&&rtcm->obs.n<MAXOBS&&i+74<=rtcm->len*8;j++) {
         prn  =getbitu(rtcm->buff,i, 6); i+= 6;
@@ -350,8 +352,8 @@ static int decode_type1002(rtcm_t *rtcm)
 /* decode type 1003: L1&L2 gps rtk observables -------------------------------*/
 static int decode_type1003(rtcm_t *rtcm)
 {
-    int sync;
-    if (decode_head1001(rtcm,&sync)<0) return -1;
+    int sync,smooth,tint_s;
+    if (decode_head1001(rtcm,&sync,&smooth,&tint_s)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -360,10 +362,10 @@ static int decode_type1004(rtcm_t *rtcm)
 {
     const int L2codes[]={CODE_L2X,CODE_L2P,CODE_L2D,CODE_L2W};
     double pr1,cnr1,cnr2,tt,cp1,cp2,freq[2]={FREQ1,FREQ2};
-    int i=24+64,j,index,nsat,sync,prn,sat,code1,code2,pr21,ppr1,ppr2;
+    int i=24+64,j,index,nsat,sync,smooth,tint_s,prn,sat,code1,code2,pr21,ppr1,ppr2;
     int lock1,lock2,amb,sys;
     
-    if ((nsat=decode_head1001(rtcm,&sync))<0) return -1;
+    if ((nsat=decode_head1001(rtcm,&sync,&smooth,&tint_s))<0) return -1;
     
     for (j=0;j<nsat&&rtcm->obs.n<MAXOBS&&i+125<=rtcm->len*8;j++) {
         prn  =getbitu(rtcm->buff,i, 6); i+= 6;
@@ -571,7 +573,7 @@ static int decode_type1008(rtcm_t *rtcm)
     return 5;
 }
 /* decode type 1009-1012 message header --------------------------------------*/
-static int decode_head1009(rtcm_t *rtcm, int *sync)
+static int decode_head1009(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
 {
     double tod;
     char *msg,tstr[64];
@@ -583,6 +585,8 @@ static int decode_head1009(rtcm_t *rtcm, int *sync)
         staid=getbitu(rtcm->buff,i,12);       i+=12;
         tod  =getbitu(rtcm->buff,i,27)*0.001; i+=27; /* sec in a day */
         *sync=getbitu(rtcm->buff,i, 1);       i+= 1;
+        *smooth =getbitu(rtcm->buff,i, 1);    i+= 1;
+        *tint_s =getbitu(rtcm->buff,i, 3);    i+= 3;/* smoothing interval (s) */
         nsat =getbitu(rtcm->buff,i, 5);
     }
     else {
@@ -599,15 +603,15 @@ static int decode_head1009(rtcm_t *rtcm, int *sync)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," staid=%4d %s nsat=%2d sync=%d",staid,tstr,nsat,*sync);
+        sprintf(msg," staid=%4d %s nsat=%2d sync=%d smooth=%d tint_s=%d",staid,tstr,nsat,*sync,*smooth,*tint_s);
     }
     return nsat;
 }
 /* decode type 1009: L1-only glonass rtk observables -------------------------*/
 static int decode_type1009(rtcm_t *rtcm)
 {
-    int sync;
-    if (decode_head1009(rtcm,&sync)<0) return -1;
+    int sync,smooth,tint_s;
+    if (decode_head1009(rtcm,&sync,&smooth,&tint_s)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -615,9 +619,9 @@ static int decode_type1009(rtcm_t *rtcm)
 static int decode_type1010(rtcm_t *rtcm)
 {
     double pr1,cnr1,tt,cp1,freq1;
-    int i=24+61,j,index,nsat,sync,prn,sat,code,fcn,ppr1,lock1,amb,sys=SYS_GLO;
+    int i=24+61,j,index,nsat,sync,smooth,tint_s,prn,sat,code,fcn,ppr1,lock1,amb,sys=SYS_GLO;
     
-    if ((nsat=decode_head1009(rtcm,&sync))<0) return -1;
+    if ((nsat=decode_head1009(rtcm,&sync,&smooth,&tint_s))<0) return -1;
     
     for (j=0;j<nsat&&rtcm->obs.n<MAXOBS&&i+79<=rtcm->len*8;j++) {
         prn  =getbitu(rtcm->buff,i, 6); i+= 6;
@@ -657,8 +661,8 @@ static int decode_type1010(rtcm_t *rtcm)
 /* decode type 1011: L1&L2 GLONASS RTK observables ---------------------------*/
 static int decode_type1011(rtcm_t *rtcm)
 {
-    int sync;
-    if (decode_head1009(rtcm,&sync)<0) return -1;
+    int sync,smooth,tint_s;
+    if (decode_head1009(rtcm,&sync,&smooth,&tint_s)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -666,10 +670,10 @@ static int decode_type1011(rtcm_t *rtcm)
 static int decode_type1012(rtcm_t *rtcm)
 {
     double pr1,cnr1,cnr2,tt,cp1,cp2,freq1,freq2;
-    int i=24+61,j,index,nsat,sync,prn,sat,fcn,code1,code2,pr21,ppr1,ppr2;
+    int i=24+61,j,index,nsat,sync,smooth,tint_s,prn,sat,fcn,code1,code2,pr21,ppr1,ppr2;
     int lock1,lock2,amb,sys=SYS_GLO;
     
-    if ((nsat=decode_head1009(rtcm,&sync))<0) return -1;
+    if ((nsat=decode_head1009(rtcm,&sync,&smooth,&tint_s))<0) return -1;
     
     for (j=0;j<nsat&&rtcm->obs.n<MAXOBS&&i+130<=rtcm->len*8;j++) {
         prn  =getbitu(rtcm->buff,i, 6); i+= 6;
@@ -2101,7 +2105,7 @@ static void save_msm_obs(rtcm_t *rtcm, int sys, msm_h_t *h, const double *r,
     }
 }
 /* decode type MSM message header --------------------------------------------*/
-static int decode_msm_head(rtcm_t *rtcm, int sys, int *sync, int *iod,
+static int decode_msm_head(rtcm_t *rtcm, int sys, int *sync, int *iod, int *smooth,int *tint_s,
                            msm_h_t *h, int *hsize)
 {
     msm_h_t h0={0};
@@ -2134,8 +2138,8 @@ static int decode_msm_head(rtcm_t *rtcm, int sys, int *sync, int *iod,
         h->time_s =getbitu(rtcm->buff,i, 7);       i+= 7;
         h->clk_str=getbitu(rtcm->buff,i, 2);       i+= 2;
         h->clk_ext=getbitu(rtcm->buff,i, 2);       i+= 2;
-        h->smooth =getbitu(rtcm->buff,i, 1);       i+= 1;
-        h->tint_s =getbitu(rtcm->buff,i, 3);       i+= 3;
+        *smooth   =getbitu(rtcm->buff,i, 1);       i+= 1;
+        *tint_s   =getbitu(rtcm->buff,i, 3);       i+= 3;
         for (j=1;j<=64;j++) {
             mask=getbitu(rtcm->buff,i,1); i+=1;
             if (mask) h->sats[h->nsat++]=j;
@@ -2169,13 +2173,13 @@ static int decode_msm_head(rtcm_t *rtcm, int sys, int *sync, int *iod,
     *hsize=i;
     
     time2str(rtcm->time,tstr,2);
-    trace(4,"decode_head_msm: time=%s sys=%d staid=%d nsat=%d nsig=%d sync=%d iod=%d ncell=%d\n",
-          tstr,sys,staid,h->nsat,h->nsig,*sync,*iod,ncell);
+    trace(4,"decode_head_msm: time=%s sys=%d staid=%d nsat=%d nsig=%d sync=%d iod=%d smooth=%d tint_s=%d ncell=%d\n",
+          tstr,sys,staid,h->nsat,h->nsig,*sync,*iod,*smooth,*tint_s,ncell);
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," staid=%4d %s nsat=%2d nsig=%2d iod=%2d ncell=%2d sync=%d",
-                staid,tstr,h->nsat,h->nsig,*iod,ncell,*sync);
+        sprintf(msg," staid=%4d %s nsat=%2d nsig=%2d iod=%2d ncell=%2d sync=%d smooth=%d tint_s=%d",
+                staid,tstr,h->nsat,h->nsig,*iod,ncell,*sync,*smooth,*tint_s);
     }
     return ncell;
 }
@@ -2277,8 +2281,8 @@ static inline void compute_rough_ranges(const gtime_t obstime, int sys,
 static int decode_msm0(rtcm_t *rtcm, int sys)
 {
     msm_h_t h={0};
-    int i,sync,iod;
-    if (decode_msm_head(rtcm,sys,&sync,&iod,&h,&i)<0) return -1;
+    int i,sync,iod,smooth,tint_s;
+    if (decode_msm_head(rtcm,sys,&sync,&iod,&smooth,&tint_s,&h,&i)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -2287,12 +2291,12 @@ static int decode_msm1(rtcm_t *rtcm, int sys)
 {
     msm_h_t h={0};
     double r[64],pr[64],cp[64];
-    int i,j,type,sync,iod,ncell,rng_m,prv;
+    int i,j,type,sync,iod,smooth,tint_s,ncell,rng_m,prv;
 
     type=getbitu(rtcm->buff,24,12);
 
     /* decode msm header */
-    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&h,&i))<0) return -1;
+    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&smooth,&tint_s,&h,&i))<0) return -1;
 
     if (i+h.nsat*10+ncell*15>rtcm->len*8) {
         trace(2,"rtcm3 %d length error: nsat=%d ncell=%d len=%d\n",type,h.nsat,
@@ -2325,12 +2329,12 @@ static int decode_msm4(rtcm_t *rtcm, int sys)
 {
     msm_h_t h={0};
     double r[64],pr[64],cp[64],cnr[64];
-    int i,j,type,sync,iod,ncell,rng,rng_m,prv,cpv,lock[64],half[64];
+    int i,j,type,sync,iod,smooth,tint_s,ncell,rng,rng_m,prv,cpv,lock[64],half[64];
     
     type=getbitu(rtcm->buff,24,12);
     
     /* decode msm header */
-    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&h,&i))<0) return -1;
+    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&smooth,&tint_s,&h,&i))<0) return -1;
     
     if (i+h.nsat*18+ncell*48>rtcm->len*8) {
         trace(2,"rtcm3 %d length error: nsat=%d ncell=%d len=%d\n",type,h.nsat,
@@ -2378,13 +2382,13 @@ static int decode_msm5(rtcm_t *rtcm, int sys)
 {
     msm_h_t h={0};
     double r[64],rr[64],pr[64],cp[64],rrf[64],cnr[64];
-    int i,j,type,sync,iod,ncell,rng,rng_m,rate,prv,cpv,rrv,lock[64];
+    int i,j,type,sync,iod,smooth,tint_s,ncell,rng,rng_m,rate,prv,cpv,rrv,lock[64];
     int ex[64],half[64];
     
     type=getbitu(rtcm->buff,24,12);
     
     /* decode msm header */
-    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&h,&i))<0) return -1;
+    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&smooth,&tint_s,&h,&i))<0) return -1;
     
     if (i+h.nsat*36+ncell*63>rtcm->len*8) {
         trace(2,"rtcm3 %d length error: nsat=%d ncell=%d len=%d\n",type,h.nsat,
@@ -2445,12 +2449,12 @@ static int decode_msm6(rtcm_t *rtcm, int sys)
 {
     msm_h_t h={0};
     double r[64],pr[64],cp[64],cnr[64];
-    int i,j,type,sync,iod,ncell,rng,rng_m,prv,cpv,lock[64],half[64];
+    int i,j,type,sync,iod,smooth,tint_s,ncell,rng,rng_m,prv,cpv,lock[64],half[64];
     
     type=getbitu(rtcm->buff,24,12);
     
     /* decode msm header */
-    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&h,&i))<0) return -1;
+    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&smooth,&tint_s,&h,&i))<0) return -1;
     
     if (i+h.nsat*18+ncell*65>rtcm->len*8) {
         trace(2,"rtcm3 %d length error: nsat=%d ncell=%d len=%d\n",type,h.nsat,
@@ -2498,13 +2502,13 @@ static int decode_msm7(rtcm_t *rtcm, int sys)
 {
     msm_h_t h={0};
     double r[64],rr[64],pr[64],cp[64],rrf[64],cnr[64];
-    int i,j,type,sync,iod,ncell,rng,rng_m,rate,prv,cpv,rrv,lock[64];
+    int i,j,type,sync,iod,smooth,tint_s,ncell,rng,rng_m,rate,prv,cpv,rrv,lock[64];
     int ex[64],half[64];
     
     type=getbitu(rtcm->buff,24,12);
     
     /* decode msm header */
-    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&h,&i))<0) return -1;
+    if ((ncell=decode_msm_head(rtcm,sys,&sync,&iod,&smooth,&tint_s,&h,&i))<0) return -1;
     
     if (i+h.nsat*36+ncell*80>rtcm->len*8) {
         trace(2,"rtcm3 %d length error: nsat=%d ncell=%d len=%d\n",type,h.nsat,
