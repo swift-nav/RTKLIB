@@ -13,13 +13,13 @@ jobs:
     strategy:
       matrix:
         os:
-        - windows-2019
-        - ubuntu-20.04
-        - macos-11
+        - windows-latest
+        - ubuntu-latest
+        - macos-latest
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           ssh-key: ${{ secrets.SSH_KEY }}
@@ -58,7 +58,7 @@ jobs:
           7z a -tzip $RELEASE_ARCHIVE $SBP2RINEX $STR2STR LICENSE.txt;
           echo $RELEASE_ARCHIVE >release-archive.filename
           echo "RELEASE_ARCHIVE=$(cat release-archive.filename)" >>$GITHUB_ENV
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-artifacts
           path: |
@@ -77,17 +77,17 @@ jobs:
           echo "DATE=${DATE}" >> $GITHUB_ENV
           echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Pull Windows Installer
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: Windows-artifacts
           path: Windows
       - name: Pull macOS Installer
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: macOS-artifacts
           path: macOS
       - name: Pull Linux Installer
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: Linux-artifacts
           path: Linux
@@ -117,7 +117,7 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - uses: swift-nav/swift-cli-publisher@v2
+      - uses: swift-nav/swift-cli-publisher@v4
         env:
           VERSION: "${{ env.VERSION }}"
           DL_MAC: "swiftnav_rtklib-${{ env.VERSION }}-macOS.zip"
