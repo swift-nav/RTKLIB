@@ -95,8 +95,7 @@ const char *msm_sig_glo[32]={
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""                        /* 25-32 */
 };
 const char *msm_sig_gal[32]={
-    /* Galileo: ref [17] table 3.5-99.
-     * 8X are tentative from the PocketSDR extensions */
+    /* Galileo: ref [17] table 3.5-99 */
     ""  ,"1C","1A","1B","1X","1Z",""  ,"6C","6A","6B","6X","6Z", /*  1-12 */
     ""  ,"7I","7Q","7X",""  ,"8I","8Q","8X",""  ,"5I","5Q","5X", /* 13-24 */
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""                        /* 25-32 */
