@@ -117,7 +117,7 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - uses: swift-nav/swift-cli-publisher@v4
+      - uses: swift-nav/swift-cli-publisher@v2
         env:
           VERSION: "${{ env.VERSION }}"
           DL_MAC: "swiftnav_rtklib-${{ env.VERSION }}-macOS.zip"
