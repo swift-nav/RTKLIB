@@ -23,7 +23,7 @@ jobs:
       - name: Install build dependencies (Ubuntu container)
         if: matrix.container == 'ubuntu:20.04'
         run: |
-          apt-get update && apt-get install -y build-essential git p7zip-full gcc
+          apt-get update && apt-get install -y build-essential git p7zip-full
 
       - name: Checkout source
         uses: actions/checkout@v4
