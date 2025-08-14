@@ -359,9 +359,9 @@ extern int gen_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync, int smooth, 
 {
     uint32_t crc;
     int i=0;
-    
-    trace(4,"gen_rtcm3: type=%d subtype=%d sync=%d\n",type,subtype,sync);
-    
+
+    trace(4,"gen_rtcm3: type=%d subtype=%d sync=%d smooth=%d tint_s=%d\n",type,subtype,sync,smooth,tint_s);
+
     rtcm->nbit=rtcm->len=rtcm->nbyte=0;
     
     /* set preamble and reserved */

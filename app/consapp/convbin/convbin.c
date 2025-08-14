@@ -546,7 +546,7 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
 int main(int argc, char **argv)
 {
     rnxopt_t opt={{0}};
-    int format,trace=0,stat;
+    int format,trace=4,stat;
     char *ifile="",*ofile[NOUTFILE]={0},*dir="";
     
     sprintf(opt.prog,"%s %s (RTKLIB %s%s)",PRGNAME,SWIFT_VER_RTKLIB,VER_RTKLIB,PATCH_LEVEL);

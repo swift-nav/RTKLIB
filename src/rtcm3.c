@@ -271,20 +271,20 @@ static int test_staid(rtcm_t *rtcm, int staid)
     return 1;
 }
 /* decode type 1001-1004 message header --------------------------------------*/
-static int decode_head1001(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
+static int decode_head1001(rtcm_t *rtcm, int *sync)
 {
     double tow;
     char *msg,tstr[64];
-    int i=24,staid,nsat,type;
-    
+    int i=24,staid,nsat,smooth,tint_s,type;
+
     type=getbitu(rtcm->buff,i,12); i+=12;
     
     if (i+52<=rtcm->len*8) {
         staid=getbitu(rtcm->buff,i,12);       i+=12;
         tow  =getbitu(rtcm->buff,i,30)*0.001; i+=30;
         *sync=getbitu(rtcm->buff,i, 1);       i+= 1;
-        *smooth=getbitu(rtcm->buff,i, 1);     i+= 1;
-        *tint_s=getbitu(rtcm->buff,i, 3);     i+= 3;
+        smooth=getbitu(rtcm->buff,i, 1);     i+= 1;
+        tint_s=getbitu(rtcm->buff,i, 3);     i+= 3;
         nsat =getbitu(rtcm->buff,i, 5);
     }
     else {
@@ -301,7 +301,7 @@ static int decode_head1001(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," staid=%4d %s nsat=%2d sync=%d smooth=%d tint_s=%d",staid,tstr,nsat,*sync,*smooth,*tint_s);
+        sprintf(msg," staid=%4d %s nsat=%2d sync=%d smooth=%d tint_s=%d",staid,tstr,nsat,*sync,smooth,tint_s);
     }
     return nsat;
 }
@@ -309,7 +309,7 @@ static int decode_head1001(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
 static int decode_type1001(rtcm_t *rtcm)
 {
     int sync,smooth,tint_s;
-    if (decode_head1001(rtcm,&sync,&smooth,&tint_s)<0) return -1;
+    if (decode_head1001(rtcm,&sync)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -319,7 +319,7 @@ static int decode_type1002(rtcm_t *rtcm)
     double pr1,cnr1,tt,cp1,freq=FREQ1;
     int i=24+64,j,index,nsat,sync,smooth,tint_s,prn,code,sat,ppr1,lock1,amb,sys;
     
-    if ((nsat=decode_head1001(rtcm,&sync,&smooth,&tint_s))<0) return -1;
+    if ((nsat=decode_head1001(rtcm,&sync))<0) return -1;
     
     for (j=0;j<nsat&&rtcm->obs.n<MAXOBS&&i+74<=rtcm->len*8;j++) {
         prn  =getbitu(rtcm->buff,i, 6); i+= 6;
@@ -361,7 +361,7 @@ static int decode_type1002(rtcm_t *rtcm)
 static int decode_type1003(rtcm_t *rtcm)
 {
     int sync,smooth,tint_s;
-    if (decode_head1001(rtcm,&sync,&smooth,&tint_s)<0) return -1;
+    if (decode_head1001(rtcm,&sync)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -373,7 +373,7 @@ static int decode_type1004(rtcm_t *rtcm)
     int i=24+64,j,index,nsat,sync,smooth,tint_s,prn,sat,code1,code2,pr21,ppr1,ppr2;
     int lock1,lock2,amb,sys;
     
-    if ((nsat=decode_head1001(rtcm,&sync,&smooth,&tint_s))<0) return -1;
+    if ((nsat=decode_head1001(rtcm,&sync))<0) return -1;
     
     for (j=0;j<nsat&&rtcm->obs.n<MAXOBS&&i+125<=rtcm->len*8;j++) {
         prn  =getbitu(rtcm->buff,i, 6); i+= 6;
@@ -581,11 +581,11 @@ static int decode_type1008(rtcm_t *rtcm)
     return 5;
 }
 /* decode type 1009-1012 message header --------------------------------------*/
-static int decode_head1009(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
+static int decode_head1009(rtcm_t *rtcm, int *sync)
 {
     double tod;
     char *msg,tstr[64];
-    int i=24,staid,nsat,type;
+    int i=24,staid,nsat,smooth,tint_s,type;
     
     type=getbitu(rtcm->buff,i,12); i+=12;
     
@@ -593,8 +593,8 @@ static int decode_head1009(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
         staid=getbitu(rtcm->buff,i,12);       i+=12;
         tod  =getbitu(rtcm->buff,i,27)*0.001; i+=27; /* sec in a day */
         *sync=getbitu(rtcm->buff,i, 1);       i+= 1;
-        *smooth =getbitu(rtcm->buff,i, 1);    i+= 1;
-        *tint_s =getbitu(rtcm->buff,i, 3);    i+= 3;/* smoothing interval (s) */
+        smooth =getbitu(rtcm->buff,i, 1);    i+= 1;
+        tint_s =getbitu(rtcm->buff,i, 3);    i+= 3;/* smoothing interval (s) */
         nsat =getbitu(rtcm->buff,i, 5);
     }
     else {
@@ -611,7 +611,7 @@ static int decode_head1009(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
     
     if (rtcm->outtype) {
         msg=rtcm->msgtype+strlen(rtcm->msgtype);
-        sprintf(msg," staid=%4d %s nsat=%2d sync=%d smooth=%d tint_s=%d",staid,tstr,nsat,*sync,*smooth,*tint_s);
+        sprintf(msg," staid=%4d %s nsat=%2d sync=%d smooth=%d tint_s=%d",staid,tstr,nsat,*sync,smooth,tint_s);
     }
     return nsat;
 }
@@ -619,7 +619,7 @@ static int decode_head1009(rtcm_t *rtcm, int *sync, int *smooth, int *tint_s)
 static int decode_type1009(rtcm_t *rtcm)
 {
     int sync,smooth,tint_s;
-    if (decode_head1009(rtcm,&sync,&smooth,&tint_s)<0) return -1;
+    if (decode_head1009(rtcm,&sync)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -629,7 +629,7 @@ static int decode_type1010(rtcm_t *rtcm)
     double pr1,cnr1,tt,cp1,freq1;
     int i=24+61,j,index,nsat,sync,smooth,tint_s,prn,sat,code,fcn,ppr1,lock1,amb,sys=SYS_GLO;
     
-    if ((nsat=decode_head1009(rtcm,&sync,&smooth,&tint_s))<0) return -1;
+    if ((nsat=decode_head1009(rtcm,&sync))<0) return -1;
     
     for (j=0;j<nsat&&rtcm->obs.n<MAXOBS&&i+79<=rtcm->len*8;j++) {
         prn  =getbitu(rtcm->buff,i, 6); i+= 6;
@@ -670,7 +670,7 @@ static int decode_type1010(rtcm_t *rtcm)
 static int decode_type1011(rtcm_t *rtcm)
 {
     int sync,smooth,tint_s;
-    if (decode_head1009(rtcm,&sync,&smooth,&tint_s)<0) return -1;
+    if (decode_head1009(rtcm,&sync)<0) return -1;
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
@@ -681,7 +681,7 @@ static int decode_type1012(rtcm_t *rtcm)
     int i=24+61,j,index,nsat,sync,smooth,tint_s,prn,sat,fcn,code1,code2,pr21,ppr1,ppr2;
     int lock1,lock2,amb,sys=SYS_GLO;
     
-    if ((nsat=decode_head1009(rtcm,&sync,&smooth,&tint_s))<0) return -1;
+    if ((nsat=decode_head1009(rtcm,&sync))<0) return -1;
     
     for (j=0;j<nsat&&rtcm->obs.n<MAXOBS&&i+130<=rtcm->len*8;j++) {
         prn  =getbitu(rtcm->buff,i, 6); i+= 6;
