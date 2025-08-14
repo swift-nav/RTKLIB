@@ -514,7 +514,7 @@ static int encode_type1004(rtcm_t *rtcm, int sync, int smooth, int tint_s)
     return 1;
 }
 /* encode type 1005: stationary RTK reference station ARP --------------------*/
-static int encode_type1005(rtcm_t *rtcm, int sync, int smooth, int tint_s)
+static int encode_type1005(rtcm_t *rtcm, int sync)
 {
     double *p=rtcm->sta.pos;
     int i=24;
@@ -2615,7 +2615,7 @@ extern int encode_rtcm3(rtcm_t *rtcm, int type, int subtype, int sync, int smoot
         case 1002: ret=encode_type1002(rtcm,sync,smooth,tint_s);     break;
         case 1003: ret=encode_type1003(rtcm,sync,smooth,tint_s);     break;
         case 1004: ret=encode_type1004(rtcm,sync,smooth,tint_s);     break;
-        case 1005: ret=encode_type1005(rtcm,sync,smooth,tint_s);     break;
+        case 1005: ret=encode_type1005(rtcm,sync);     break;
         case 1006: ret=encode_type1006(rtcm,sync);     break;
         case 1007: ret=encode_type1007(rtcm,sync);     break;
         case 1008: ret=encode_type1008(rtcm,sync);     break;
