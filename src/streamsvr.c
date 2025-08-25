@@ -649,28 +649,14 @@ static void *strsvrthread(void *arg)
         
         /* read data from input stream */
         while ((n=strread(svr->stream,svr->buff,svr->buffsize))>0&&svr->state) {
-            uint8_t *data_to_write=svr->buff;
-            int data_len=n;
-            uint8_t filtered_buff[4096];
-            
-            /* Apply GGA filtering if input is NTRIP and relayback is enabled */
-            if (svr->relayback>0 && svr->stream[0].type==STR_NTRIPCLI) {
-                
-                /* Filter through GGA filter for input stream */
-                data_len=process_gga_filter(&gga_filter,svr->buff,n, 
-                                          filtered_buff,sizeof(filtered_buff));
-                data_to_write=filtered_buff;
-            }
             
             /* write data to output streams */
-            if (data_len>0) {
-                for (i=1;i<svr->nstr;i++) {
-                    if (svr->conv[i-1]) {
-                        strconv(svr->stream+i,svr->conv[i-1],data_to_write,data_len);
-                    }
-                    else {
-                        strwrite(svr->stream+i,data_to_write,data_len);
-                    }
+            for (i=1;i<svr->nstr;i++) {
+                if (svr->conv[i-1]) {
+                    strconv(svr->stream+i,svr->conv[i-1],svr->buff,n);
+                }
+                else {
+                    strwrite(svr->stream+i,svr->buff,n);
                 }
             }
             /* write data to log stream */
@@ -689,7 +675,18 @@ static void *strsvrthread(void *arg)
                 
                 /* relay back message from output stream to input stream */
                 if (i==svr->relayback) {
-                    strwrite(svr->stream,buff,n);
+                    /* Apply GGA filtering if relaying back to NTRIP client */
+                    if (svr->stream[0].type==STR_NTRIPCLI) {
+                        uint8_t filtered_buff[4096];
+                        int filtered_len=process_gga_filter(&gga_filter,buff,n, 
+                                                          filtered_buff,sizeof(filtered_buff));
+                        if (filtered_len>0) {
+                            strwrite(svr->stream,filtered_buff,filtered_len);
+                        }
+                    }
+                    else {
+                        strwrite(svr->stream,buff,n);
+                    }
                 }
                 /* write data to log stream */
                 strwrite(svr->strlog+i,buff,n);
