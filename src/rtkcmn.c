@@ -1840,6 +1840,22 @@ extern int adjgpsweek(int week)
     if (w<1560) w=1560; /* use 2009/12/1 if time is earlier than 2009/12/1 */
     return week+(w-week+1)/1024*1024;
 }
+/* adjust 10-bit gps week using a caller-supplied reference time --------------
+* same rollover formula as adjgpsweek but takes the reference time explicitly
+* so callers can avoid timeget(). intended for offline replay where the user
+* supplies a known epoch (e.g. -tr) and wall clock must not be consulted.
+*-----------------------------------------------------------------------------*/
+extern int adjgpsweek_ref(int week, gtime_t ref)
+{
+    int w,adj;
+    (void)time2gpst(ref,&w);
+    adj=(w-week+1)/1024;
+    if (adj!=0) {
+        trace(3,"adjgpsweek_ref: rolled raw=%d -> full=%d (ref_w=%d)\n",
+              week,week+adj*1024,w);
+    }
+    return week+adj*1024;
+}
 /* get tick time ---------------------------------------------------------------
 * get current tick in ms
 * args   : none

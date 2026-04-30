@@ -628,9 +628,11 @@ static int decode_msgobs(raw_t *raw) {
 
 /* common part of GPS eph decoding (navigation data)
  * --------------------------*/
-static void decode_gpsnav_common_dep1(uint8_t *_pBuff, eph_t *_pEph) {
+static void decode_gpsnav_common_dep1(raw_t *raw, uint8_t *_pBuff,
+                                      eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
+  int safeephem = strstr(raw->opt, "-SAFEEPHEMTIME") != NULL;
 
   _pEph->toes = U4(_pBuff + 4);
   uWeekE = U2(_pBuff + 8);
@@ -666,16 +668,25 @@ static void decode_gpsnav_common_dep1(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U1(_pBuff + 182);
   _pEph->iodc = U2(_pBuff + 183);
 
-  _pEph->week = adjgpsweek(uWeekE);
+  _pEph->week = safeephem ? adjgpsweek_ref(uWeekE, raw->time)
+                          : adjgpsweek(uWeekE);
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
+  if (safeephem) {
+    double tt = timediff(_pEph->toe, raw->time);
+    if (fabs(tt) > 86400.0 * 3.0) {
+      trace(2, "sbp gpsnav -SAFEEPHEMTIME: stale eph age=%.1f days\n",
+            -tt / 86400.0);
+    }
+  }
 }
 
 /* common part of GPS eph decoding (navigation data)
  * --------------------------*/
-static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
+static void decode_gpsnav_common(raw_t *raw, uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
+  int safeephem = strstr(raw->opt, "-SAFEEPHEMTIME") != NULL;
 
   _pEph->toes = U4(_pBuff + 4);
   uWeekE = U2(_pBuff + 8);
@@ -711,17 +722,26 @@ static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U1(_pBuff + 138);
   _pEph->iodc = U2(_pBuff + 139);
 
-  _pEph->week = adjgpsweek(uWeekE);
+  _pEph->week = safeephem ? adjgpsweek_ref(uWeekE, raw->time)
+                          : adjgpsweek(uWeekE);
   _pEph->code = 2; /* SBP payload does not have the "code on L2" flag */
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
+  if (safeephem) {
+    double tt = timediff(_pEph->toe, raw->time);
+    if (fabs(tt) > 86400.0 * 3.0) {
+      trace(2, "sbp gpsnav -SAFEEPHEMTIME: stale eph age=%.1f days\n",
+            -tt / 86400.0);
+    }
+  }
 }
 
 /* common part of BDS eph decoding (navigation data)
  * --------------------------*/
-static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
+static void decode_bdsnav_common(raw_t *raw, uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
+  int safeephem = strstr(raw->opt, "-SAFEEPHEMTIME") != NULL;
 
   _pEph->toes = U4(_pBuff + 4) - BDS_SECOND_TO_GPS_SECOND;
   uWeekE = U2(_pBuff + 8);
@@ -757,16 +777,25 @@ static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U1(_pBuff + 146);
   _pEph->iodc = U2(_pBuff + 147);
 
-  _pEph->week = adjgpsweek(uWeekE) - BDS_WEEK_TO_GPS_WEEK;
+  _pEph->week = (safeephem ? adjgpsweek_ref(uWeekE, raw->time)
+                           : adjgpsweek(uWeekE)) - BDS_WEEK_TO_GPS_WEEK;
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
+  if (safeephem) {
+    double tt = timediff(_pEph->toe, raw->time);
+    if (fabs(tt) > 86400.0 * 3.0) {
+      trace(2, "sbp bdsnav -SAFEEPHEMTIME: stale eph age=%.1f days\n",
+            -tt / 86400.0);
+    }
+  }
 }
 
 /* common part of GAL eph decoding (navigation data)
  * --------------------------*/
-static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
+static void decode_galnav_common(raw_t *raw, uint8_t *_pBuff, eph_t *_pEph) {
   uint16_t uWeekE, uWeekC;
   double dToc;
+  int safeephem = strstr(raw->opt, "-SAFEEPHEMTIME") != NULL;
 
   _pEph->toes = U4(_pBuff + 4);
   uWeekE = U2(_pBuff + 8);
@@ -802,9 +831,17 @@ static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U2(_pBuff + 150);
   _pEph->iodc = U2(_pBuff + 152);
 
-  _pEph->week = adjgpsweek(uWeekE);
+  _pEph->week = safeephem ? adjgpsweek_ref(uWeekE, raw->time)
+                          : adjgpsweek(uWeekE);
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
+  if (safeephem) {
+    double tt = timediff(_pEph->toe, raw->time);
+    if (fabs(tt) > 86400.0 * 3.0) {
+      trace(2, "sbp galnav -SAFEEPHEMTIME: stale eph age=%.1f days\n",
+            -tt / 86400.0);
+    }
+  }
 }
 
 /* decode deprecated SBP nav message for GPS (navigation data)
@@ -833,12 +870,13 @@ static int decode_gpsnav_dep_e(raw_t *raw) {
 
   eph.code = U1(puiTmp + 2);
 
-  decode_gpsnav_common_dep1(puiTmp, &eph);
+  decode_gpsnav_common_dep1(raw, puiTmp, &eph);
 
-  if (0 == timediff(raw->time, time0)) {
-    eph.ttr = timeget();
-  } else {
+  if (strstr(raw->opt, "-SAFEEPHEMTIME") ||
+      timediff(raw->time, time0) != 0) {
     eph.ttr = raw->time;
+  } else {
+    eph.ttr = timeget();
   }
 
   if (!strstr(raw->opt, "EPHALL")) {
@@ -895,12 +933,13 @@ static int decode_gpsnav_dep_f(raw_t *raw) {
     return -1;
   }
 
-  decode_gpsnav_common_dep1(puiTmp - 2, &eph);
+  decode_gpsnav_common_dep1(raw, puiTmp - 2, &eph);
 
-  if (0 == timediff(raw->time, time0)) {
-    eph.ttr = timeget();
-  } else {
+  if (strstr(raw->opt, "-SAFEEPHEMTIME") ||
+      timediff(raw->time, time0) != 0) {
     eph.ttr = raw->time;
+  } else {
+    eph.ttr = timeget();
   }
 
   if (!strstr(raw->opt, "EPHALL")) {
@@ -950,12 +989,13 @@ static int decode_gpsnav(raw_t *raw) {
     return -1;
   }
 
-  decode_gpsnav_common(puiTmp - 2, &eph);
+  decode_gpsnav_common(raw, puiTmp - 2, &eph);
 
-  if (0 == timediff(raw->time, time0)) {
-    eph.ttr = timeget();
-  } else {
+  if (strstr(raw->opt, "-SAFEEPHEMTIME") ||
+      timediff(raw->time, time0) != 0) {
     eph.ttr = raw->time;
+  } else {
+    eph.ttr = timeget();
   }
 
   if (!strstr(raw->opt, "EPHALL")) {
@@ -1013,12 +1053,13 @@ static int decode_qzssnav(raw_t *raw) {
     return -1;
   }
 
-  decode_gpsnav_common(puiTmp - 2, &eph);
+  decode_gpsnav_common(raw, puiTmp - 2, &eph);
 
-  if (0 == timediff(raw->time, time0)) {
-    eph.ttr = timeget();
-  } else {
+  if (strstr(raw->opt, "-SAFEEPHEMTIME") ||
+      timediff(raw->time, time0) != 0) {
     eph.ttr = raw->time;
+  } else {
+    eph.ttr = timeget();
   }
 
   if (!strstr(raw->opt, "EPHALL")) {
@@ -1076,7 +1117,7 @@ static int decode_bdsnav(raw_t *raw) {
     return -1;
   }
 
-  decode_bdsnav_common(puiTmp - 2, &eph);
+  decode_bdsnav_common(raw, puiTmp - 2, &eph);
 
   eph.ttr = raw->time;
 
@@ -1128,7 +1169,7 @@ static int decode_galnav_dep_a(raw_t *raw) {
     return -1;
   }
 
-  decode_galnav_common(puiTmp - 2, &eph);
+  decode_galnav_common(raw, puiTmp - 2, &eph);
 
   eph.ttr = raw->time;
 
@@ -1180,7 +1221,7 @@ static int decode_galnav(raw_t *raw) {
     return -1;
   }
 
-  decode_galnav_common(puiTmp - 2, &eph);
+  decode_galnav_common(raw, puiTmp - 2, &eph);
 
   eph.ttr = raw->time;
 
