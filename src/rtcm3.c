@@ -64,6 +64,11 @@
 #define P2_59       1.734723475976810E-18 /* 2^-59 */
 #define P2_66       1.355252715606880E-20 /* 2^-66 */
 
+/* Threshold (seconds) for the safemode stale-eph trace warning. Independent
+   of the legacy +/-1 week nudge boundary (302400s = 3.5 days), which this
+   PR removes from the safemode path. */
+#define SAFEEPHEM_STALE_THRESHOLD_S (86400.0*3.0)
+
 /* type definition -----------------------------------------------------------*/
 
 typedef struct {              /* multi-signal-message header type */
@@ -815,7 +820,7 @@ static int decode_type1019(rtcm_t *rtcm)
         eph.toc=gpst2time(eph.week,toc);
         if (safeephem) {
             tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>86400.0*3.0) {
+            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
                 trace(2,"rtcm3 1019 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
                       prn,-tt/86400.0);
             }
@@ -1148,7 +1153,7 @@ static int decode_type1041(rtcm_t *rtcm)
         eph.toc=gpst2time(eph.week,toc);
         if (safeephem) {
             tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>86400.0*3.0) {
+            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
                 trace(2,"rtcm3 1041 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
                       prn,-tt/86400.0);
             }
@@ -1237,7 +1242,7 @@ static int decode_type1044(rtcm_t *rtcm)
         eph.toc=gpst2time(eph.week,toc);
         if (safeephem) {
             tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>86400.0*3.0) {
+            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
                 trace(2,"rtcm3 1044 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
                       prn,-tt/86400.0);
             }
@@ -1331,7 +1336,7 @@ static int decode_type1045(rtcm_t *rtcm)
         eph.toc=gpst2time(eph.week,toc);
         if (safeephem) {
             tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>86400.0*3.0) {
+            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
                 trace(2,"rtcm3 1045 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
                       prn,-tt/86400.0);
             }
@@ -1428,7 +1433,7 @@ static int decode_type1046(rtcm_t *rtcm)
         eph.toc=gpst2time(eph.week,toc);
         if (safeephem) {
             tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>86400.0*3.0) {
+            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
                 trace(2,"rtcm3 1046 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
                       prn,-tt/86400.0);
             }
@@ -1520,7 +1525,7 @@ static int decode_type1042(rtcm_t *rtcm)
         eph.toc=bdt2gpst(bdt2time(eph.week,toc));      /* bdt -> gpst */
         if (safeephem) {
             tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>86400.0*3.0) {
+            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
                 trace(2,"rtcm3 1042 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
                       prn,-tt/86400.0);
             }
