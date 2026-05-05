@@ -1841,15 +1841,25 @@ extern int adjgpsweek(int week)
     return week+(w-week+1)/1024*1024;
 }
 /* adjust 10-bit gps week using a caller-supplied reference time --------------
-* same rollover formula as adjgpsweek but takes the reference time explicitly
-* so callers can avoid timeget(). intended for offline replay where the user
-* supplies a known epoch (e.g. -tr) and wall clock must not be consulted.
+* takes the reference time explicitly so callers can avoid timeget(). intended
+* for offline replay where the user supplies a known epoch (e.g. -tr).
+*
+* Uses round-to-nearest centering (+512) rather than the past-biased +1 used
+* by adjgpsweek. The legacy +1 formula gives error window (-1023, +1] weeks
+* -- fine for live receivers (eph TOE <= current week) but breaks on offline
+* captures whose ephs are valid into the *next* week: a 10-bit field of
+* ((ref_w + 1) mod 1024 + 1) gets rolled 1024 weeks back to the previous
+* rollover (e.g. ref_w=2415, input=369 -> 1393 = year 2006) instead of
+* forward by one week. Centering via +512 gives error window (-512, +512],
+* which handles forward-broadcast ephs symmetrically. Caveat: for ephs
+* >9.8 years older than -tr, +512 rounds toward the future side; callers
+* with truly archival data should set -tr to match the data's epoch.
 *-----------------------------------------------------------------------------*/
 extern int adjgpsweek_ref(int week, gtime_t ref)
 {
     int w,adj;
     (void)time2gpst(ref,&w);
-    adj=(w-week+1)/1024;
+    adj=(w-week+512)/1024;
     if (adj!=0) {
         trace(3,"adjgpsweek_ref: rolled raw=%d -> full=%d (ref_w=%d)\n",
               week,week+adj*1024,w);
