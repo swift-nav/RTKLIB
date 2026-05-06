@@ -759,10 +759,11 @@ static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U1(_pBuff + 146);
   _pEph->iodc = U2(_pBuff + 147);
 
-  /* SBP carries a full 16-bit GPS week; trust it directly. The internal
-     rtklib BDS convention stores eph.week as BDS-relative. */
+  /* SBP carries full GPS week numbers for BDS messages. Internal rtklib
+     BDS convention: eph.week is BDS-relative; eph.toe/eph.toc are GPST
+     gtime_t derived from BDT (week, tow) -- matches rtcm3.c MT 1042. */
   _pEph->week = uWeekE - BDS_WEEK_TO_GPS_WEEK;
-  _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
+  _pEph->toe = bdt2gpst(bdt2time(_pEph->week, _pEph->toes));
   _pEph->toc = gpst2time(uWeekC, dToc);
 }
 
