@@ -184,10 +184,15 @@ test_safeephem_rtcm3_anchors:
 	./sbp2rinex -r rtcm3 -safeephemtime -tr 2026/05/01 0:0:0 \
 	    $(DATDIR)$(SEP)igs_ephem_2026-05-01.rtcm \
 	    -o se_rtcm.obs -n se_rtcm.nav
-	@if ! grep -qE '^[A-Z][0-9]+ +2026 ' se_rtcm.nav; then \
-	    echo "FAIL: no 2026 epochs in RTCM3 nav file"; exit 1; \
+	@# C45's first eph in this fixture is at BDS week 1058, toe 597600s,
+	@# more than 3.5 days from the wall clock. Legacy code nudges
+	@# eph.week++ producing "2026 04 25"; safemode preserves on-wire bits
+	@# producing "2026 04 18".
+	@if ! grep -q '^C45 2026 04 18 22 00 00' se_rtcm.nav; then \
+	    echo "FAIL: C45 first eph not at 2026 04 18 22 00 00"; \
+	    grep '^C45' se_rtcm.nav | head -2; exit 1; \
 	  fi
-	@echo "OK: RTCM3 nav epochs anchored to 2026"
+	@echo "OK: C45 first eph at 2026 04 18 22 00 00 (on-wire week preserved)"
 
 testclean:
 	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs
