@@ -582,7 +582,7 @@ int main(int argc, char **argv)
         tok=(used>0)?" -SAFEEPHEMTIME":"-SAFEEPHEMTIME";
         toklen=strlen(tok);
         if (used+toklen+1>sizeof(opt.rcvopt)) {
-            fprintf(stderr,"-ro string too long to add -SAFEEPHEMTIME\n");
+            fprintf(stderr,"receiver option string too long to add -SAFEEPHEMTIME\n");
             return -1;
         }
         memcpy(opt.rcvopt+used,tok,toklen+1);
