@@ -114,6 +114,9 @@ static const char *help[]={
 "     -l lfile     output RINEX LNAV file",
 "     -s sfile     output SBAS message file",
 "     -trace level output trace level [off]",
+"     -safeephemtime  refuse to use wall clock and refuse to increment",
+"                     ephemeris week numbers when decoding ephemerides;",
+"                     requires -tr; affects RTCM3 and SBP eph decoders",
 "",
 " If not any output file is specified, default output files <file>.obs,",
 " <file>.nav, <file>.gnav, <file>.hnav, <file>.qnav, <file>.lnav and",
@@ -337,7 +340,8 @@ static int get_filetime(const char *file, gtime_t *time)
 }
 /* parse command line options ------------------------------------------------*/
 static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
-                   char **ofile, char **dir, int *trace)
+                   char **ofile, char **dir, int *trace, int *safeephemtime,
+                   int *has_tr)
 {
     double eps[]={1980,1,1,0,0,0},epe[]={2037,12,31,0,0,0};
     double epr[]={2010,1,1,0,0,0},span=0.0;
@@ -365,6 +369,7 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
             sscanf(argv[++i],"%lf/%lf/%lf",epr,epr+1,epr+2);
             sscanf(argv[++i],"%lf:%lf:%lf",epr+3,epr+4,epr+5);
             opt->trtcm=epoch2time(epr);
+            *has_tr=1;
         }
         else if (!strcmp(argv[i],"-ti")&&i+1<argc) {
             opt->tint=atof(argv[++i]);
@@ -485,6 +490,9 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
         else if (!strcmp(argv[i],"-trace" )&&i+1<argc) {
             *trace=atoi(argv[++i]);
         }
+        else if (!strcmp(argv[i],"-safeephemtime")) {
+            *safeephemtime=1;
+        }
         else if (!strncmp(argv[i],"-",1)) printhelp(opt);
         
         else *ifile=argv[i];
@@ -546,14 +554,15 @@ static int cmdopts(int argc, char **argv, rnxopt_t *opt, char **ifile,
 int main(int argc, char **argv)
 {
     rnxopt_t opt={{0}};
-    int format,trace=0,stat;
+    int format,trace=0,stat,safeephemtime=0,has_tr=0;
     char *ifile="",*ofile[NOUTFILE]={0},*dir="";
-    
+
     sprintf(opt.prog,"%s %s (RTKLIB %s%s)",PRGNAME,SWIFT_VER_RTKLIB,VER_RTKLIB,PATCH_LEVEL);
 
     /* parse command line options */
-    format=cmdopts(argc,argv,&opt,&ifile,ofile,&dir,&trace);
-    
+    format=cmdopts(argc,argv,&opt,&ifile,ofile,&dir,&trace,&safeephemtime,
+                   &has_tr);
+
     if (!*ifile) {
         fprintf(stderr,"no input file\n");
         return -1;
@@ -562,7 +571,23 @@ int main(int argc, char **argv)
         fprintf(stderr,"input format can not be recognized\n");
         return -1;
     }
-    
+    if (safeephemtime) {
+        size_t used,toklen;
+        const char *tok;
+        if (!has_tr) {
+            fprintf(stderr,"-safeephemtime requires -tr y/m/d h:m:s\n");
+            return -1;
+        }
+        used=strlen(opt.rcvopt);
+        tok=(used>0)?" -SAFEEPHEMTIME":"-SAFEEPHEMTIME";
+        toklen=strlen(tok);
+        if (used+toklen+1>sizeof(opt.rcvopt)) {
+            fprintf(stderr,"receiver option string too long to add -SAFEEPHEMTIME\n");
+            return -1;
+        }
+        memcpy(opt.rcvopt+used,tok,toklen+1);
+    }
+
     if (trace>0) {
         traceopen(TRACEFILE);
         tracelevel(trace);

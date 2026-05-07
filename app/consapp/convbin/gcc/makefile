@@ -129,7 +129,9 @@ install:
 clean:
 	rm -f sbp2rinex sbp2rinex.exe *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs *.stackdump
 
-test : test1 test2 test3 test4 test5 test6 testclean
+test : test1 test2 test3 test4 test5 test6 \
+       test_safeephem_guard test_safeephem_sbp_anchors test_safeephem_rtcm3_anchors \
+       testclean
 
 test1: # binary sbp
 	@echo -e "\n\n****** Test1: sbp binary ********\n"
@@ -155,5 +157,42 @@ test6: # BDS + GAL + GLO + GPS
 	diff --strip-trailing-cr ./2018-06-15-json.trunc.obs $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json-ref.obs
 	tail -n +5 ./2018-06-15-json.nav > 2018-06-15-json.trunc.nav
 	diff --strip-trailing-cr ./2018-06-15-json.trunc.nav $(shell pwd)$(SEP)$(DATDIR)$(SEP)2018-06-15-json-ref.nav
+test_safeephem_guard:
+	@echo -e "\n\n****** test_safeephem_guard: -safeephemtime without -tr ******\n"
+	@if ./sbp2rinex -safeephemtime $(DATDIR)$(SEP)2017-05-12-v1.1.26.sbp \
+	      -o se_guard.obs >/dev/null 2>&1; then \
+	    echo "FAIL: expected non-zero exit"; exit 1; \
+	  else \
+	    echo "OK: rejected as expected"; \
+	  fi
+
+test_safeephem_sbp_anchors:
+	@echo -e "\n\n****** test_safeephem_sbp_anchors: 2017 SBP fixture anchored to 2017 ******\n"
+	./sbp2rinex -safeephemtime -tr 2017/05/12 0:0:0 \
+	    $(DATDIR)$(SEP)2017-05-12-v1.1.26.sbp \
+	    -o se_sbp.obs -n se_sbp.nav
+	@if ! grep -qE '^[A-Z][0-9]+ +2017 ' se_sbp.nav; then \
+	    echo "FAIL: no 2017 epochs in SBP nav file"; exit 1; \
+	  fi
+	@if grep -qE '^[A-Z][0-9]+ +202[5-9] ' se_sbp.nav; then \
+	    echo "FAIL: SBP nav contains current-era epochs (rollover regression)"; exit 1; \
+	  fi
+	@echo "OK: SBP nav epochs anchored to 2017"
+
+test_safeephem_rtcm3_anchors:
+	@echo -e "\n\n****** test_safeephem_rtcm3_anchors: 2026 IGS RTCM3 fixture ******\n"
+	./sbp2rinex -r rtcm3 -safeephemtime -tr 2026/05/01 0:0:0 \
+	    $(DATDIR)$(SEP)igs_ephem_2026-05-01.rtcm \
+	    -o se_rtcm.obs -n se_rtcm.nav
+	@# C45's first eph in this fixture is at BDS week 1058, toe 597600s,
+	@# more than 3.5 days from the wall clock. Legacy code nudges
+	@# eph.week++ producing "2026 04 25"; safemode preserves on-wire bits
+	@# producing "2026 04 18".
+	@if ! grep -q '^C45 2026 04 18 22 00 00' se_rtcm.nav; then \
+	    echo "FAIL: C45 first eph not at 2026 04 18 22 00 00"; \
+	    grep '^C45' se_rtcm.nav | head -2; exit 1; \
+	  fi
+	@echo "OK: C45 first eph at 2026 04 18 22 00 00 (on-wire week preserved)"
+
 testclean:
 	rm -f *.o *.obs *.nav *.gnav *.hnav *.qnav *.sbs

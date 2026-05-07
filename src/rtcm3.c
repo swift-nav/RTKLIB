@@ -64,6 +64,11 @@
 #define P2_59       1.734723475976810E-18 /* 2^-59 */
 #define P2_66       1.355252715606880E-20 /* 2^-66 */
 
+/* Threshold (seconds) for the safemode stale-eph trace warning. Independent
+   of the legacy +/-1 week nudge boundary (302400s = 3.5 days), which this
+   PR removes from the safemode path. */
+#define SAFEEPHEM_STALE_THRESHOLD_S (86400.0*3.0)
+
 /* type definition -----------------------------------------------------------*/
 
 typedef struct {              /* multi-signal-message header type */
@@ -181,12 +186,27 @@ static void adjweek(rtcm_t *rtcm, double tow)
     rtcm->time=gpst2time(week,tow);
 }
 /* adjust weekly rollover of BDS time ----------------------------------------*/
+/* BDS WN field on the wire is 13 bits (range 0..8191); mod-8192 matches that.
+   See rtklibexplorer/RTKLIB@1b6036e. */
 static int adjbdtweek(int week)
 {
     int w;
     (void)time2bdt(gpst2bdt(utc2gpst(timeget())),&w);
     if (w<1) w=1; /* use 2006/1/1 if time is earlier than 2006/1/1 */
-    return week+(w-week+512)/1024*1024;
+    return week+(w-week+4095)/8192*8192;
+}
+/* Trace a SAFEEPHEMTIME warning if the decoded TOE is too far from the
+   current rtcm reference time. No-op when safemode is off. */
+static void trace_safeephem_stale(int safeephem, gtime_t toe, gtime_t time,
+                                  int prn, int msg_id)
+{
+    double tt;
+    if (!safeephem) return;
+    tt=timediff(toe,time);
+    if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
+        trace(2,"rtcm3 %d -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
+              msg_id,prn,-tt/86400.0);
+    }
 }
 /* adjust daily rollover of GLONASS time -------------------------------------*/
 static void adjday_glot(rtcm_t *rtcm, double tod)
@@ -796,13 +816,23 @@ static int decode_type1019(rtcm_t *rtcm)
         return -1;
     }
     eph.sat=sat;
-    eph.week=adjgpsweek(week);
-    if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
-    tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
-    if      (tt<-302400.0) eph.week++;
-    else if (tt>=302400.0) eph.week--;
-    eph.toe=gpst2time(eph.week,eph.toes);
-    eph.toc=gpst2time(eph.week,toc);
+    {
+        int safeephem=strstr(rtcm->opt,"-SAFEEPHEMTIME")!=NULL;
+        if (safeephem&&rtcm->time.time==0) {
+            trace(2,"rtcm3 1019 -SAFEEPHEMTIME: rtcm->time not set; rejecting eph\n");
+            return -1;
+        }
+        eph.week=safeephem?adjgpsweek_ref(week,rtcm->time):adjgpsweek(week);
+        if (!safeephem) {
+            if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
+            tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
+            if      (tt<-302400.0) eph.week++;
+            else if (tt>=302400.0) eph.week--;
+        }
+        eph.toe=gpst2time(eph.week,eph.toes);
+        eph.toc=gpst2time(eph.week,toc);
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1019);
+    }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
     if (!strstr(rtcm->opt,"-EPHALL")) {
@@ -1113,13 +1143,23 @@ static int decode_type1041(rtcm_t *rtcm)
         return -1;
     }
     eph.sat=sat;
-    eph.week=adjgpsweek(week);
-    if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
-    tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
-    if      (tt<-302400.0) eph.week++;
-    else if (tt>=302400.0) eph.week--;
-    eph.toe=gpst2time(eph.week,eph.toes);
-    eph.toc=gpst2time(eph.week,toc);
+    {
+        int safeephem=strstr(rtcm->opt,"-SAFEEPHEMTIME")!=NULL;
+        if (safeephem&&rtcm->time.time==0) {
+            trace(2,"rtcm3 1041 -SAFEEPHEMTIME: rtcm->time not set; rejecting eph\n");
+            return -1;
+        }
+        eph.week=safeephem?adjgpsweek_ref(week,rtcm->time):adjgpsweek(week);
+        if (!safeephem) {
+            if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
+            tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
+            if      (tt<-302400.0) eph.week++;
+            else if (tt>=302400.0) eph.week--;
+        }
+        eph.toe=gpst2time(eph.week,eph.toes);
+        eph.toc=gpst2time(eph.week,toc);
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1041);
+    }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
     eph.iodc=eph.iode;
@@ -1186,13 +1226,23 @@ static int decode_type1044(rtcm_t *rtcm)
         return -1;
     }
     eph.sat=sat;
-    eph.week=adjgpsweek(week);
-    if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
-    tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
-    if      (tt<-302400.0) eph.week++;
-    else if (tt>=302400.0) eph.week--;
-    eph.toe=gpst2time(eph.week,eph.toes);
-    eph.toc=gpst2time(eph.week,toc);
+    {
+        int safeephem=strstr(rtcm->opt,"-SAFEEPHEMTIME")!=NULL;
+        if (safeephem&&rtcm->time.time==0) {
+            trace(2,"rtcm3 1044 -SAFEEPHEMTIME: rtcm->time not set; rejecting eph\n");
+            return -1;
+        }
+        eph.week=safeephem?adjgpsweek_ref(week,rtcm->time):adjgpsweek(week);
+        if (!safeephem) {
+            if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
+            tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
+            if      (tt<-302400.0) eph.week++;
+            else if (tt>=302400.0) eph.week--;
+        }
+        eph.toe=gpst2time(eph.week,eph.toes);
+        eph.toc=gpst2time(eph.week,toc);
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1044);
+    }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
     eph.flag=1; /* fixed to 1 */
@@ -1265,12 +1315,22 @@ static int decode_type1045(rtcm_t *rtcm)
     }
     eph.sat=sat;
     eph.week=week+1024; /* gal-week = gst-week + 1024 */
-    if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
-    tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
-    if      (tt<-302400.0) eph.week++;
-    else if (tt>=302400.0) eph.week--;
-    eph.toe=gpst2time(eph.week,eph.toes);
-    eph.toc=gpst2time(eph.week,toc);
+    {
+        int safeephem=strstr(rtcm->opt,"-SAFEEPHEMTIME")!=NULL;
+        if (safeephem&&rtcm->time.time==0) {
+            trace(2,"rtcm3 1045 -SAFEEPHEMTIME: rtcm->time not set; rejecting eph\n");
+            return -1;
+        }
+        if (!safeephem) {
+            if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
+            tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
+            if      (tt<-302400.0) eph.week++;
+            else if (tt>=302400.0) eph.week--;
+        }
+        eph.toe=gpst2time(eph.week,eph.toes);
+        eph.toc=gpst2time(eph.week,toc);
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1045);
+    }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
     eph.svh=(e5a_hs<<4)+(e5a_dvs<<3);
@@ -1346,12 +1406,22 @@ static int decode_type1046(rtcm_t *rtcm)
     }
     eph.sat=sat;
     eph.week=week+1024; /* gal-week = gst-week + 1024 */
-    if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
-    tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
-    if      (tt<-302400.0) eph.week++;
-    else if (tt>=302400.0) eph.week--;
-    eph.toe=gpst2time(eph.week,eph.toes);
-    eph.toc=gpst2time(eph.week,toc);
+    {
+        int safeephem=strstr(rtcm->opt,"-SAFEEPHEMTIME")!=NULL;
+        if (safeephem&&rtcm->time.time==0) {
+            trace(2,"rtcm3 1046 -SAFEEPHEMTIME: rtcm->time not set; rejecting eph\n");
+            return -1;
+        }
+        if (!safeephem) {
+            if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
+            tt=timediff(gpst2time(eph.week,eph.toes),rtcm->time);
+            if      (tt<-302400.0) eph.week++;
+            else if (tt>=302400.0) eph.week--;
+        }
+        eph.toe=gpst2time(eph.week,eph.toes);
+        eph.toc=gpst2time(eph.week,toc);
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1046);
+    }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
     eph.svh=(e5b_hs<<7)+(e5b_dvs<<6)+(e1_hs<<1)+(e1_dvs<<0);
@@ -1419,13 +1489,25 @@ static int decode_type1042(rtcm_t *rtcm)
         return -1;
     }
     eph.sat=sat;
-    eph.week=adjbdtweek(week);
-    if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
-    tt=timediff(bdt2gpst(bdt2time(eph.week,eph.toes)),rtcm->time);
-    if      (tt<-302400.0) eph.week++;
-    else if (tt>=302400.0) eph.week--;
-    eph.toe=bdt2gpst(bdt2time(eph.week,eph.toes)); /* bdt -> gpst */
-    eph.toc=bdt2gpst(bdt2time(eph.week,toc));      /* bdt -> gpst */
+    {
+        int safeephem=strstr(rtcm->opt,"-SAFEEPHEMTIME")!=NULL;
+        if (safeephem&&rtcm->time.time==0) {
+            trace(2,"rtcm3 1042 -SAFEEPHEMTIME: rtcm->time not set; rejecting eph\n");
+            return -1;
+        }
+        /* BDS WN in MT1042 is 13 bits, unambiguous for ~140 years; under
+           -SAFEEPHEMTIME use it directly without rollover resolution. */
+        eph.week=safeephem?week:adjbdtweek(week);
+        if (!safeephem) {
+            if (rtcm->time.time==0) rtcm->time=utc2gpst(timeget());
+            tt=timediff(bdt2gpst(bdt2time(eph.week,eph.toes)),rtcm->time);
+            if      (tt<-302400.0) eph.week++;
+            else if (tt>=302400.0) eph.week--;
+        }
+        eph.toe=bdt2gpst(bdt2time(eph.week,eph.toes)); /* bdt -> gpst */
+        eph.toc=bdt2gpst(bdt2time(eph.week,toc));      /* bdt -> gpst */
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1042);
+    }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
     if (!strstr(rtcm->opt,"-EPHALL")) {

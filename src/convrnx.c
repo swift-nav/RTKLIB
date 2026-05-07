@@ -1275,7 +1275,8 @@ static int convrnx_s(int sess, int format, rnxopt_t *opt, const char *file,
         for (i=0;i<MAXEXFILE;i++) free(epath[i]);
         return 0;
     }
-    if (format==STRFMT_RTCM2||format==STRFMT_RTCM3||format==STRFMT_RT17) {
+    if (format==STRFMT_RTCM2||format==STRFMT_RTCM3||format==STRFMT_RT17||
+        strstr(opt->rcvopt,"-SAFEEPHEMTIME")) {
         str->time=opt->trtcm;
     }
     else if (opt->ts.time) {

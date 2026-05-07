@@ -666,7 +666,8 @@ static void decode_gpsnav_common_dep1(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U1(_pBuff + 182);
   _pEph->iodc = U2(_pBuff + 183);
 
-  _pEph->week = adjgpsweek(uWeekE);
+  /* SBP carries a full 16-bit GPS week; trust it directly. */
+  _pEph->week = uWeekE;
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
 }
@@ -711,7 +712,8 @@ static void decode_gpsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U1(_pBuff + 138);
   _pEph->iodc = U2(_pBuff + 139);
 
-  _pEph->week = adjgpsweek(uWeekE);
+  /* SBP carries a full 16-bit GPS week; trust it directly. */
+  _pEph->week = uWeekE;
   _pEph->code = 2; /* SBP payload does not have the "code on L2" flag */
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
@@ -757,8 +759,11 @@ static void decode_bdsnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U1(_pBuff + 146);
   _pEph->iodc = U2(_pBuff + 147);
 
-  _pEph->week = adjgpsweek(uWeekE) - BDS_WEEK_TO_GPS_WEEK;
-  _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
+  /* SBP carries full GPS week numbers for BDS messages. Internal rtklib
+     BDS convention: eph.week is BDS-relative; eph.toe/eph.toc are GPST
+     gtime_t derived from BDT (week, tow) -- matches rtcm3.c MT 1042. */
+  _pEph->week = uWeekE - BDS_WEEK_TO_GPS_WEEK;
+  _pEph->toe = bdt2gpst(bdt2time(_pEph->week, _pEph->toes));
   _pEph->toc = gpst2time(uWeekC, dToc);
 }
 
@@ -802,7 +807,8 @@ static void decode_galnav_common(uint8_t *_pBuff, eph_t *_pEph) {
   _pEph->iode = U2(_pBuff + 150);
   _pEph->iodc = U2(_pBuff + 152);
 
-  _pEph->week = adjgpsweek(uWeekE);
+  /* SBP carries a full 16-bit GPS week; trust it directly. */
+  _pEph->week = uWeekE;
   _pEph->toe = gpst2time(_pEph->week, _pEph->toes);
   _pEph->toc = gpst2time(uWeekC, dToc);
 }
@@ -835,10 +841,11 @@ static int decode_gpsnav_dep_e(raw_t *raw) {
 
   decode_gpsnav_common_dep1(puiTmp, &eph);
 
-  if (0 == timediff(raw->time, time0)) {
-    eph.ttr = timeget();
-  } else {
+  if (strstr(raw->opt, "-SAFEEPHEMTIME") ||
+      timediff(raw->time, time0) != 0) {
     eph.ttr = raw->time;
+  } else {
+    eph.ttr = timeget();
   }
 
   if (!strstr(raw->opt, "EPHALL")) {
@@ -897,10 +904,11 @@ static int decode_gpsnav_dep_f(raw_t *raw) {
 
   decode_gpsnav_common_dep1(puiTmp - 2, &eph);
 
-  if (0 == timediff(raw->time, time0)) {
-    eph.ttr = timeget();
-  } else {
+  if (strstr(raw->opt, "-SAFEEPHEMTIME") ||
+      timediff(raw->time, time0) != 0) {
     eph.ttr = raw->time;
+  } else {
+    eph.ttr = timeget();
   }
 
   if (!strstr(raw->opt, "EPHALL")) {
@@ -952,10 +960,11 @@ static int decode_gpsnav(raw_t *raw) {
 
   decode_gpsnav_common(puiTmp - 2, &eph);
 
-  if (0 == timediff(raw->time, time0)) {
-    eph.ttr = timeget();
-  } else {
+  if (strstr(raw->opt, "-SAFEEPHEMTIME") ||
+      timediff(raw->time, time0) != 0) {
     eph.ttr = raw->time;
+  } else {
+    eph.ttr = timeget();
   }
 
   if (!strstr(raw->opt, "EPHALL")) {
@@ -1015,10 +1024,11 @@ static int decode_qzssnav(raw_t *raw) {
 
   decode_gpsnav_common(puiTmp - 2, &eph);
 
-  if (0 == timediff(raw->time, time0)) {
-    eph.ttr = timeget();
-  } else {
+  if (strstr(raw->opt, "-SAFEEPHEMTIME") ||
+      timediff(raw->time, time0) != 0) {
     eph.ttr = raw->time;
+  } else {
+    eph.ttr = timeget();
   }
 
   if (!strstr(raw->opt, "EPHALL")) {

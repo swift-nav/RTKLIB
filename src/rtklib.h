@@ -1382,6 +1382,7 @@ EXPORT double  utc2gmst (gtime_t t, double ut1_utc);
 EXPORT int read_leaps(const char *file);
 
 EXPORT int adjgpsweek(int week);
+EXPORT int adjgpsweek_ref(int week, gtime_t ref);
 EXPORT uint32_t tickget(void);
 EXPORT void sleepms(int ms);
 
