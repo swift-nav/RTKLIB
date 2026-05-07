@@ -195,6 +195,19 @@ static int adjbdtweek(int week)
     if (w<1) w=1; /* use 2006/1/1 if time is earlier than 2006/1/1 */
     return week+(w-week+4095)/8192*8192;
 }
+/* Trace a SAFEEPHEMTIME warning if the decoded TOE is too far from the
+   current rtcm reference time. No-op when safemode is off. */
+static void trace_safeephem_stale(int safeephem, gtime_t toe, gtime_t time,
+                                  int prn, int msg_id)
+{
+    double tt;
+    if (!safeephem) return;
+    tt=timediff(toe,time);
+    if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
+        trace(2,"rtcm3 %d -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
+              msg_id,prn,-tt/86400.0);
+    }
+}
 /* adjust daily rollover of GLONASS time -------------------------------------*/
 static void adjday_glot(rtcm_t *rtcm, double tod)
 {
@@ -818,13 +831,7 @@ static int decode_type1019(rtcm_t *rtcm)
         }
         eph.toe=gpst2time(eph.week,eph.toes);
         eph.toc=gpst2time(eph.week,toc);
-        if (safeephem) {
-            tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
-                trace(2,"rtcm3 1019 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
-                      prn,-tt/86400.0);
-            }
-        }
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1019);
     }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
@@ -1151,13 +1158,7 @@ static int decode_type1041(rtcm_t *rtcm)
         }
         eph.toe=gpst2time(eph.week,eph.toes);
         eph.toc=gpst2time(eph.week,toc);
-        if (safeephem) {
-            tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
-                trace(2,"rtcm3 1041 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
-                      prn,-tt/86400.0);
-            }
-        }
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1041);
     }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
@@ -1240,13 +1241,7 @@ static int decode_type1044(rtcm_t *rtcm)
         }
         eph.toe=gpst2time(eph.week,eph.toes);
         eph.toc=gpst2time(eph.week,toc);
-        if (safeephem) {
-            tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
-                trace(2,"rtcm3 1044 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
-                      prn,-tt/86400.0);
-            }
-        }
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1044);
     }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
@@ -1334,13 +1329,7 @@ static int decode_type1045(rtcm_t *rtcm)
         }
         eph.toe=gpst2time(eph.week,eph.toes);
         eph.toc=gpst2time(eph.week,toc);
-        if (safeephem) {
-            tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
-                trace(2,"rtcm3 1045 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
-                      prn,-tt/86400.0);
-            }
-        }
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1045);
     }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
@@ -1431,13 +1420,7 @@ static int decode_type1046(rtcm_t *rtcm)
         }
         eph.toe=gpst2time(eph.week,eph.toes);
         eph.toc=gpst2time(eph.week,toc);
-        if (safeephem) {
-            tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
-                trace(2,"rtcm3 1046 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
-                      prn,-tt/86400.0);
-            }
-        }
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1046);
     }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
@@ -1523,13 +1506,7 @@ static int decode_type1042(rtcm_t *rtcm)
         }
         eph.toe=bdt2gpst(bdt2time(eph.week,eph.toes)); /* bdt -> gpst */
         eph.toc=bdt2gpst(bdt2time(eph.week,toc));      /* bdt -> gpst */
-        if (safeephem) {
-            tt=timediff(eph.toe,rtcm->time);
-            if (fabs(tt)>SAFEEPHEM_STALE_THRESHOLD_S) {
-                trace(2,"rtcm3 1042 -SAFEEPHEMTIME: stale eph prn=%d age=%.1f days\n",
-                      prn,-tt/86400.0);
-            }
-        }
+        trace_safeephem_stale(safeephem,eph.toe,rtcm->time,prn,1042);
     }
     eph.ttr=rtcm->time;
     eph.A=sqrtA*sqrtA;
