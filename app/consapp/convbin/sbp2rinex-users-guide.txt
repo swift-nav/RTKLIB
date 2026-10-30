@@ -25,9 +25,7 @@ Usage:
 
   sbp2rinex [option ...] file
 
-Options [default value]
-
- Options [default]:
+Options [default]:
 
      file         receiver log file
      -ts y/m/d h:m:s  start time [all]
@@ -58,6 +56,7 @@ Options [default value]
      -oi          include iono correction in rinex nav header [off]
      -ot          include time correction in rinex nav header [off]
      -ol          include leap seconds in rinex nav header [off]
+     -os          include standardized signal strength (1-9) in rinex obs [off]
      -halfc       half-cycle ambiguity correction [off]
      -mask   [sig[,...]] signal mask(s) (sig={G|R|E|J|S|C|I}L{1C|1P|1W|...})
      -nomask [sig[,...]] signal no mask (same as above)
@@ -73,6 +72,9 @@ Options [default value]
      -l lfile     output RINEX LNAV file
      -s sfile     output SBAS message file
      -trace level output trace level [off]
+     -safeephemtime  refuse to use wall clock and refuse to increment
+                     ephemeris week numbers when decoding ephemerides;
+                     requires -tr; affects RTCM3 and SBP eph decoders
 
  If not any output file is specified, default output files <file>.obs,
  <file>.nav, <file>.gnav, <file>.hnav, <file>.qnav, <file>.lnav and
