@@ -984,20 +984,19 @@ void __fastcall TPlot::SaveSnrMp(AnsiString file)
     FILE *fp;
     AnsiString ObsTypeText=ObsType2->Text;
     gtime_t time;
-    double tow;
+	double tow;
     char sat[32],mp[32],tstr[64],*code=ObsTypeText.c_str()+1;
     const char *tlabel;
-    int i,j,k,week;
-    
+	int i,j,k,week, slip, half_cycle;
     trace(3,"SaveSnrMp: file=%s\n",file.c_str());
     
     if (!(fp=fopen(file.c_str(),"w"))) return;
     
-    tlabel=TimeLabel<=1?"TIME (GPST)":(TimeLabel<=2?"TIME (UTC)":"TIME (JST)");
+	tlabel=TimeLabel<=1?"Week, ToW, ":(TimeLabel<=2?"TIME (UTC)":"TIME (JST)");
     
     sprintf(mp,"%s MP(m)",ObsTypeText.c_str());
-    fprintf(fp,"%% %-*s %6s %8s %8s %9s %10s\n",TimeLabel==0?13:19,tlabel,"SAT",
-            "AZ(deg)","EL(deg)","SNR(dBHz)",mp);
+	fprintf(fp,"%-*s, %6s, %8s, %8s, %9s, %10s, %8s, %8s\n",TimeLabel==0?13:19,tlabel,"SAT",
+			"AZ(deg)","EL(deg)","SNR(dBHz)",mp,"LLI","HC_flag");
     
     for (i=0;i<MAXSAT;i++) {
         if (SatMask[i]||!SatSel[i]) continue;
@@ -1007,15 +1006,15 @@ void __fastcall TPlot::SaveSnrMp(AnsiString file)
             if (Obs.data[j].sat!=i+1) continue;
             
             for (k=0;k<NFREQ+NEXOBS;k++) {
-                if (strstr(code2obs(Obs.data[j].code[k]),code)) break;
+                if (strchr(code2obs(Obs.data[j].code[k]),code[0])) break;
             }
-            if (k>=NFREQ+NEXOBS) continue;
+			if (k>=NFREQ+NEXOBS) continue;
             
             time=Obs.data[j].time;
             
             if (TimeLabel==0) {
                 tow=time2gpst(time,&week);
-                sprintf(tstr,"%4d %9.1f ",week,tow);
+				sprintf(tstr,"%4d, %9.1f ",week,tow);
             }
             else if (TimeLabel==1) {
                 time2str(time,tstr,1);
@@ -1024,13 +1023,15 @@ void __fastcall TPlot::SaveSnrMp(AnsiString file)
                 time2str(gpst2utc(time),tstr,1);
             }
             else {
-                time2str(timeadd(gpst2utc(time),9*3600.0),tstr,1);
-            }
-            fprintf(fp,"%s %6s %8.1f %8.1f %9.2f %10.4f\n",tstr,sat,Az[j]*R2D,
-                    El[j]*R2D,Obs.data[j].SNR[k]*SNR_UNIT,!Mp[k]?0.0:Mp[k][j]);
-        }
-    }
-    fclose(fp);
+				time2str(timeadd(gpst2utc(time),9*3600.0),tstr,1);
+			}
+			 slip=(Obs.data[j].LLI[0]&3);
+			 half_cycle = (Obs.data[j].LLI[1]&3);
+			fprintf(fp,"%s, %6s, %8.1f, %8.1f, %9.2f, %10.4f, %d, %d\n",tstr,sat,Az[j]*R2D,
+					El[j]*R2D,Obs.data[j].SNR[k]*SNR_UNIT,!Mp[k]?0.0:Mp[k][j], slip, half_cycle);
+		}
+	}
+	fclose(fp);
 }
 // save elev mask --------------------------------------------------------------
 void __fastcall TPlot::SaveElMask(AnsiString file)
