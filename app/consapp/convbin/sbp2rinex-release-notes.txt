@@ -7,6 +7,16 @@ Source Code Location:   github.com/swift-nav/RTKLIB
 ===============================================================================
 
 -------------------------------------------------------------------------------
+Release 2.7                                                          2026-10-30
+-------------------------------------------------------------------------------
+CHANGES:
+* Add -safeephemtime flag to sbp2rinex to allow processing of stale ephemerides
+* Fix decoding of logs containing both BDS B2a and BDS B3I data
+
+KNOWN ISSUES:
+none
+
+-------------------------------------------------------------------------------
 Release 2.6                                                          2025-06-19
 -------------------------------------------------------------------------------
 CHANGES:
@@ -14,11 +24,8 @@ CHANGES:
 * Fix compilation issues of rnx2rtcm, sbp2rinex
 * Fix decoding for MSM with 0 satellites, MSM1 and GAL F/NAV
 
-
 KNOWN ISSUES:
 none
-
-
 
 -------------------------------------------------------------------------------
 Release 2.3                                                          2022-03-18
@@ -68,7 +75,6 @@ CHANGES:
 
 KNOWN ISSUES:
 none
-
 
 -------------------------------------------------------------------------------
 Release 1.0  (Initial Release)                                       2017-05-12
