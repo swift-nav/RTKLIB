@@ -7,6 +7,10 @@ on:
       - 'master'
     tags:
       - 'v*'
+
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Run Checks and Build
@@ -26,10 +30,9 @@ jobs:
           apt-get update && apt-get install -y build-essential git p7zip-full
 
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          submodules: recursive
-          ssh-key: ${{ secrets.SSH_KEY }}
+          persist-credentials: false
 
       - name: Run convbin build
         working-directory: app/consapp/convbin/gcc
@@ -52,7 +55,7 @@ jobs:
         shell: bash
         run: |
           POSTFIX="";
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
             POSTFIX=".exe";
           fi
           VERSION="${GITHUB_REF##*/}"
@@ -61,11 +64,11 @@ jobs:
           STR2STR="str2str${POSTFIX}"
           cp ./app/consapp/convbin/gcc/$SBP2RINEX $SBP2RINEX
           cp ./app/consapp/str2str/gcc/$STR2STR $STR2STR
-          RELEASE_ARCHIVE="swiftnav_rtklib-${VERSION}-${{ runner.os }}.zip"
+          RELEASE_ARCHIVE="swiftnav_rtklib-${VERSION}-${RUNNER_OS}.zip"
           7z a -tzip $RELEASE_ARCHIVE $SBP2RINEX $STR2STR LICENSE.txt;
           echo $RELEASE_ARCHIVE >release-archive.filename
           echo "RELEASE_ARCHIVE=$(cat release-archive.filename)" >>$GITHUB_ENV
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ${{ runner.os }}-artifacts
           path: |
@@ -77,6 +80,8 @@ jobs:
       - build
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Store git tag and date vars.
         run: |
@@ -84,17 +89,17 @@ jobs:
           echo "DATE=${DATE}" >> $GITHUB_ENV
           echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Pull Windows Installer
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: Windows-artifacts
           path: Windows
       - name: Pull macOS Installer
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: macOS-artifacts
           path: macOS
       - name: Pull Linux Installer
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: Linux-artifacts
           path: Linux
@@ -105,7 +110,7 @@ jobs:
           echo "LINUX_ARCHIVE=$(cat Linux/release-archive.filename)" >>$GITHUB_ENV
           echo "MACOS_ARCHIVE=$(cat macOS/release-archive.filename)" >>$GITHUB_ENV
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           name: "${{ env.VERSION }}-${{ env.DATE }}"
           files: |
@@ -124,7 +129,7 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - uses: swift-nav/swift-cli-publisher@v2
+      - uses: swift-nav/swift-cli-publisher@679e6070b50adca6b41423bbfca3f1f6c6967bd6 # v2
         env:
           VERSION: "${{ env.VERSION }}"
           DL_MAC: "swiftnav_rtklib-${{ env.VERSION }}-macOS.zip"
