@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: |
           POSTFIX="";
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
+          if [[ "${RUNNER_OS}" == "Windows" ]]; then
             POSTFIX=".exe";
           fi
           VERSION="${GITHUB_REF##*/}"
