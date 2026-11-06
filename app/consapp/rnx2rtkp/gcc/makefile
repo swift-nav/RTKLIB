@@ -10,7 +10,7 @@ OPTS    = -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=5
 CC=gcc
 CFLAGS=-Wall -O2 -g -Wno-unused-but-set-variable -I$(SRC) $(OPTS) 
 #LDLIBS  = -lm -lrt
-LDLIBS  = ../../../../lib/iers/gcc/iers.a -lgfortran -lm -lrt
+LDLIBS  = ../../../../lib/iers/gcc/iers.a -lgfortran -lm
 
 #CFLAGS  = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) -DLAPACK $(OPTS)
 #LDLIBS  = -lm -lrt -llapack -lblas
