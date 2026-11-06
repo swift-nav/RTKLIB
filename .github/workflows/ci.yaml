@@ -35,6 +35,10 @@ jobs:
           persist-credentials: false
 
       - uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: ${{ matrix.toolchain.compiler }}
+          version: ${{ matrix.toolchain.version }}
 
       - name: Run convbin build
         working-directory: app/consapp/convbin/gcc
