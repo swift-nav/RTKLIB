@@ -11,6 +11,12 @@ CC=gcc
 CFLAGS=-Wall -O2 -g -Wno-unused-but-set-variable -I$(SRC) $(OPTS) 
 #LDLIBS  = -lm -lrt
 LDLIBS  = ../../../../lib/iers/gcc/iers.a -lgfortran -lm
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
 
 #CFLAGS  = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) -DLAPACK $(OPTS)
 #LDLIBS  = -lm -lrt -llapack -lblas
