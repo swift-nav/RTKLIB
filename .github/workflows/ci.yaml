@@ -19,13 +19,13 @@ jobs:
         include:
           - os: windows-latest
           - os: ubuntu-latest
-            container: ubuntu:20.04
+            container: ubuntu:22.04
           - os: macos-latest
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
       - name: Install build dependencies (Ubuntu container)
-        if: matrix.container == 'ubuntu:20.04'
+        if: matrix.container == 'ubuntu:22.04'
         run: |
           apt-get update && apt-get install -y build-essential git p7zip-full
 
@@ -35,10 +35,6 @@ jobs:
           persist-credentials: false
 
       - uses: fortran-lang/setup-fortran@v1
-        id: setup-fortran
-        with:
-          compiler: ${{ matrix.toolchain.compiler }}
-          version: ${{ matrix.toolchain.version }}
 
       - name: Run convbin build
         working-directory: app/consapp/convbin/gcc
