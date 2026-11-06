@@ -34,6 +34,8 @@ jobs:
         with:
           persist-credentials: false
 
+      - uses: fortran-lang/setup-fortran@v1
+
       - name: Run convbin build
         working-directory: app/consapp/convbin/gcc
         run: |
