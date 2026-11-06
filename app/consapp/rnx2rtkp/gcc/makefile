@@ -1,4 +1,14 @@
 # makefile for rnx2rtkp
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
+
 BINDIR  = /usr/local/bin
 SRC     = ../../../../src
 
@@ -10,7 +20,13 @@ OPTS    = -DTRACE -DENAGLO -DENAQZS -DENAGAL -DENACMP -DENAIRN -DNFREQ=5
 CC=gcc
 CFLAGS=-Wall -O2 -g -Wno-unused-but-set-variable -I$(SRC) $(OPTS) 
 #LDLIBS  = -lm -lrt
-LDLIBS  = ../../../../lib/iers/gcc/iers.a -lgfortran -lm -lrt
+LDLIBS  = ../../../../lib/iers/gcc/iers.a -lgfortran -lm
+ifeq ($(UNAME),Linux)
+LDLIBS+= -lrt
+endif
+ifeq ($(UNAME),Windows)
+LDLIBS+= -lwinmm
+endif
 
 #CFLAGS  = -Wall -O3 -ansi -pedantic -Wno-unused-but-set-variable -I$(SRC) -DLAPACK $(OPTS)
 #LDLIBS  = -lm -lrt -llapack -lblas
