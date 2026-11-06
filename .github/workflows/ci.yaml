@@ -75,7 +75,7 @@ jobs:
           cp ./app/consapp/str2str/gcc/$STR2STR $STR2STR
           cp ./app/consapp/rnx2rtkp/gcc/$RNX2RTKP $RNX2RTKP
           RELEASE_ARCHIVE="swiftnav_rtklib-${VERSION}-${RUNNER_OS}.zip"
-          7z a -tzip $RELEASE_ARCHIVE $SBP2RINEX $STR2STR LICENSE.txt;
+          7z a -tzip $RELEASE_ARCHIVE $SBP2RINEX $STR2STR $RNX2RTKP LICENSE.txt;
           echo $RELEASE_ARCHIVE >release-archive.filename
           echo "RELEASE_ARCHIVE=$(cat release-archive.filename)" >>$GITHUB_ENV
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
