@@ -1,4 +1,14 @@
 # makefile for rnx2rtkp
+ifeq ($(OS),Windows_NT)
+    UNAME := Windows
+else
+ifneq (,$(findstring WINDOWS,$(PATH)))
+    UNAME := Windows
+else
+    UNAME := $(shell uname -s)
+endif
+endif
+
 BINDIR  = /usr/local/bin
 SRC     = ../../../../src
 
