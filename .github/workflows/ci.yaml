@@ -54,6 +54,7 @@ jobs:
       - name: Run rnx2rtkp build
         working-directory: app/consapp/rnx2rtkp/gcc
         run: |
+          make -C ../../../../lib/iers/gcc/ clean iers.a
           make clean all
 
       - name: Archive ${{ runner.os }} Binaries.
