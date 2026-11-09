@@ -416,7 +416,7 @@ static void initx(rtk_t *rtk, double xi, double var, int i)
     }
 }
 /* select common satellites between rover and reference station --------------*/
-static int selsat(const obsd_t *obs, double *azel, int nu, int nr,
+extern int selsat(const obsd_t *obs, double *azel, int nu, int nr,
                   const prcopt_t *opt, int *sat, int *iu, int *ir)
 {
     int i,j,k=0;
@@ -1329,7 +1329,7 @@ static void holdamb(rtk_t *rtk, const double *xa)
 
     trace(3,"holdamb :\n");
     
-    v=mat(nb,1); H=zeros(nb,rtk->nx);
+    v=mat(nb,1); H=zeros(rtk->nx,nb);
     
     for (m=0;m<5;m++) for (f=0;f<nf;f++) {
         

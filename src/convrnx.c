@@ -787,7 +787,7 @@ static int scan_file(char **files, int nf, rnxopt_t *opt, strfile_t *str,
                 update_stas(str);
             }
             else if (type==5) { /* station info */
-                if (str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
+                if (str->format==STRFMT_RTCM3||str->format==STRFMT_SBP||str->format==STRFMT_SBPJSON) {
                   /* update station list */
                   if(str->raw.staid>=0) update_stas(str);
                 }

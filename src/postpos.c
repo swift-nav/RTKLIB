@@ -1286,3 +1286,417 @@ extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
     
     return stat;
 }
+
+#if 0
+extern double gettgd(int sat, const nav_t *nav, int type);
+#define SQR(x)      ((x)*(x))
+
+static double get_time_group_delay(const obsd_t* obs, int freq, const nav_t* nav, const prcopt_t* opt) {
+    double gamma, tgd;
+    int sat = obs->sat;
+
+    switch(satsys(sat, NULL)) {
+        case SYS_GPS:
+        case SYS_QZS:
+            tgd = gettgd(sat, nav, 0); /* TGD (m) */
+            return tgd;
+        case SYS_GLO:
+            gamma = SQR(FREQ1_GLO/FREQ2_GLO);
+            tgd = gettgd(sat,nav,0); /* -dtaun (m) */
+            return tgd/(gamma-1.0);
+        case SYS_GAL:
+            if(obs->code[freq] == CODE_L5I || obs->code[freq] == CODE_L5Q || obs->code[freq] == CODE_L5X) { // BGD_E1E5a
+                // The first TGD correction is for the (E1,E5a) combination
+                tgd = gettgd(sat, nav, 0);
+            } else { // BGD_E1E5b
+                // The clock corrections from INAV are for the (E1,E5b) combination, so
+                // use the matching group delay correction for all the other signals
+                tgd = gettgd(sat, nav, 1);
+            }
+            return tgd;
+        case SYS_CMP:
+            if(obs->code[freq] == CODE_L2I) { // TGD_B1I
+                tgd = gettgd(sat, nav, 0);
+            } else if(obs->code[freq] == CODE_L7I || obs->code[freq] == CODE_L7Q || obs->code[freq] == CODE_L7X || obs->code[freq] == CODE_L7D || obs->code[freq] == CODE_L7P || obs->code[freq] == CODE_L7Z) { // TGD_B2I/B2b
+                tgd = gettgd(sat, nav, 1);
+            } else if(obs->code[freq] == CODE_L1P) { // TGD_B1Cp
+                tgd = gettgd(sat, nav, 2);
+            } else if(obs->code[freq] == CODE_L5P) { // TGD_B2ap
+                tgd = gettgd(sat, nav, 3);
+            } else if(obs->code[freq] == CODE_L5X || obs->code[freq] == CODE_L8X || obs->code[freq] == CODE_L5D) {
+                tgd = gettgd(sat, nav, 5); // ISC_B2ad
+            } else { // TGD_B1Cp+ISC_B1Cd
+                tgd = gettgd(sat, nav, 2) + gettgd(sat, nav, 4);
+            }
+            return tgd;
+        case SYS_IRN: // L5
+            gamma = SQR(FREQ9/FREQ5);
+            tgd = gettgd(sat,nav,0); /* TGD (m) */
+            return gamma*tgd;
+    }
+
+    return 0.;
+}
+
+
+
+/*
+ * adjust_pseudoranges
+ *
+ * Given a set of rover observations and a set of base observations, compute
+ * the PRC (Pseudo Range Correction) value for each satellite and adjust each
+ * observation accordingly
+ */
+void adjust_pseudoranges(const prcopt_t* opt, obsd_t* obs, int num_obs_rover, int num_obs_base, const nav_t* nav) {
+    int i, j;
+    double *rs,*dts,*var,*azel;
+    double basepos_llh[3]; // base station position as lat/lon/alt
+    int num_obs_matching;
+    int sat[MAXSAT]; // matching satellites between base and rover
+    int iu[MAXSAT]; // indices of matching rover obs
+    int ir[MAXSAT]; // indices of matching base obs
+    int svh[MAXOBS*2]; // satellite health info
+    int num_obs_total = num_obs_rover + num_obs_base;
+    double e[3]; // LOS unit vector
+
+    trace(3, "adjust_pseudorange: time=%s n=%d\n", time_str(obs[0].time, 3), num_obs_total);
+    trace(4, "obs in=\n"); traceobs(4, obs, num_obs_total);
+
+    rs = mat(6, num_obs_total); dts = mat(2, num_obs_total); var = mat(1, num_obs_total); azel = zeros(2, num_obs_total);
+
+    // compute satellite positions/clocks at time of transmission
+    satposs(obs[0].time, obs, num_obs_total, nav, opt->sateph, rs, dts, var, svh);
+
+    // compute geometry values for all satellites visible from base station
+    ecef2pos(opt->rb, basepos_llh);
+    for(i = 0; i < num_obs_base; i++) {
+        if(geodist(rs + num_obs_rover*6 + i*6, opt->rb, e) <= 0.) {
+            continue;
+        }
+        satazel(basepos_llh, e, azel + num_obs_rover*2 + i*2);
+    }
+
+    // select common satellites between rover and base station
+    if((num_obs_matching = selsat(obs, azel, num_obs_rover, num_obs_base, opt, sat, iu, ir)) <= 0) {
+        trace(1, "no common satellites\n");
+
+        free(rs); free(dts); free(var); free(azel);
+        return;
+    }
+
+    // iterate over all rover observations
+    int idx_common = 0;
+    double geometric_range, pseudorange;
+    for(i = 0; i < num_obs_rover; i++) {
+        if(iu[idx_common] == i) { // have matching base observations
+            int idx_rover = i;
+            int idx_base = ir[idx_common];
+
+            // exclude satellite due to bad health?
+            if(satexclude(obs[idx_base].sat, var[idx_base], svh[idx_base], opt)) {
+                trace(3, "unhealthy base sat %i\n", obs[idx_base].sat);
+                continue;
+            }
+            if(satexclude(obs[idx_rover].sat, var[idx_rover], svh[idx_rover], opt)) {
+                trace(3, "unhealthy rover sat %i\n", obs[idx_rover].sat);
+                continue;
+            }
+
+            // geometric range from base station to satellite (corrected for Sagnac effect)
+            geometric_range = geodist(rs + idx_base*6, opt->rb, e);
+
+            if(geometric_range <= 0.) {
+                trace(3, "invalid geometric range for base sat %i\n", obs[idx_base].sat);
+                continue;
+            }
+
+            // satellite clock bias (corrected for relativistic effect)
+            geometric_range -= CLIGHT * dts[idx_base*2];
+
+            for(j = 0; j < opt->nf; j++) {
+                if(obs[idx_rover].P[j] == 0. || obs[idx_base].P[j] == 0.) {
+                    obs[idx_rover].P[j] = 0.;
+                    continue;
+                }
+
+                pseudorange = obs[idx_base].P[j] - get_time_group_delay(obs + idx_base, j, nav, opt);
+
+                // PRC = geometric_range - pseudorange
+                obs[idx_rover].P[j] += geometric_range - pseudorange;
+            }
+
+            idx_common++;
+        } else { // no matching base observations, invalidate rover pseudorange observations
+            for(j = 0; j < opt->nf; j++) {
+                obs[i].P[j] = 0.;
+            }
+        }
+    }
+
+    trace(4, "obs out=\n"); traceobs(4, obs, num_obs_total);
+
+    free(rs); free(dts); free(var); free(azel);
+}
+
+#define SCALE_DF398 1024
+#define SCALE_DF400 16777216
+#define INVALID_DF400 0x4000
+
+void convert_pseudoranges_to_msm1(const prcopt_t* opt, const obsd_t* obs, int num_obs, uint16_t DF398[MAXSAT][NFREQ], int16_t DF400[MAXSAT][NFREQ]) {
+    double pseudorange_ms, rough_range_ms;
+    uint8_t integer_ms;
+
+    for(int i = 0; i < num_obs; i++) {
+        for(int j = 0; j < opt->nf; j++) {
+            if(obs[i].P[j] != 0.) {
+                pseudorange_ms = obs[i].P[j] * 1000. / CLIGHT;
+                rough_range_ms = rint(pseudorange_ms * (double)SCALE_DF398) / SCALE_DF398;
+
+                // DF397: number of integer milliseconds
+                integer_ms = (uint8_t)floor(rough_range_ms);
+
+                // DF398: GNSS Satellite rough ranges modulo 1 second
+                DF398[i][j] = (uint16_t)round((rough_range_ms - integer_ms) * SCALE_DF398);
+
+                // DF400: GNSS signal fine pseudoranges
+                rough_range_ms = integer_ms + (double)DF398[i][j] / SCALE_DF398;
+                DF400[i][j] = (int16_t)round((pseudorange_ms - rough_range_ms) * SCALE_DF400);
+
+                trace(2, "Convert PR %.6f to %i/%i/%i => %.6f\n", pseudorange_ms, integer_ms, DF398[i][j], DF400[i][j],
+                    (double)integer_ms + (double)DF398[i][j]/(double)SCALE_DF398 + (double)DF400[i][j]/(double)SCALE_DF400);
+            } else { // invalid pseudorange
+                DF398[i][j] = 0;
+                DF400[i][j] = INVALID_DF400;
+            }
+        }
+    }
+}
+
+
+void convert_msm1_to_pseudoranges(const prcopt_t* opt, const gtime_t* obs_time, obsd_t* obs, int num_obs, const uint16_t DF398[MAXSAT][NFREQ], const int16_t DF400[MAXSAT][NFREQ], const nav_t* nav) {
+    int i, j;
+    gtime_t tot;
+    double dt; // satellite clock bias
+    double geometric_range;
+    double pseudorange_ms, rough_range_ms;
+    uint8_t integer_ms;
+    double e[3]; // LOS unit vector
+    double rs[6]; // satellite position and velocity
+    double dts[2]; // sat clock {bias,drift} (s|s/s)
+    double var; // sat position and clock error variance (m^2)
+    int svh; // satellite health flag
+
+    trace(3, "convert_msm1_to_pseudoranges: time=%s n=%d\n", time_str(*obs_time, 3), num_obs);
+
+    for(i = 0; i < num_obs; i++) {
+        // estimate time of transmission for the observation
+        tot = timeadd(*obs_time, -0.07);
+
+        // evaluate ephemeris at time of transmission
+        if(!ephclk(tot, *obs_time, obs[i].sat, nav, &dt)) {
+            trace(3, "no broadcast clock %s sat=%i\n", time_str(tot, 3), obs[i].sat);
+            for(j = 0; j < opt->nf; j++) obs[i].P[j] = 0.;
+            continue;
+        }
+
+        // adjust time of transmission for satellite clock bias
+        tot = timeadd(tot, -dt);
+
+        // evaluate satellite position and clock at time of transmission
+        if(!satpos(tot, *obs_time, obs[i].sat, opt->sateph, nav, rs, dts, &var, &svh)) {
+            trace(3, "no ephemeris %s sat=%i\n", time_str(tot,3), obs[i].sat);
+            for(j = 0; j < opt->nf; j++) obs[i].P[j] = 0.;
+            continue;
+        }
+
+        // exclude satellite due to bad health?
+        if(satexclude(obs[i].sat, var, svh, opt)) {
+            trace(3, "unhealthy sat %i\n", obs[i].sat);
+            for(j = 0; j < opt->nf; j++) obs[i].P[j] = 0.;
+            continue;
+        }
+
+        // geometric range from base station to satellite (corrected for Sagnac effect)
+        geometric_range = geodist(rs, opt->rb, e);
+
+        if(geometric_range <= 0.) {
+            trace(3, "invalid geometric range for sat %i\n", obs[i].sat);
+            for(j = 0; j < opt->nf; j++) obs[i].P[j] = 0.;
+            continue;
+        }
+
+        // satellite clock bias (corrected for relativistic effect)
+        geometric_range -= CLIGHT * dts[0];
+
+        for(j = 0; j < opt->nf; j++) {
+            if(DF400[i][j] == INVALID_DF400) {
+                obs[i].P[j] = 0.;
+                continue;
+            }
+
+            // convert estimated pseudorange to milliseconds
+            pseudorange_ms = geometric_range * 1000. / CLIGHT;
+
+            // remove the rough pseudorange and the fine pseudorange from the estimated pseudorange
+            rough_range_ms = rint(pseudorange_ms * (double)SCALE_DF398) / SCALE_DF398;
+
+            // estimate number of whole milliseconds
+            integer_ms = (uint8_t)floor(rough_range_ms);
+
+            // add rough pseudorange and fine pseudorange to estimated whole milliseconds
+            pseudorange_ms = (double)integer_ms + (double)DF398[i][j]/(double)SCALE_DF398 + (double)DF400[i][j]/(double)SCALE_DF400;
+
+            trace(2, "Reconstructed PR %i/%i/%i => PR %.6f\n", integer_ms, DF398[i][j], DF400[i][j], pseudorange_ms);
+
+            // convert to metres
+            obs[i].P[j] = pseudorange_ms / 1000. * CLIGHT;
+        }
+    }
+}
+
+
+// convert MSM5 corrections to DGNSS, then apply these DGNSS corrections
+// to rover observations
+int apply_dgnss_corrections(const prcopt_t* opt, obsd_t* obs, int num_obs_total, const nav_t* nav) {
+    int num_obs_rover, num_obs_base;
+#if 0
+    uint16_t DF398[MAXSAT][NFREQ];
+    int16_t DF400[MAXSAT][NFREQ];
+#endif
+
+    // count rover and base station observations
+    for(num_obs_rover = 0; num_obs_rover < num_obs_total && obs[num_obs_rover].rcv==1; num_obs_rover++);
+    for(num_obs_base = 0; num_obs_rover+num_obs_base < num_obs_total && obs[num_obs_rover+num_obs_base].rcv==2; num_obs_base++);
+
+    if(num_obs_base == 0 || timediff(obs[0].time, obs[num_obs_rover].time) != 0.) {
+        trace(1, "No base observations at t=%s\n", time_str(obs[0].time, 3));
+        return num_obs_rover;
+    }
+
+#if 0
+    convert_pseudoranges_to_msm1(opt, obs + num_obs_rover, num_obs_base, DF398, DF400);
+
+    // zero base pseudoranges
+    for(int i = 0; i < num_obs_base; i++) {
+        for(int j = 0; j < opt->nf; j++) {
+            obs[i + num_obs_rover].P[j] = 0.;
+        }
+    }
+
+    convert_msm1_to_pseudoranges(opt, &obs[num_obs_rover].time, obs + num_obs_rover, num_obs_base, DF398, DF400, &navs);
+#endif
+
+    adjust_pseudoranges(opt, obs, num_obs_rover, num_obs_base, &navs);
+
+    return num_obs_rover;
+}
+
+int execses2(gtime_t ts, gtime_t te, double ti, const prcopt_t *popt,
+                   const solopt_t *sopt, const filopt_t *fopt, int flag,
+                   char **infile, const int *index, int n, char *outfile)
+{
+    FILE *fp;
+    prcopt_t popt_=*popt;
+    char tracefile[1024];
+    obsd_t obs[MAXOBS*2]; /* for rover and base */
+    int i,j,nobs;
+
+    rnxopt_t opt={{0}};
+
+    opt.rnxver=304;
+    opt.obstype=OBSTYPE_PR|OBSTYPE_CP|OBSTYPE_DOP|OBSTYPE_SNR;
+    opt.navsys=SYS_GPS|SYS_GAL|SYS_QZS|SYS_CMP;
+
+    for (i=0;i<6;i++) for (j=0;j<64;j++) opt.mask[i][j] = '1';
+
+    opt.freqtype|=FREQTYPE_L1 | FREQTYPE_L3;
+
+    // GPS
+    opt.nobs[0] = 8;
+    strcpy(opt.tobs[0][0], "C1C");
+    strcpy(opt.tobs[0][1], "L1C");
+    strcpy(opt.tobs[0][2], "D1C");
+    strcpy(opt.tobs[0][3], "S1C");
+    strcpy(opt.tobs[0][4], "C5Q");
+    strcpy(opt.tobs[0][5], "L5Q");
+    strcpy(opt.tobs[0][6], "D5Q");
+    strcpy(opt.tobs[0][7], "S5Q");
+    // GAL
+    opt.nobs[2] = 8;
+    strcpy(opt.tobs[2][0], "C1C");
+    strcpy(opt.tobs[2][1], "L1C");
+    strcpy(opt.tobs[2][2], "D1C");
+    strcpy(opt.tobs[2][3], "S1C");
+    strcpy(opt.tobs[2][4], "C5X");
+    strcpy(opt.tobs[2][5], "L5X");
+    strcpy(opt.tobs[2][6], "D5X");
+    strcpy(opt.tobs[2][7], "S5X");
+    // QZSS
+    opt.nobs[3] = 8;
+    strcpy(opt.tobs[3][0], "C1C");
+    strcpy(opt.tobs[3][1], "L1C");
+    strcpy(opt.tobs[3][2], "D1C");
+    strcpy(opt.tobs[3][3], "S1C");
+    strcpy(opt.tobs[3][4], "C5Q");
+    strcpy(opt.tobs[3][5], "L5Q");
+    strcpy(opt.tobs[3][6], "D5Q");
+    strcpy(opt.tobs[3][7], "S5Q");
+    // BDS
+    opt.nobs[5] = 8;
+    strcpy(opt.tobs[5][0], "C2I");
+    strcpy(opt.tobs[5][1], "L2I");
+    strcpy(opt.tobs[5][2], "D2I");
+    strcpy(opt.tobs[5][3], "S2I");
+    strcpy(opt.tobs[5][4], "C5P");
+    strcpy(opt.tobs[5][5], "L5P");
+    strcpy(opt.tobs[5][6], "D5P");
+    strcpy(opt.tobs[5][7], "S5P");
+
+    trace(3, "execses : n=%d outfile=%s\n", n, outfile);
+
+    /* open debug trace */
+    if(flag && sopt->trace > 0) {
+        if (*outfile) {
+            strcpy(tracefile, outfile);
+            strcat(tracefile, ".trace");
+        }
+        else {
+            strcpy(tracefile, fopt->trace);
+        }
+        traceclose();
+        traceopen(tracefile);
+        tracelevel(sopt->trace);
+    }
+    /* read obs and nav data */
+    if(!readobsnav(ts, te, ti, infile, index, n, &popt_, &obss, &navs, stas)) return 0;
+
+    /* read antenna position from rinex header */
+    if(!antpos(&popt_, 2, &obss, &navs, stas, fopt->stapos)) {
+        freeobsnav(&obss,&navs);
+        return 0;
+    }
+
+    // disable usage of iono/tropo modelling
+    popt_.mode = PMODE_SINGLE;
+
+    if ((fp=fopen("dgnss.obs", "w"))) {
+        outrnxobsh(fp, &opt, NULL);
+
+        while((nobs=inputobs(obs, 666, &popt_)) >= 0) {
+            nobs = apply_dgnss_corrections(&popt_, obs, nobs, &navs);
+
+            // write out adjusted pseudoranegs
+            outrnxobsb(fp, &opt, obs, nobs, 0, 0.0);
+
+            // TODO: also write using libsbp?
+        }
+        fclose(fp);
+
+    }
+
+    /* free obs and nav data */
+    freeobsnav(&obss, &navs);
+
+    return aborts? 1: 0;
+}
+#endif
