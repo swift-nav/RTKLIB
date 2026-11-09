@@ -55,7 +55,7 @@ static double varerr(const prcopt_t *opt, double el, int sys)
     return SQR(fact)*varr;
 }
 /* get group delay parameter (m) ---------------------------------------------*/
-double gettgd(int sat, const nav_t *nav, int type)
+static double gettgd(int sat, const nav_t *nav, int type)
 {
     int i,sys=satsys(sat,NULL);
     
@@ -432,7 +432,7 @@ static int estpos(const obsd_t *obs, int n, const double *rs, const double *dts,
     free(v); free(H); free(var);
     return 0;
 }
-/* RAIM FDE (failure detection and exclusion) -------------------------------*/
+/* RAIM FDE (failure detection and exclution) -------------------------------*/
 static int raim_fde(const obsd_t *obs, int n, const double *rs,
                     const double *dts, const double *vare, const int *svh,
                     const nav_t *nav, const prcopt_t *opt, sol_t *sol,
@@ -630,7 +630,7 @@ extern int pntpos(const obsd_t *obs, int n, const nav_t *nav,
         opt_.ionoopt=IONOOPT_BRDC;
         opt_.tropopt=TROPOPT_SAAS;
     }
-    /* satellite positions, velocities and clocks */
+    /* satellite positons, velocities and clocks */
     satposs(sol->time,obs,n,nav,opt_.sateph,rs,dts,var,svh);
     
     /* estimate receiver position with pseudorange */
