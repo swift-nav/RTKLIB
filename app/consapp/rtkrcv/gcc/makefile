@@ -1,5 +1,4 @@
-# makefile for rtkrcv-swiftnav
-
+# makefile for rtkrcv
 ifeq ($(OS),Windows_NT)
     UNAME := Windows
 else
@@ -17,6 +16,9 @@ CTARGET= -DENAGLO -DENAQZS -DENACMP -DENAGAL -DENAIRN -DNFREQ=5 -DSVR_REUSEADDR
 #CTARGET= -DENAGLO -DENAQZS -DENACMP -DENAGAL -DENAIRN -DNFREQ=3 -DIERS_MODEL -DSVR_REUSEADDR
 
 CFLAGS = -Wall -O3 -ansi -std=c99 -pedantic -Wno-unused-but-set-variable -I$(SRC) -I.. -DTRACE $(CTARGET) -g
+ifeq ($(UNAME),Windows)
+CFLAGS += -DWIN32
+endif
 LDLIBS  = -lm -lpthread
 ifeq ($(UNAME),Linux)
 LDLIBS+= -lrt
