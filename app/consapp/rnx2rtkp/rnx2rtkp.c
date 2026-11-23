@@ -19,12 +19,15 @@
 *-----------------------------------------------------------------------------*/
 #include <stdarg.h>
 #include "rtklib.h"
+#include "rtklib_swift.h"
 
 #define PROGNAME    "rnx2rtkp"          /* program name */
 #define MAXFILE     16                  /* max number of input files */
 
 /* help text -----------------------------------------------------------------*/
 static const char *help[]={
+"",
+" " PROGNAME " " VER_RTKLIB PATCH_LEVEL "+" SWIFT_VER_RTKLIB,
 "",
 " usage: rnx2rtkp [option]... file file [...]",
 "",

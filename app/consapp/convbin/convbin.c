@@ -557,7 +557,7 @@ int main(int argc, char **argv)
     int format,trace=0,stat,safeephemtime=0,has_tr=0;
     char *ifile="",*ofile[NOUTFILE]={0},*dir="";
 
-    sprintf(opt.prog,"%s %s (RTKLIB %s%s)",PRGNAME,SWIFT_VER_RTKLIB,VER_RTKLIB,PATCH_LEVEL);
+    sprintf(opt.prog,"%s %s%s+%s",PRGNAME,VER_RTKLIB,PATCH_LEVEL,SWIFT_VER_RTKLIB);
 
     /* parse command line options */
     format=cmdopts(argc,argv,&opt,&ifile,ofile,&dir,&trace,&safeephemtime,
