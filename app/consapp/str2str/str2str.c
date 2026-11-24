@@ -32,6 +32,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include "rtklib.h"
+#include "rtklib_swift.h"
 
 #ifndef SIGHUP
 #define SIGHUP 1
@@ -50,6 +51,8 @@ static volatile int intrflg = 0; /* interrupt flag */
 
 /* help text -----------------------------------------------------------------*/
 static const char *help[] = {
+    "",
+    " " PRGNAME " " VER_RTKLIB PATCH_LEVEL "+" SWIFT_VER_RTKLIB,
     "",
     " usage: str2str [-in stream] [-out stream [-out stream...]] [options]",
     "",
